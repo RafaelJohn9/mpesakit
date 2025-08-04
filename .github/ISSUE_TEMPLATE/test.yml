@@ -1,0 +1,65 @@
+# Report issues related to testing or quality assurance.
+name: 🧪 Testing & QA
+description: Report issues related to testing or quality assurance
+labels:
+  - testing
+  - QA
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧪 Testing & QA
+
+        Please use this template to report issues related to testing or quality.
+
+  - type: dropdown
+    id: subcategory
+    attributes:
+      label: Subcategory
+      description: Select the most relevant subcategory for your issue. If none apply, select "_No Response_".
+      options:
+        - unit-test-failure - Unit test consistently fails
+        - test-coverage - Request to add or improve tests
+        - flaky-test - Test fails randomly
+        - test-env-setup - Test environment config problem
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe the issue in detail. If not applicable, write "_No Response_".
+      placeholder: Describe the problem, steps to reproduce, and any relevant logs or screenshots or type "_No Response_" if not applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps to reproduce the issue.
+      placeholder: |
+        1. Go to ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any other context, logs, or screenshots?
+    validations:
+      required: false

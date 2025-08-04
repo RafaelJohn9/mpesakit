@@ -1,0 +1,49 @@
+# Report issues or suggestions related to community, collaboration, or project governance.
+name: "💬 Community & Collaboration"
+description: Report issues or suggestions related to community, collaboration, or project governance.
+labels:
+  - community
+  - collaboration
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 💬 Community & Collaboration
+
+        Thank you for helping us improve our community and collaboration!
+
+        Please select the most relevant subcategory and provide details below.
+
+  - type: dropdown
+    id: subcategory
+    attributes:
+      label: Subcategory
+      description: Select the subcategory that best fits your issue or suggestion. If none apply, select "_No Response_".
+      options:
+        - first-timers-only (Mentored, beginner-friendly)
+        - contribution-guide (Missing or unclear steps)
+        - labeling-feedback (Labels, issue templates, etc.)
+        - moderation-issue (Toxic comment, off-topic, spam)
+        - project-governance (Suggesting changes to rules or roadmap)
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe your issue or suggestion in detail. If not applicable, write "_No Response_".
+      placeholder: Tell us what happened or what could be improved or type "_No Response_" if not applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestions
+    attributes:
+      label: Suggestions (optional)
+      description: If you have any suggestions for improvement, please share them here.
+      placeholder: Your ideas for making things better.
+    validations:
+      required: false

@@ -1,0 +1,77 @@
+# Bug Report Template
+name: 🐛 Bug Report
+description: Report unexpected behavior, failures, or issues in the project.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: dropdown
+    id: bug-category
+    attributes:
+      label: Bug Category
+      description: Please select the most appropriate category for this bug. If none apply, select "_No Response_"
+      options:
+        - Functional Issue (feature not working as intended)
+        - Performance Issue (slow, unresponsive, resource usage)
+        - Compatibility Issue (platform, OS, browser, device)
+        - Security Issue (vulnerability, data leak, auth problem)
+        - Build/Deployment Issue (installation, CI/CD, packaging)
+        - Regression (previously working, now broken)
+        - Other validations
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? If not applicable, write "_No Response_".
+      placeholder: Describe what actually happened or type "_No Response_" if not applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen? If not applicable, write "_No Response_".
+      placeholder: Describe what you expected to see or type "_No Response_" if not applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps to reproduce the behavior. If not applicable, write "_No Response_".
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+        Or type "_No Response_" if this does not apply.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide details about your environment.
+      placeholder: |
+        - OS: [e.g. Windows, macOS, Linux]
+        - Browser [if applicable]: [e.g. Chrome, Safari]
+        - Version: [e.g. 22]
+        - Device: [e.g. Desktop, Mobile]
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or logs about the problem here.
+      placeholder: Attach logs, screenshots, or relevant files.
+    validations:
+      required: false

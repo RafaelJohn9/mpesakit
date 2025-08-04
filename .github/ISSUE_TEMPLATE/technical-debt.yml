@@ -1,0 +1,64 @@
+# Technical Debt Issue Template
+name: "🛠️ Technical Debt"
+description: "Report technical debt that needs to be addressed in the codebase."
+labels:
+  - technical-debt
+  - enhancement
+  - code-quality
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🛠️ Technical Debt
+        Please use this template to report technical debt that needs to be addressed in the codebase.
+
+  - type: dropdown
+    id: subcategory
+    attributes:
+      label: Subcategory
+      description: Select the subcategory that best describes the technical debt issue. If none apply, select "_No Response_".
+    options:
+      - Code Structure
+      - Performance
+      - Testing
+      - Documentation
+      - Other
+      - _No Response_
+    validations:
+      required: true
+      
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe the technical debt issue in detail. If not applicable, write "_No Response_".
+      placeholder: "Describe the technical debt issue, its impact, and any relevant context, or type '_No Response_' if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Please describe the impact of the technical debt issue. If not applicable, write "_No Response_".
+      placeholder: "Describe the impact of the technical debt issue, including any potential risks or consequences, or type '_No Response_' if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: Please describe the proposed solution for the technical debt issue.".
+      placeholder: "Describe the proposed solution for the technical debt issue"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_comments
+    attributes:
+      label: Additional Comments
+      description: Please provide any additional comments or context related to the technical debt issue.
+      placeholder: "Provide any additional comments or context related to the technical debt issue."
+    validations:
+      required: false

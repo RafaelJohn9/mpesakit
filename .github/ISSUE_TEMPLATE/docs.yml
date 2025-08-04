@@ -1,0 +1,50 @@
+# Report issues or suggest improvements related to documentation, guides, or help content.
+name: 📄 Documentation
+description: Report issues or suggest improvements related to documentation, guides, or help content.
+labels:
+  - documentation
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📄 Documentation Issue
+
+        Please use this template to report problems or suggest improvements for documentation, guides, or help content.
+
+  - type: dropdown
+    id: subcategory
+    attributes:
+      label: Subcategory
+      description: Select the most relevant subcategory for your issue. If none apply, select "_No Response_".
+      options:
+        - missing-docs - Docs are completely absent
+        - outdated-docs - Needs update to match current behavior
+        - typo - Grammar, spelling, broken links
+        - new-docs-request - Suggesting a new section or tutorial
+        - readme-improvement - Better structure or examples
+        - api-docs-issue - Generated or manual API references
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe the documentation issue or suggestion in detail. If not applicable, write "_No Response_".
+      placeholder: Tell us what needs to be fixed or improved or type "_No Response_" if not applicable.
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Documentation Location (optional)
+      description: Link to the relevant file, section, or page (if applicable).
+      placeholder: e.g., /docs/getting-started.md
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context (optional)
+      description: Add any other context, screenshots, or references here.

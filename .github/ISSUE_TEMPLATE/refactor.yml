@@ -1,0 +1,66 @@
+# Refactor Issue template for GitHub
+name: "🔧 Refactor Request"
+description: "Request a code refactor for improved readability, performance, or maintainability."
+labels:
+  - refactor
+  - performance
+  - code-quality
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Refactor Request
+        Please provide a detailed description of the code you want to refactor, including any specific issues you've identified and your proposed changes.
+
+  - type: dropdown
+    id: refactor-category
+    options:
+      - Readability
+      - Performance
+      - Maintainability
+    attributes:
+      label: Refactor Category
+      description: Select the category that best describes the refactor request. If none apply, select "_No Response_".
+      options:
+        - Readability: Improve code clarity and structure
+        - Performance: Optimize for speed or resource usage
+        - Maintainability: Simplify future updates and changes
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: refactor-description
+    attributes:
+      label: Refactor Description
+      description: Please describe the code you want to refactor and why. If not applicable, write "_No Response_".
+      placeholder: "Describe the code, its current state, and the desired improvements or type '_No Response_' if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-issues
+    attributes:
+      label: Current Issues
+      description: Please describe any current issues or limitations with the code. If not applicable, write "_No Response_".
+      placeholder: "Describe the current issues or limitations with the code, or type '_No Response_' if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-changes
+    attributes:
+      label: Proposed Changes
+      description: Please describe the changes you propose to improve the code. If not applicable, write "_No Response_".
+      placeholder: "Outline the specific changes you want to make, or type '_No Response_' if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-comments
+    attributes:
+      label: Additional Comments
+      description: Please provide any additional comments or context for the refactor request. If not applicable, write "_No Response_".
+      placeholder: "Add any extra information or context that may be helpful, or type '_No Response_' if not applicable."
+    validations:
+      required: false

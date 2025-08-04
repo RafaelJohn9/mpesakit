@@ -1,0 +1,45 @@
+# Chore Issue Template
+name: "🧹 Chore"
+description: "Report a chore task that needs to be done."
+labels:
+  - chore
+  - enhancement
+  - code-quality
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧹 Chore
+        Please use this template to report a chore task that needs to be done.
+
+  - type: dropdown
+    id: chore-category
+    attributes:
+      label: Chore Category
+      description: Select the most relevant category for your chore task. If none apply, select "_No Response_".
+      options:
+        - Code Cleanup
+        - Dependency Update
+        - Documentation
+        - Other
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe the chore task in detail. If not applicable, write "_No Response_".
+      placeholder: "Describe the chore task, its impact, and any relevant context, or type '_No Response_' if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-comments
+    attributes:
+      label: Additional Comments
+      description: Please provide any additional comments or context related to the chore task.
+      placeholder: "Provide any additional comments or context related to the chore task."
+    validations:
+      required: false

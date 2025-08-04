@@ -1,0 +1,67 @@
+# Report issues that affect developers' experience
+name: "🧑‍💻 Developer Experience (DX) Feedback"
+description: Report issues that affect developers' experience
+labels:
+  - dx
+  - feedback
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧑‍💻 Developer Experience (DX) Feedback
+
+        Please use this template to report any issues that affect the experience of developers.
+
+  - type: dropdown
+    id: subcategory
+    attributes:
+      label: Subcategory
+      description: Select the area most affected. If none apply, select "_No Response_".
+      options:
+        - setup-complexity - Project is hard to set up
+        - env-vars-issue - Missing .env or unclear config
+        - onboarding-gap - New devs face barriers to contributing
+        - cli-issue - Internal tool, CLI issue
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: Please provide a clear and concise description of the problem. If not applicable, write "_No Response_".
+      placeholder: What happened? What did you expect? If not applicable, type "_No Response_".
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps to reproduce the issue (if applicable).
+      placeholder: |
+        1. Go to '...'
+        2. Run '...'
+        3. See error '...'
+    validations:
+      required: false
+
+  - type: textarea
+    id: suggestions
+    attributes:
+      label: Suggestions or Solutions
+      description: If you have ideas for how to improve the developer experience, please share them.
+      placeholder: Suggest a fix or improvement
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Please specify your OS, CLI version, or other relevant environment details.
+      placeholder: e.g., macOS 14, Node.js 20, CLI v1.2.3
+    validations:
+      required: false

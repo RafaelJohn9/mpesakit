@@ -1,0 +1,57 @@
+# Ask a question or request support (not for bugs or feature requests)
+name: "❓ Support Question"
+description: Ask a question or request support (not for bugs or feature requests)
+labels:
+  - question
+  - support
+  - help wanted
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ❓ Questions & Support
+
+        This template is for questions about usage, setup, or expected behavior. For bugs or feature requests, please use the appropriate template.
+
+  - type: dropdown
+    id: subcategory
+    attributes:
+      label: Subcategory
+      description: What type of support do you need? If none apply, select "_No Response_".
+      options:
+        - how-to: User doesn’t know how to use feature
+        - expected-behavior: Confused by what the app should do
+        - support-needed: Setup or usage help
+        - environment-help: Local dev env isn’t working
+        - deprecated-feature-confusion: Unsure why something was removed
+        - _No Response_
+      multiple: false
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: Please describe your question or the support you need in detail. If not applicable, write "_No Response_".
+      placeholder: "Describe your issue or question here...Or type _No Response_ if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-tried
+    attributes:
+      label: Steps Tried
+      description: What have you tried so far to resolve your question?
+      placeholder: "List any steps or documentation you have already checked."
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment (if applicable)
+      description: "If your question is environment-specific, please provide details (OS, version, etc.)."
+      placeholder: "e.g., Windows 11, Node.js v18, Docker 24.0"
+    validations:
+      required: false
