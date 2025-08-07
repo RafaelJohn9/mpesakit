@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import MpesaHttpClient
 from .schemas import StkPushRequest, StkPushResponse
 
@@ -15,12 +16,12 @@ class StkPush(BaseModel):
     """
 
     http_client: MpesaHttpClient
-    request: StkPushRequest
+    token_manager: TokenManager
 
     class Config:
         arbitrary_types_allowed = True
 
-    def push(self) -> StkPushResponse:
+    def push(self, request: StkPushRequest) -> StkPushResponse:
         """
         Initiates an M-Pesa STK Push transaction.
 
@@ -29,12 +30,10 @@ class StkPush(BaseModel):
         """
         url = "/mpesa/stkpush/v1/processrequest"
         headers = {
-            "Authorization": f"Bearer {self.http_client.get_token()}",
+            "Authorization": f"Bearer {self.token_manager.get_token()}",
             "Content-Type": "application/json",
         }
 
-        response_data = self.http_client.post(
-            url, json=dict(self.request), headers=headers
-        )
+        response_data = self.http_client.post(url, json=dict(request), headers=headers)
 
         return StkPushResponse(**response_data)

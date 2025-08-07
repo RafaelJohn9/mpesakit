@@ -182,17 +182,9 @@ class StkPushResponse(BaseModel):
         ...,
         description="Numeric status code indicating the status of the transaction submission. 0 means success.",
     )
-    ResultDesc: str = Field(
-        ...,
-        description="Message from the API giving the status of the request processing.",
-    )
     ResponseDescription: str = Field(
         ...,
         description="Acknowledgment message from the API about the request submission status.",
-    )
-    ResultCode: int = Field(
-        ...,
-        description="Numeric status code indicating the status of the transaction processing. 0 means success.",
     )
     CustomerMessage: str = Field(
         ...,
@@ -207,7 +199,6 @@ class StkPushResponse(BaseModel):
                 "ResponseCode": 0,
                 "ResultDesc": "The service request is processed successfully.",
                 "ResponseDescription": "The service request has been accepted successfully",
-                "ResultCode": 0,
                 "CustomerMessage": "Success. Request accepted for processing.",
             }
         }

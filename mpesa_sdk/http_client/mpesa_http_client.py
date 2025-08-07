@@ -19,20 +19,52 @@ class MpesaHttpClient:
         self, url: str, json: Dict[str, Any], headers: Dict[str, str]
     ) -> Dict[str, Any]:
         try:
-            response = requests.post(
-                f"{self.base_url}{url}", json=json, headers=headers
+            full_url = f"{self.base_url}{url}"
+            response = requests.post(full_url, json=json, headers=headers, timeout=10)
+
+            try:
+                response_data = response.json()
+            except ValueError:
+                response_data = {"errorMessage": response.text.strip() or ""}
+
+            if not response.ok:
+                error_message = response_data.get("errorMessage", "")
+                raise MpesaApiException(
+                    MpesaError(
+                        error_code=f"HTTP_{response.status_code}",
+                        error_message=error_message,
+                        status_code=response.status_code,
+                        raw_response=response_data,
+                    )
+                )
+
+            return response_data
+
+        except requests.Timeout:
+            raise MpesaApiException(
+                MpesaError(
+                    error_code="REQUEST_TIMEOUT",
+                    error_message="Request to Mpesa timed out.",
+                    status_code=None,
+                )
             )
-            response_data = response.json()
+        except requests.ConnectionError:
+            raise MpesaApiException(
+                MpesaError(
+                    error_code="CONNECTION_ERROR",
+                    error_message="Failed to connect to Mpesa API. Check network or URL.",
+                    status_code=None,
+                )
+            )
         except requests.RequestException as e:
             raise MpesaApiException(
                 MpesaError(
-                    error_message=str(e),
+                    error_code="REQUEST_FAILED",
+                    error_message=f"HTTP request failed: {str(e)}",
                     status_code=None,
                     raw_response=None,
                 )
             )
-
-        return response_data
 
     def get(
         self, url: str, params: Dict[str, Any] = None, headers: Dict[str, str] = None
