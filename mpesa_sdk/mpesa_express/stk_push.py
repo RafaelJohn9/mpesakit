@@ -1,0 +1,40 @@
+from pydantic import BaseModel
+
+from mpesa_sdk.http_client import MpesaHttpClient
+from .schemas import StkPushRequest, StkPushResponse
+
+
+class StkPush(BaseModel):
+    """
+    Represents the request payload for initiating an M-Pesa STK Push transaction.
+
+    https://developer.safaricom.co.ke/APIs/MpesaExpressQuery
+    Attributes:
+        http_client (MpesaHttpClient): The HTTP client used to make requests to the M-Pesa API.
+        request (StkPushRequest): The request data for the STK Push transaction.
+    """
+
+    http_client: MpesaHttpClient
+    request: StkPushRequest
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def push(self) -> StkPushResponse:
+        """
+        Initiates an M-Pesa STK Push transaction.
+
+        Returns:
+            StkPushResponse: The response from the M-Pesa API after initiating the STK Push.
+        """
+        url = "/mpesa/stkpush/v1/processrequest"
+        headers = {
+            "Authorization": f"Bearer {self.http_client.get_token()}",
+            "Content-Type": "application/json",
+        }
+
+        response_data = self.http_client.post(
+            url, json=dict(self.request), headers=headers
+        )
+
+        return StkPushResponse(**response_data)
