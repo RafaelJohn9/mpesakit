@@ -1,0 +1,96 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mpesa-sdk"
+dynamic = ["version"]
+description = "A Python SDK for integrating with M-Pesa APIs"
+readme = "README.md"
+license = { text = "APACHE-2.0" }
+requires-python = ">=3.10"
+authors = [
+  { name = "John Kagunda", email = "johnmkagunda@gmail.com" }
+]
+maintainers = [
+  { name = "John Kagunda", email = "johnmkagunda@gmail.com" }
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+  "Typing :: Typed"
+]
+keywords = ["mpesa", "sdk", "payment", "africa", "flask", "django", "fastapi", "rest", "api"]
+urls = { Homepage = "https://github.com/rafaeljohn9/mpesa-daraja-sdk", Repository = "https://github.com/rafaeljohn9/mpesa-daraja-sdk" }
+
+[project.optional-dependencies]
+dev = [
+  "ruff",
+  "pytest",
+  "pytest-cov",
+  "build",
+  "twine",
+  "pydantic",
+  "mypy",
+  "hatch-vcs",
+  "hatchling",
+  "hatch",
+  "requests",
+  "coverage",
+  "types-requests",
+]
+install = [
+  "pydantic",
+  "requests"
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build]
+include = [
+  "mpesa_sdk/**/*",
+  "pyproject.toml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["mpesa_sdk"]
+
+# Ruff configuration
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["D", "E", "W"]  # Enable docstring checks, pycodestyle errors, and warnings
+ignore = [
+  "D104",  # Missing docstring in public package
+  "D105",  # Missing docstring in magic method
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
+
+[tool.ruff.lint.isort]
+known-first-party = ["mpesa_sdk"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["D104", "F401"]
+
+# Testing configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v -s --cov=mpesa_sdk --cov-report=html --cov-report=term"
+
+
+[tool.mypy]
+enable_error_code = ["ignore-without-comment"]
+plugins = ["pydantic.mypy"]
