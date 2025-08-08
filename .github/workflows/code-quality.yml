@@ -26,6 +26,9 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: Create virtual environment
+        run: uv venv .venv
+
       - name: Install project & dev dependencies
         run: uv pip install -e '.[dev]'
 
@@ -45,6 +48,9 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           python-version: '3.13'
+      
+      - name: Create virtual environment
+        run: uv venv .venv
 
       - name: Install project & dev dependencies
         run: uv pip install -e '.[dev]'
@@ -62,6 +68,9 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           python-version: '3.13'
+      
+      - name: Create virtual environment
+        run: uv venv .venv
 
       - name: Install Bandit and project
         run: |
