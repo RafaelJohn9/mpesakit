@@ -6,6 +6,7 @@ from .schemas import (
     StkPushCallbackMetadata,
     StkPushCallback,
     StkPushCallbackBody,
+    StkCallback,
 )
 
 
@@ -18,4 +19,5 @@ __all__ = [
     "StkPushCallbackMetadata",
     "StkPushCallback",
     "StkPushCallbackBody",
+    "StkCallback",
 ]

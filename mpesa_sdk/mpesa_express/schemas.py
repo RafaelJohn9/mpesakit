@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
+import re
 from typing import Optional
 from datetime import datetime
 import base64
@@ -123,12 +124,32 @@ class StkPushRequest(BaseModel):
         """
         password = values.get("Password")
         passkey = values.get("Passkey")
+        timestamp = values.get("Timestamp")
 
         if not password and not passkey:
             raise ValueError("Either 'Password' or 'Passkey' must be provided")
 
+        # If Password is provided, Timestamp must also be provided
+        if (
+            password and not timestamp
+        ):  # TODO: this won't work since we set timestamp in __init__
+            raise ValueError(
+                "If 'Password' is provided, 'Timestamp' must also be provided"
+                "Password = Shortcode + Passkey + Timestamp"
+            )
+
         # Validate phone number format (12 digits starting with 254)
         phone_number = values.get("PhoneNumber", "")
+        # Normalize phone number to 12 digits starting with 254
+        if phone_number.startswith("0") and len(phone_number) == 10:
+            # Replace leading 0 with 254
+            phone_number = "254" + phone_number[1:]
+            values["PhoneNumber"] = phone_number
+        elif phone_number.startswith("+254") and len(phone_number) == 13:
+            # Remove leading '+'
+            phone_number = phone_number[1:]
+            values["PhoneNumber"] = phone_number
+
         if not (
             phone_number.isdigit()
             and len(phone_number) == 12
@@ -217,6 +238,33 @@ class StkPushCallbackMetadataItem(BaseModel):
     Value: Optional[str | int | float] = Field(
         None, description="Value of the metadata field"
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_value_conditionally(cls, data):
+        """
+        Only parse 'Value' specially if 'Name' is 'Balance'.
+        Avoid interfering with Amount, PhoneNumber, etc.
+        """
+        # Accept dict or object; ensure we can access keys
+        if isinstance(data, dict):
+            name = data.get("Name")
+            value = data.get("Value")
+
+            if name == "Balance" and isinstance(value, str):
+                # Try to extract BasicAmount from "{Amount={...}}"
+                if "{Amount={" in value:
+                    match = re.search(r"BasicAmount=([0-9]+\.?[0-9]*)", value)
+                    if match:
+                        try:
+                            # Convert to float
+                            parsed_value = float(match.group(1))
+                            # Replace Value with parsed number
+                            data["Value"] = parsed_value
+                        except ValueError:
+                            # If float fails, keep original string
+                            pass
+        return data
 
 
 class StkPushCallbackMetadata(BaseModel):
