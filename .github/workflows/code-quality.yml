@@ -43,7 +43,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install Mypy
-        run: pip install mypy types-requests types-pydantic
+        run: pip install mypy types-requests
 
       - name: Run Mypy (Type Checking)
         run: mypy mpesa_sdk
