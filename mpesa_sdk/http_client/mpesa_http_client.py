@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import requests
 
 from mpesa_sdk.errors import MpesaError, MpesaApiException
@@ -67,7 +67,10 @@ class MpesaHttpClient:
             )
 
     def get(
-        self, url: str, params: Dict[str, Any] = None, headers: Dict[str, str] = None
+        self,
+        url: str,
+        params: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         try:
             if headers is None:

@@ -38,9 +38,11 @@ class TokenManager(BaseModel):
         headers = {"Authorization": self._get_basic_auth_header()}
 
         try:
-            response = self.http_client.get(url, headers=headers)
+            response = self.http_client.get(url, headers=headers, params=params)
         except MpesaApiException as e:
-            if e.error.status_code == 400 and len(e.error.error_message) == 0:
+            if e.error.status_code == 400 and (
+                e.error.error_message is None or len(e.error.error_message) == 0
+            ):
                 raise MpesaApiException(
                     MpesaError(
                         error_code="AUTH_INVALID_CREDENTIALS",
