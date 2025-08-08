@@ -32,19 +32,19 @@ urls = { Homepage = "https://github.com/rafaeljohn9/mpesa-daraja-sdk", Repositor
 
 [project.optional-dependencies]
 dev = [
-  "ruff",
-  "pytest",
-  "pytest-cov",
+  "bandit",
   "build",
-  "twine",
-  "pydantic",
-  "mypy",
+  "coverage",
+  "hatch",
   "hatch-vcs",
   "hatchling",
-  "hatch",
+  "mypy",
+  "pydantic",
+  "pytest",
+  "pytest-cov",
   "requests",
-  "coverage",
-  "types-requests",
+  "ruff",
+  "types-requests"
 ]
 install = [
   "pydantic",
