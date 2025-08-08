@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python with uv
         uses: astral-sh/setup-uv@v3
         with:
-          version: '3.13'
+          version: '3.12'
 
       - name: Create virtual environment
         run: uv venv .venv
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Python with uv
         uses: astral-sh/setup-uv@v3
         with:
-          version: '3.13'
+          version: '3.12'
       
       - name: Create virtual environment
         run: uv venv .venv
@@ -67,7 +67,7 @@ jobs:
       - name: Set up Python with uv
         uses: astral-sh/setup-uv@v3
         with:
-          version: '3.13'
+          version: '3.12'
       
       - name: Create virtual environment
         run: uv venv .venv
