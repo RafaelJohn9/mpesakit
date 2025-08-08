@@ -33,7 +33,8 @@ class TokenManager(BaseModel):
         ):
             return self._access_token.token
 
-        url = "/oauth/v1/generate?grant_type=client_credentials"
+        url = "/oauth/v1/generate"
+        params = {"grant_type": "client_credentials"}
         headers = {"Authorization": self._get_basic_auth_header()}
 
         try:
