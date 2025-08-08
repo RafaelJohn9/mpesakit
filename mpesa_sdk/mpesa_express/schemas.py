@@ -1,14 +1,18 @@
-from pydantic import BaseModel, Field, model_validator
-import re
-from typing import Optional
-from datetime import datetime
+"""This module defines the schemas for M-Pesa STK Push requests and responses.
+
+It includes the request payload structure, response structure, and callback metadata.
+"""
+
 import base64
+from datetime import datetime
 from enum import Enum
+import re
+from pydantic import BaseModel, Field, model_validator, ConfigDict
+from typing import Optional
 
 
 class TransactionType(str, Enum):
-    """
-    Enum representing the types of M-Pesa transactions.
+    """Enum representing the types of M-Pesa transactions.
 
     CUSTOMER_PAYBILL_ONLINE: Used for PayBill transactions
     CUSTOMER_BUYGOODS_ONLINE: Used for Till Number transactions
@@ -19,8 +23,7 @@ class TransactionType(str, Enum):
 
 
 class StkPushRequest(BaseModel):
-    """
-    Represents the request payload for initiating an M-Pesa STK Push transaction.
+    """Represents the request payload for initiating an M-Pesa STK Push transaction.
 
     https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
 
@@ -80,8 +83,8 @@ class StkPushRequest(BaseModel):
         description="Passkey for the shortcode (used to generate Password if not provided).",
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "BusinessShortCode": 654321,
                 "Password": "bXlwYXNzd29yZA==",
@@ -96,8 +99,14 @@ class StkPushRequest(BaseModel):
                 "TransactionDesc": "Payment",
             }
         }
+    )
 
     def __init__(self, **data):
+        """Initialize the STK Push request.
+
+        If Password is not provided, generate it using the shortcode, passkey, and timestamp.
+        If Timestamp is not provided, generate it in the format YYYYMMDDHHmmss.
+        """
         password = data.get("Password")
         passkey = data.get("Passkey")
         shortcode = data.get("BusinessShortCode")
@@ -119,9 +128,7 @@ class StkPushRequest(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate_request(cls, values):
-        """
-        Validate the STK Push request fields.
-        """
+        """Validate the STK Push request fields."""
         password = values.get("Password")
         passkey = values.get("Passkey")
         timestamp = values.get("Timestamp")
@@ -178,10 +185,9 @@ class StkPushRequest(BaseModel):
 
 
 class StkPushResponse(BaseModel):
-    """
-    Represents the response returned after initiating an M-Pesa STK Push transaction.
+    """Represents the response returned after initiating an M-Pesa STK Push transaction.
 
-    https://developer.safaricom.co.ke/APIs/MpesaExpressQuery
+    https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
     Attributes:
         MerchantRequestID (str): Global unique identifier for the submitted payment request.
         CheckoutRequestID (str): Global unique identifier for the processed checkout transaction request.
@@ -212,8 +218,8 @@ class StkPushResponse(BaseModel):
         description="Message that can be displayed to the customer as acknowledgment of payment request submission.",
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "MerchantRequestID": "16813-1590513-1",
                 "CheckoutRequestID": "ws_CO_DMZ_123212312_2342347678234",
@@ -223,12 +229,13 @@ class StkPushResponse(BaseModel):
                 "CustomerMessage": "Success. Request accepted for processing.",
             }
         }
+    )
 
 
 class StkPushCallbackMetadataItem(BaseModel):
-    """
-    Represents an item in the CallbackMetadata array from an M-Pesa STK Push callback.
+    """Represents an item in the CallbackMetadata array from an M-Pesa STK Push callback.
 
+    https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
     Attributes:
         Name (str): The name of the metadata field (e.g., Amount, MpesaReceiptNumber)
         Value (Optional[str | int | float]): The value of the metadata field
@@ -242,8 +249,8 @@ class StkPushCallbackMetadataItem(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def parse_value_conditionally(cls, data):
-        """
-        Only parse 'Value' specially if 'Name' is 'Balance'.
+        """Only parse 'Value' specially if 'Name' is 'Balance'.
+
         Avoid interfering with Amount, PhoneNumber, etc.
         """
         # Accept dict or object; ensure we can access keys
@@ -268,9 +275,9 @@ class StkPushCallbackMetadataItem(BaseModel):
 
 
 class StkPushCallbackMetadata(BaseModel):
-    """
-    Represents the metadata returned in a successful STK Push transaction callback.
+    """Represents the metadata returned in a successful STK Push transaction callback.
 
+    https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
     Attributes:
         Item (list[StkPushCallbackMetadataItem]): List of metadata items with transaction details
     """
@@ -281,8 +288,7 @@ class StkPushCallbackMetadata(BaseModel):
 
 
 class StkCallback(BaseModel):
-    """
-    Represents the STK Push callback data contained in the stkCallback field.
+    """Represents the STK Push callback data contained in the stkCallback field.
 
     Attributes:
         MerchantRequestID (str): Global unique identifier for the payment request
@@ -313,8 +319,7 @@ class StkCallback(BaseModel):
 
 
 class StkPushCallbackBody(BaseModel):
-    """
-    Represents the body of the STK Push callback.
+    """Represents the body of the STK Push callback.
 
     Attributes:
         stkCallback (StkCallback): The STK callback data
@@ -326,8 +331,7 @@ class StkPushCallbackBody(BaseModel):
 
 
 class StkPushCallback(BaseModel):
-    """
-    Represents the full STK Push callback received from M-Pesa.
+    """Represents the full STK Push callback received from M-Pesa.
 
     This model represents the data sent to the callback URL after an STK Push
     transaction has been processed by M-Pesa.
@@ -340,8 +344,8 @@ class StkPushCallback(BaseModel):
         ..., description="Root object containing stkCallback data"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "Body": {
                     "stkCallback": {
@@ -368,10 +372,10 @@ class StkPushCallback(BaseModel):
                 }
             }
         }
+    )
 
     def get_metadata_value(self, name: str) -> Optional[str | int | float]:
-        """
-        Helper method to get a specific metadata value by name.
+        """Helper method to get a specific metadata value by name.
 
         Args:
             name: The name of the metadata field
@@ -392,38 +396,37 @@ class StkPushCallback(BaseModel):
 
     @property
     def amount(self) -> Optional[float]:
-        """Gets the transaction amount"""
+        """Gets the transaction amount."""
         value = self.get_metadata_value("Amount")
         return float(value) if value is not None else None
 
     @property
     def mpesa_receipt_number(self) -> Optional[str]:
-        """Gets the M-PESA receipt number"""
+        """Gets the M-PESA receipt number."""
         value = self.get_metadata_value("MpesaReceiptNumber")
         return str(value) if value is not None else None
 
     @property
     def balance(self) -> Optional[float]:
-        """Gets the account balance"""
+        """Gets the account balance."""
         value = self.get_metadata_value("Balance")
         return float(value) if value is not None else None
 
     @property
     def transaction_date(self) -> Optional[str]:
-        """Gets the transaction date"""
+        """Gets the transaction date."""
         value = self.get_metadata_value("TransactionDate")
         return str(value) if value is not None else None
 
     @property
     def phone_number(self) -> Optional[str]:
-        """Gets the customer's phone number"""
+        """Gets the customer's phone number."""
         value = self.get_metadata_value("PhoneNumber")
         return str(value) if value is not None else None
 
     @property
     def is_successful(self) -> bool:
-        """
-        Indicates whether the STK Push transaction was successful.
+        """Indicates whether the STK Push transaction was successful.
 
         Returns:
             bool: True if ResultCode is 0, False otherwise.

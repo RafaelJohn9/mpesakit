@@ -1,7 +1,9 @@
+"""TokenManager: Handles retrieval, storage, and refreshing of access tokens for M-Pesa API authentication."""
+
 import base64
 from datetime import datetime
-from pydantic import BaseModel, PrivateAttr
-from typing import Optional
+from pydantic import BaseModel, PrivateAttr, ConfigDict
+from typing import Optional, ClassVar
 
 from mpesa_sdk.http_client import MpesaHttpClient
 from mpesa_sdk.auth import AccessToken
@@ -9,14 +11,15 @@ from mpesa_sdk.errors import MpesaError, MpesaApiException
 
 
 class TokenManager(BaseModel):
+    """Handles retrieval, storage, and refreshing of access tokens for M-Pesa API authentication."""
+
     consumer_key: str
     consumer_secret: str
     http_client: MpesaHttpClient
 
     _access_token: Optional[AccessToken] = PrivateAttr(default=None)
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config: ClassVar[ConfigDict] = {"arbitrary_types_allowed": True}
 
     def _get_basic_auth_header(self) -> str:
         credentials = f"{self.consumer_key}:{self.consumer_secret}"
@@ -26,6 +29,15 @@ class TokenManager(BaseModel):
         return f"Basic {encoded_credentials}"
 
     def get_token(self, force_refresh: bool = False) -> str:
+        """Retrieves the access token, refreshing it if necessary.
+
+        Args:
+            force_refresh (bool): If True, forces a refresh of the token even if it is not expired.
+
+        Returns:
+            str: The access token string.
+        """
+        # Check if the token is already available and not expired
         if (
             self._access_token
             and not self._access_token.is_expired()

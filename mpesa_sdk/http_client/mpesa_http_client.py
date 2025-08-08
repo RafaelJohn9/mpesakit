@@ -1,3 +1,8 @@
+"""MpesaHttpClient: A client for making HTTP requests to the M-Pesa API.
+
+Handles GET and POST requests with error handling for common HTTP issues.
+"""
+
 from typing import Dict, Any, Optional
 import requests
 
@@ -5,9 +10,24 @@ from mpesa_sdk.errors import MpesaError, MpesaApiException
 
 
 class MpesaHttpClient:
+    """A client for making HTTP requests to the M-Pesa API.
+
+    This client handles GET and POST requests, including error handling for common HTTP issues.
+    It supports both sandbox and production environments.
+
+    Attributes:
+        base_url (str): The base URL for the M-Pesa API, depending on the environment.
+    """
+
     base_url: str
 
     def __init__(self, env: str = "sandbox"):
+        """Initializes the MpesaHttpClient with the specified environment.
+
+        Args:
+            env (str): The environment to use, either 'sandbox' or 'production'.
+                Defaults to 'sandbox'.
+        """
         self.base_url = self._resolve_base_url(env)
 
     def _resolve_base_url(self, env: str) -> str:
@@ -18,6 +38,19 @@ class MpesaHttpClient:
     def post(
         self, url: str, json: Dict[str, Any], headers: Dict[str, str]
     ) -> Dict[str, Any]:
+        """Sends a POST request to the M-Pesa API.
+
+        Args:
+            url (str): The endpoint URL to send the POST request to.
+            json (Dict[str, Any]): The JSON payload to include in the request body.
+            headers (Dict[str, str]): The headers to include in the request.
+
+        Returns:
+            Dict[str, Any]: The JSON response from the M-Pesa API.
+
+        Raises:
+            MpesaApiException: If the request fails or returns an error response.
+        """
         try:
             full_url = f"{self.base_url}{url}"
             response = requests.post(full_url, json=json, headers=headers, timeout=10)
@@ -72,6 +105,19 @@ class MpesaHttpClient:
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
+        """Sends a GET request to the M-Pesa API.
+
+        Args:
+            url (str): The endpoint URL to send the GET request to.
+            params (Optional[Dict[str, Any]]): The query parameters to include in the request.
+            headers (Optional[Dict[str, str]]): The headers to include in the request.
+
+        Returns:
+            Dict[str, Any]: The JSON response from the M-Pesa API.
+
+        Raises:
+            MpesaApiException: If the request fails or returns an error response.
+        """
         try:
             if headers is None:
                 headers = {}
