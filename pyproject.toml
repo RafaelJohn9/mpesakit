@@ -72,12 +72,11 @@ select = ["D", "E", "W"]  # Enable docstring checks, pycodestyle errors, and war
 ignore = [
   "D104",  # Missing docstring in public package
   "D105",  # Missing docstring in magic method
+  "E501",  # Line too long
 ]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-
 
 [tool.ruff.lint.isort]
 known-first-party = ["mpesa_sdk"]
