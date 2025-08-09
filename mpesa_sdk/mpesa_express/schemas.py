@@ -112,7 +112,7 @@ class StkPushSimulateRequest(BaseModel):
         shortcode = data.get("BusinessShortCode")
         timestamp = data.get("Timestamp")
 
-        if not timestamp:
+        if not timestamp and not password:
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             data["Timestamp"] = timestamp
 
@@ -137,9 +137,7 @@ class StkPushSimulateRequest(BaseModel):
             raise ValueError("Either 'Password' or 'Passkey' must be provided")
 
         # If Password is provided, Timestamp must also be provided
-        if (
-            password and not timestamp
-        ):  # TODO: this won't work since we set timestamp in __init__
+        if password and not timestamp:
             raise ValueError(
                 "If 'Password' is provided, 'Timestamp' must also be provided"
                 "Password = Shortcode + Passkey + Timestamp"
@@ -488,7 +486,7 @@ class StkPushQueryRequest(BaseModel):
         shortcode = data.get("BusinessShortCode")
         timestamp = data.get("Timestamp")
 
-        if not timestamp:
+        if not timestamp and not password:
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             data["Timestamp"] = timestamp
 
