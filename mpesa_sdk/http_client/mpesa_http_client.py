@@ -7,9 +7,10 @@ from typing import Dict, Any, Optional
 import requests
 
 from mpesa_sdk.errors import MpesaError, MpesaApiException
+from .http_client import HttpClient
 
 
-class MpesaHttpClient:
+class MpesaHttpClient(HttpClient):
     """A client for making HTTP requests to the M-Pesa API.
 
     This client handles GET and POST requests, including error handling for common HTTP issues.
