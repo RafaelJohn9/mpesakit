@@ -5,7 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, PrivateAttr, ConfigDict
 from typing import Optional, ClassVar
 
-from mpesa_sdk.http_client import MpesaHttpClient
+from mpesa_sdk.http_client import HttpClient
 from mpesa_sdk.auth import AccessToken
 from mpesa_sdk.errors import MpesaError, MpesaApiException
 
@@ -15,7 +15,7 @@ class TokenManager(BaseModel):
 
     consumer_key: str
     consumer_secret: str
-    http_client: MpesaHttpClient
+    http_client: HttpClient
 
     _access_token: Optional[AccessToken] = PrivateAttr(default=None)
 
