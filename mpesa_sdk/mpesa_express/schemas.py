@@ -232,7 +232,7 @@ class StkPushSimulateResponse(BaseModel):
     )
 
 
-class StkPushCallbackMetadataItem(BaseModel):
+class StkPushSimulateCallbackMetadataItem(BaseModel):
     """Represents an item in the CallbackMetadata array from an M-Pesa STK Push callback.
 
     https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
@@ -274,15 +274,15 @@ class StkPushCallbackMetadataItem(BaseModel):
         return data
 
 
-class StkPushCallbackMetadata(BaseModel):
+class StkPushSimulateCallbackMetadata(BaseModel):
     """Represents the metadata returned in a successful STK Push transaction callback.
 
     https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
     Attributes:
-        Item (list[StkPushCallbackMetadataItem]): List of metadata items with transaction details
+        Item (list[StkPushSimulateCallbackMetadataItem]): List of metadata items with transaction details
     """
 
-    Item: list[StkPushCallbackMetadataItem] = Field(
+    Item: list[StkPushSimulateCallbackMetadataItem] = Field(
         ..., description="Array containing transaction details"
     )
 
@@ -295,7 +295,7 @@ class StkCallback(BaseModel):
         CheckoutRequestID (str): Global unique identifier of the processed checkout transaction
         ResultCode (int): Numeric status code (0 means successful)
         ResultDesc (str): Description of the result
-        CallbackMetadata (Optional[StkPushCallbackMetadata]): Additional transaction details for successful transactions
+        CallbackMetadata (Optional[StkPushSimulateCallbackMetadata]): Additional transaction details for successful transactions
     """
 
     MerchantRequestID: str = Field(
@@ -312,13 +312,13 @@ class StkCallback(BaseModel):
     ResultDesc: str = Field(
         ..., description="Message giving the status of the request processing"
     )
-    CallbackMetadata: Optional[StkPushCallbackMetadata] = Field(
+    CallbackMetadata: Optional[StkPushSimulateCallbackMetadata] = Field(
         None,
         description="Contains additional transaction details for successful transactions",
     )
 
 
-class StkPushCallbackBody(BaseModel):
+class StkPushSimulateCallbackBody(BaseModel):
     """Represents the body of the STK Push callback.
 
     Attributes:
@@ -330,17 +330,17 @@ class StkPushCallbackBody(BaseModel):
     )
 
 
-class StkPushCallback(BaseModel):
+class StkPushSimulateCallback(BaseModel):
     """Represents the full STK Push callback received from M-Pesa.
 
     This model represents the data sent to the callback URL after an STK Push
     transaction has been processed by M-Pesa.
 
     Attributes:
-        Body (StkPushCallbackBody): The body of the callback containing the transaction details
+        Body (StkPushSimulateCallbackBody): The body of the callback containing the transaction details
     """
 
-    Body: StkPushCallbackBody = Field(
+    Body: StkPushSimulateCallbackBody = Field(
         ..., description="Root object containing stkCallback data"
     )
 

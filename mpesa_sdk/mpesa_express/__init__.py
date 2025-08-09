@@ -2,10 +2,10 @@ from .schemas import (
     StkPushSimulateRequest,
     StkPushSimulateResponse,
     TransactionType,
-    StkPushCallbackMetadataItem,
-    StkPushCallbackMetadata,
-    StkPushCallback,
-    StkPushCallbackBody,
+    StkPushSimulateCallbackMetadataItem,
+    StkPushSimulateCallbackMetadata,
+    StkPushSimulateCallback,
+    StkPushSimulateCallbackBody,
     StkCallback,
 )
 
@@ -15,9 +15,9 @@ __all__ = [
     "StkPushSimulateRequest",
     "StkPushSimulateResponse",
     "TransactionType",
-    "StkPushCallbackMetadataItem",
-    "StkPushCallbackMetadata",
-    "StkPushCallback",
-    "StkPushCallbackBody",
+    "StkPushSimulateCallbackMetadataItem",
+    "StkPushSimulateCallbackMetadata",
+    "StkPushSimulateCallback",
+    "StkPushSimulateCallbackBody",
     "StkCallback",
 ]
