@@ -1,13 +1,13 @@
 """STK Push: Initiates an M-Pesa STK Push transaction.
 
 This module provides functionality to initiate an M-Pesa STK Push transaction using the M-Pesa API.
-It requires a valid access token for authentication and uses the MpesaHttpClient for making HTTP requests.
+It requires a valid access token for authentication and uses the HttpClient for making HTTP requests.
 """
 
 from pydantic import BaseModel, ConfigDict
 
 from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
+from mpesa_sdk.http_client import HttpClient
 from .schemas import (
     StkPushSimulateRequest,
     StkPushSimulateResponse,
@@ -22,11 +22,11 @@ class StkPush(BaseModel):
     https://developer.safaricom.co.ke/APIs/MpesaExpressQuery
     https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
     Attributes:
-        http_client (MpesaHttpClient): The HTTP client used to make requests to the M-Pesa API.
+        http_client (HttpClient): The HTTP client used to make requests to the M-Pesa API.
         request (StkPushSimulateRequest): The request data for the STK Push transaction.
     """
 
-    http_client: MpesaHttpClient
+    http_client: HttpClient
     token_manager: TokenManager
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
