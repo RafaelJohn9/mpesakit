@@ -132,7 +132,7 @@ class MpesaHttpClient:
             except ValueError:
                 response_data = {"errorMessage": response.text.strip() or ""}
 
-            if response.status_code != 200:
+            if not response.ok:
                 error_message = response_data.get("errorMessage", "")
                 raise MpesaApiException(
                     MpesaError(
