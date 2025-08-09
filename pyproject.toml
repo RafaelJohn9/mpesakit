@@ -50,6 +50,14 @@ install = [
   "pydantic",
   "requests"
 ]
+test = [
+  "pyngrok",
+  "pytest",
+  "pytest-cov",
+  "requests",
+  "pydantic",
+  "types-requests"
+]
 
 [tool.hatch.version]
 source = "vcs"
