@@ -1,6 +1,6 @@
 from .schemas import (
-    StkPushRequest,
-    StkPushResponse,
+    StkPushSimulateRequest,
+    StkPushSimulateResponse,
     TransactionType,
     StkPushCallbackMetadataItem,
     StkPushCallbackMetadata,
@@ -12,8 +12,8 @@ from .schemas import (
 
 __all__ = [
     "StkPush",
-    "StkPushRequest",
-    "StkPushResponse",
+    "StkPushSimulateRequest",
+    "StkPushSimulateResponse",
     "TransactionType",
     "StkPushCallbackMetadataItem",
     "StkPushCallbackMetadata",

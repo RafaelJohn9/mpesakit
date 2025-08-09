@@ -22,7 +22,7 @@ class TransactionType(str, Enum):
     CUSTOMER_BUYGOODS_ONLINE = "CustomerBuyGoodsOnline"
 
 
-class StkPushRequest(BaseModel):
+class StkPushSimulateRequest(BaseModel):
     """Represents the request payload for initiating an M-Pesa STK Push transaction.
 
     https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
@@ -184,7 +184,7 @@ class StkPushRequest(BaseModel):
         return values
 
 
-class StkPushResponse(BaseModel):
+class StkPushSimulateResponse(BaseModel):
     """Represents the response returned after initiating an M-Pesa STK Push transaction.
 
     https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate
