@@ -7,7 +7,10 @@ from .schemas import (
     StkPushSimulateCallback,
     StkPushSimulateCallbackBody,
     StkCallback,
+    StkPushQueryRequest,
+    StkPushQueryResponse,
 )
+from .stk_push import StkPush
 
 
 __all__ = [
@@ -20,4 +23,6 @@ __all__ = [
     "StkPushSimulateCallback",
     "StkPushSimulateCallbackBody",
     "StkCallback",
+    "StkPushQueryRequest",
+    "StkPushQueryResponse",
 ]
