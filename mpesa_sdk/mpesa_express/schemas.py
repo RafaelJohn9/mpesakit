@@ -432,3 +432,143 @@ class StkPushSimulateCallback(BaseModel):
             bool: True if ResultCode is 0, False otherwise.
         """
         return self.Body.stkCallback.ResultCode == 0
+
+
+class StkPushQueryRequest(BaseModel):
+    """Represents the request payload for querying the status of an M-Pesa STK Push transaction.
+
+    https://developer.safaricom.co.ke/APIs/MpesaExpressQuery
+
+    Attributes:
+        BusinessShortCode (int): Organization's shortcode (Paybill or Buygoods - 5 to 7 digits).
+        Password (str): Base64 encoded string (Shortcode+Passkey+Timestamp).
+        Timestamp (str): Timestamp in the format YYYYMMDDHHmmss.
+        CheckoutRequestID (str): Global unique identifier of the processed checkout transaction request.
+        Passkey (Optional[str]): Passkey for the shortcode (used to generate Password if not provided).
+    """
+
+    BusinessShortCode: int = Field(
+        ...,
+        description="Organization's shortcode (Paybill or Buygoods - 5 to 7 digits).",
+    )
+    Password: Optional[str] = Field(
+        None, description="Base64 encoded string (Shortcode+Passkey+Timestamp)."
+    )
+    Timestamp: Optional[str] = Field(
+        None, description="Timestamp in the format YYYYMMDDHHmmss."
+    )
+    CheckoutRequestID: str = Field(
+        ...,
+        description="Global unique identifier of the processed checkout transaction request.",
+    )
+    Passkey: Optional[str] = Field(
+        None,
+        description="Passkey for the shortcode (used to generate Password if not provided).",
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "BusinessShortCode": 654321,
+                "Password": "bXlwYXNzd29yZA==",
+                "Timestamp": "20240607123045",
+                "CheckoutRequestID": "ws_CO_DMZ_123212312_2342347678234",
+            }
+        }
+    )
+
+    def __init__(self, **data):
+        """Initialize the STK Push query request.
+
+        If Password is not provided, generate it using the shortcode, passkey, and timestamp.
+        If Timestamp is not provided, generate it in the format YYYYMMDDHHmmss.
+        """
+        password = data.get("Password")
+        passkey = data.get("Passkey")
+        shortcode = data.get("BusinessShortCode")
+        timestamp = data.get("Timestamp")
+
+        if not timestamp:
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            data["Timestamp"] = timestamp
+
+        if not password and passkey and shortcode and timestamp:
+            data["Password"] = self._generate_password(shortcode, passkey, timestamp)
+        super().__init__(**data)
+
+    @staticmethod
+    def _generate_password(shortcode: int, passkey: str, timestamp: str) -> str:
+        raw = f"{shortcode}{passkey}{timestamp}"
+        return base64.b64encode(raw.encode("utf-8")).decode("utf-8")
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_request(cls, values):
+        """Validate the STK Push query request fields."""
+        password = values.get("Password")
+        passkey = values.get("Passkey")
+        timestamp = values.get("Timestamp")
+
+        # Validate that either Password or Passkey is provided
+        if not password and not passkey:
+            raise ValueError("Either 'Password' or 'Passkey' must be provided")
+
+        # If Password is provided, Timestamp must also be provided
+        if password and not timestamp:
+            raise ValueError(
+                "If 'Password' is provided, 'Timestamp' must also be provided"
+            )
+
+        return values
+
+
+class StkPushQueryResponse(BaseModel):
+    """Represents the response returned after querying the status of an M-Pesa STK Push transaction.
+
+    https://developer.safaricom.co.ke/APIs/MpesaExpressQuery
+
+    Attributes:
+        MerchantRequestID (str): Global unique identifier for the submitted payment request.
+        CheckoutRequestID (str): Global unique identifier for the processed checkout transaction request.
+        ResponseCode (int): Numeric status code indicating the status of the transaction submission. 0 means success.
+        ResponseDescription (str): Acknowledgment message from the API about the request submission status.
+        ResultCode (int): Numeric status code indicating the status of the transaction processing. 0 means success.
+        ResultDesc (str): Message from the API giving the status of the request processing.
+    """
+
+    MerchantRequestID: str = Field(
+        ..., description="Global unique Identifier for any submitted payment request."
+    )
+    CheckoutRequestID: str = Field(
+        ...,
+        description="Global unique identifier of the processed checkout transaction request.",
+    )
+    ResponseCode: int = Field(
+        ...,
+        description="Numeric status code indicating the status of the transaction submission. 0 means success.",
+    )
+    ResponseDescription: str = Field(
+        ...,
+        description="Acknowledgment message from the API about the request submission status.",
+    )
+    ResultCode: int = Field(
+        ...,
+        description="Numeric status code indicating the status of the transaction processing. 0 means success.",
+    )
+    ResultDesc: str = Field(
+        ...,
+        description="Message from the API giving the status of the request processing.",
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "MerchantRequestID": "22205-34066-1",
+                "CheckoutRequestID": "ws_CO_13012021093521236557",
+                "ResponseCode": 0,
+                "ResponseDescription": "The service request has been accepted successfully",
+                "ResultCode": 0,
+                "ResultDesc": "The service request is processed successfully.",
+            }
+        }
+    )

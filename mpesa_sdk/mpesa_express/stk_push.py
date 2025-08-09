@@ -8,7 +8,12 @@ from pydantic import BaseModel, ConfigDict
 
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import MpesaHttpClient
-from .schemas import StkPushSimulateRequest, StkPushSimulateResponse
+from .schemas import (
+    StkPushSimulateRequest,
+    StkPushSimulateResponse,
+    StkPushQueryRequest,
+    StkPushQueryResponse,
+)
 
 
 class StkPush(BaseModel):
@@ -41,3 +46,19 @@ class StkPush(BaseModel):
         response_data = self.http_client.post(url, json=dict(request), headers=headers)
 
         return StkPushSimulateResponse(**response_data)
+
+    def query(self, request: StkPushQueryRequest) -> StkPushQueryResponse:
+        """Queries the status of an M-Pesa STK Push transaction.
+
+        Returns:
+            StkPushQueryResponse: The response from the M-Pesa API after querying the transaction status.
+        """
+        url = "/mpesa/stkpushquery/v1/query"
+        headers = {
+            "Authorization": f"Bearer {self.token_manager.get_token()}",
+            "Content-Type": "application/json",
+        }
+
+        response_data = self.http_client.post(url, json=dict(request), headers=headers)
+
+        return StkPushQueryResponse(**response_data)
