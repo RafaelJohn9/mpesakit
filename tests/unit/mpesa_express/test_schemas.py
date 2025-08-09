@@ -155,11 +155,46 @@ def test_stkpush_simulate_response_fields():
 
 def test_callback_metadata_item_balance_parsing():
     """Test that Balance metadata item parses BasicAmount from string."""
+    # Test with string representation of BasicAmount
     item = schemas.StkPushSimulateCallbackMetadataItem(
         Name="Balance",
         Value="{Amount={BasicAmount=123.45, MinLimit=0.00, MaxLimit=0.00}}",
     )
     assert item.Value == 123.45
+
+    # Test with float value
+    item = schemas.StkPushSimulateCallbackMetadataItem(
+        Name="Balance",
+        Value=123.45,  # Should be a float, not a string
+    )
+    assert item.Value == 123.45
+
+    # Test with an anomally response
+    item = schemas.StkPushSimulateCallbackMetadataItem(
+        Name="Balance",
+        Value="another string that is not a valid balance",
+    )
+    assert item.Value == "another string that is not a valid balance"
+
+
+def test_callback_metadata_item_balance_parsing_invalid_float(monkeypatch):
+    """Test that if BasicAmount is present but not a valid float, ValueError is handled gracefully."""
+
+    # Patch re.search to return a match with a non-numeric string
+    class FakeMatch:
+        def group(self, idx):
+            return "not_a_float"
+
+    def fake_search(pattern, string):
+        return FakeMatch()
+
+    monkeypatch.setattr(schemas.re, "search", fake_search)
+    # Should not raise, Value should remain the original string
+    item = schemas.StkPushSimulateCallbackMetadataItem(
+        Name="Balance",
+        Value="{Amount={BasicAmount=not_a_float}}",
+    )
+    assert item.Value == "{Amount={BasicAmount=not_a_float}}"
 
 
 def test_callback_metadata_item_non_balance_untouched():
@@ -198,6 +233,9 @@ def test_stkpush_simulate_callback_properties():
     assert callback.phone_number == "254712345678"
     assert callback.is_successful is True
 
+    # test that non-existent attributes return None
+    assert callback.get_metadata_value("NonExistent") is None
+
 
 def test_stkpush_simulate_callback_missing_metadata_returns_none():
     """Test that missing CallbackMetadata returns None for metadata properties."""
@@ -234,6 +272,21 @@ def test_stkpush_query_request_missing_password_and_passkey_raises():
     """Test that missing both Password and Passkey in StkPushQueryRequest raises ValidationError."""
     with pytest.raises(ValidationError):
         schemas.StkPushQueryRequest(BusinessShortCode=123456, CheckoutRequestID="crid")
+
+
+def test_stkpush_query_request_password_provided_without_timestamp_raises():
+    """Test that providing Password without Timestamp in StkPushQueryRequest raises a ValidationError."""
+    # __init__ sets Timestamp if missing, so we must call the validator directly
+    with pytest.raises(ValidationError) as excinfo:
+        schemas.StkPushQueryRequest(
+            BusinessShortCode=123456,
+            Password="bXlwYXNzd29yZA==",
+            CheckoutRequestID="crid",
+            # No Timestamp, no Passkey
+        )
+    assert "If 'Password' is provided, 'Timestamp' must also be provided" in str(
+        excinfo.value
+    )
 
 
 def test_stkpush_query_response_fields():
