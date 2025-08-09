@@ -92,7 +92,7 @@ def test_stk_push_full_e2e_with_query(stk_service, fastapi_server, ngrok_tunnel)
         BusinessShortCode=int(os.getenv("MPESA_SHORTCODE")),
         Passkey=os.getenv("MPESA_PASSKEY"),
         TransactionType="CustomerPayBillOnline",
-        Amount=1000,
+        Amount=1,
         PartyA=os.getenv("MPESA_TEST_PHONE"),
         PartyB=os.getenv("MPESA_SHORTCODE"),
         PhoneNumber=os.getenv("MPESA_TEST_PHONE"),
