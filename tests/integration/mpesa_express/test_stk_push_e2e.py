@@ -113,7 +113,7 @@ def test_stk_push_full_e2e_with_query(stk_service, fastapi_server, ngrok_tunnel)
     callback = None
     for _ in range(30):
         time.sleep(1)
-        r = requests.get(f"{callback_base_url}/latest")
+        r = requests.get(f"{callback_base_url}/latest", timeout=45)
         if r.status_code == 200:
             callback_received = True
             callback_json = r.json()["parsed"]
