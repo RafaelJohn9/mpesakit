@@ -242,6 +242,14 @@ class StkPushSimulateResponse(BaseModel):
         }
     )
 
+    def is_successful(self) -> bool:
+        """Indicates whether the STK Push transaction was successful.
+
+        Returns:
+            bool: True if ResponseCode is 0, False otherwise.
+        """
+        return self.ResponseCode == 0
+
 
 class StkPushSimulateCallbackMetadataItem(BaseModel):
     """Represents an item in the CallbackMetadata array from an M-Pesa STK Push callback.
@@ -583,3 +591,9 @@ class StkPushQueryResponse(BaseModel):
             }
         }
     )
+
+    def is_successful(self) -> bool:
+        """Return True if ResponseCode indicates success (e.g., '0', '00000000')."""
+        code = str(self.ResponseCode)
+        # Remove  zeros and check if the result is empty (i.e., all zeros)
+        return code.strip("0") == "" and code != ""

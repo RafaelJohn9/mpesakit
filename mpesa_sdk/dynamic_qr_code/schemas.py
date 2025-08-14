@@ -165,3 +165,9 @@ class DynamicQRGenerateResponse(BaseModel):
             }
         }
     )
+
+    def is_successful(self) -> bool:
+        """Return True if ResponseCode indicates success (e.g., '0', '00000000')."""
+        code = str(self.ResponseCode)
+        # Remove zeros and check if the result is empty (i.e., all zeros)
+        return code.strip("0") == "" and code != ""
