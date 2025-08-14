@@ -453,6 +453,17 @@ class StkPushSimulateCallback(BaseModel):
         return self.Body.stkCallback.ResultCode == 0
 
 
+class StkPushSimulateCallbackResponse(BaseModel):
+    """Schema for confirmation acknowledgment from your ConfirmationURL."""
+
+    ResultCode: int = Field(0, description="Always 0 (success).")
+    ResultDesc: str = Field("Success", description="Usually 'Success'.")
+
+    model_config = ConfigDict(
+        json_schema_extra={"example": {"ResultCode": 0, "ResultDesc": "Success"}}
+    )
+
+
 class StkPushQueryRequest(BaseModel):
     """Represents the request payload for querying the status of an M-Pesa STK Push transaction.
 
