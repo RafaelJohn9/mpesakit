@@ -562,7 +562,7 @@ class StkPushQueryResponse(BaseModel):
         ...,
         description="Global unique identifier of the processed checkout transaction request.",
     )
-    ResponseCode: int = Field(
+    ResponseCode: int | str = Field(
         ...,
         description="Numeric status code indicating the status of the transaction submission. 0 means success.",
     )

@@ -139,7 +139,7 @@ class DynamicQRGenerateResponse(BaseModel):
         QRCode (str): QR Code Image/Data/String (base64 or similar).
     """
 
-    ResponseCode: str = Field(
+    ResponseCode: str | int = Field(
         ...,
         description="Used to show if the transaction was successful or not. 00 indicates success.",
         examples=["00"],
