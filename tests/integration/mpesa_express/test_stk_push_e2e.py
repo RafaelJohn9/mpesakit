@@ -142,18 +142,27 @@ def test_stk_push_full_e2e_with_query(stk_service, fastapi_server, ngrok_tunnel)
     while time.time() - start_time < 60:  # Max 60s
         try:
             query_response = stk_service.query(request=query_request)
-            result_code = query_response.ResponseCode
-            result_desc = query_response.ResultDesc
+            result_code = getattr(query_response, "ResponseCode", None)
+            result_desc = getattr(query_response, "ResultDesc", "")
 
             print(f"📊 Query result: Code={result_code}, Desc='{result_desc}'")
 
-            if result_code in [0, 1]:
+            if query_response.is_successful():
                 final_result = query_response
+                print("✅ Query returned a valid result.")
                 break
             time.sleep(2)
         except Exception as e:
             print(f"⚠️ Query failed: {str(e)}")
-            time.sleep(2)
+            # If we already have a valid result, break out of the loop
+            if final_result is not None:
+                break
+
+            # If HTTP 429 (rate limit), skip retrying for a short time
+            if "HTTP_429" in str(e):
+                time.sleep(5)
+            else:
+                time.sleep(2)
 
     assert final_result is not None, "❌ Query never returned a valid result"
 
