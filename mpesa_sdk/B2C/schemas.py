@@ -202,7 +202,7 @@ class B2CResultMetadata(BaseModel):
         super().__init__(**data)
 
         self._parameters_dict = {
-            param.Key: param.Value for param in self.ResultParameters
+            param.Key: param.Value for param in self.ResultParameters or []
         }
 
     @property
@@ -213,12 +213,12 @@ class B2CResultMetadata(BaseModel):
     @property
     def transaction_receipt(self) -> Optional[str]:
         """Return the TransactionReceipt value if present."""
-        return self._parameters_dict().get("TransactionReceipt")
+        return self._parameters_dict.get("TransactionReceipt")
 
     @property
     def recipient_is_registered(self) -> Optional[bool]:
         """Return True if B2CRecipientIsRegisteredCustomer is 'Y', False if 'N', None if missing."""
-        val = self._parameters_dict().get("B2CRecipientIsRegisteredCustomer")
+        val = self._parameters_dict.get("B2CRecipientIsRegisteredCustomer")
         if val == "Y":
             return True
         if val == "N":
@@ -228,27 +228,27 @@ class B2CResultMetadata(BaseModel):
     @property
     def receiver_party_public_name(self) -> Optional[str]:
         """Return the ReceiverPartyPublicName value if present."""
-        return self._parameters_dict().get("ReceiverPartyPublicName")
+        return self._parameters_dict.get("ReceiverPartyPublicName")
 
     @property
     def transaction_completed_datetime(self) -> Optional[str]:
         """Return the TransactionCompletedDateTime value if present."""
-        return self._parameters_dict().get("TransactionCompletedDateTime")
+        return self._parameters_dict.get("TransactionCompletedDateTime")
 
     @property
     def charges_paid_account_available_funds(self) -> Optional[float]:
         """Return the B2CChargesPaidAccountAvailableFunds value if present."""
-        return self._parameters_dict().get("B2CChargesPaidAccountAvailableFunds")
+        return self._parameters_dict.get("B2CChargesPaidAccountAvailableFunds")
 
     @property
     def utility_account_available_funds(self) -> Optional[float]:
         """Return the B2CUtilityAccountAvailableFunds value if present."""
-        return self._parameters_dict().get("B2CUtilityAccountAvailableFunds")
+        return self._parameters_dict.get("B2CUtilityAccountAvailableFunds")
 
     @property
     def working_account_available_funds(self) -> Optional[float]:
         """Return the B2CWorkingAccountAvailableFunds value if present."""
-        return self._parameters_dict().get("B2CWorkingAccountAvailableFunds")
+        return self._parameters_dict.get("B2CWorkingAccountAvailableFunds")
 
 
 class B2CResultCallback(BaseModel):
