@@ -10,6 +10,8 @@ import re
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 from typing import Optional
 
+from mpesa_sdk.utils.phone import normalize_phone_number
+
 
 class TransactionType(str, Enum):
     """Enum representing the types of M-Pesa transactions.
@@ -127,8 +129,17 @@ class StkPushSimulateRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_request(cls, values):
+    def validate(cls, values):
         """Validate the STK Push request fields."""
+        cls._validate_password_and_passkey(values)
+        cls._validate_phone_number(values)
+        cls._validate_account_reference(values)
+        cls._validate_transaction_desc(values)
+        cls._validate_transaction_type_enum(values)
+        return values
+
+    @classmethod
+    def _validate_password_and_passkey(cls, values):
         password = values.get("Password")
         passkey = values.get("Passkey")
         timestamp = values.get("Timestamp")
@@ -143,26 +154,16 @@ class StkPushSimulateRequest(BaseModel):
                 "Password = Shortcode + Passkey + Timestamp"
             )
 
-        # Validate phone number format (12 digits starting with 254)
+    @classmethod
+    def _validate_phone_number(cls, values):
         phone_number = values.get("PhoneNumber", "")
-        # Normalize phone number to 12 digits starting with 254
-        if phone_number.startswith("0") and len(phone_number) == 10:
-            # Replace leading 0 with 254
-            phone_number = "254" + phone_number[1:]
-            values["PhoneNumber"] = phone_number
-        elif phone_number.startswith("+254") and len(phone_number) == 13:
-            # Remove leading '+'
-            phone_number = phone_number[1:]
-            values["PhoneNumber"] = phone_number
+        normalized = normalize_phone_number(phone_number)
+        if not normalized:
+            raise ValueError("PhoneNumber must be valid and in the format 254XXXXXXXXX")
+        values["PhoneNumber"] = normalized
 
-        if not (
-            phone_number.isdigit()
-            and len(phone_number) == 12
-            and phone_number.startswith("254")
-        ):
-            raise ValueError("PhoneNumber must be 12 digits in the format 254XXXXXXXXX")
-
-        # Validate that AccountReference is provided when TransactionType is CustomerPayBillOnline
+    @classmethod
+    def _validate_account_reference(cls, values):
         transaction_type = values.get("TransactionType")
         account_ref = values.get("AccountReference")
         if (
@@ -175,11 +176,23 @@ class StkPushSimulateRequest(BaseModel):
         if account_ref and len(account_ref) > 12:
             raise ValueError("AccountReference must be 12 characters or less")
 
+    @classmethod
+    def _validate_transaction_desc(cls, values):
         trans_desc = values.get("TransactionDesc", "")
         if trans_desc and len(trans_desc) > 13:
             raise ValueError("TransactionDesc must be 13 characters or less")
 
-        return values
+    @classmethod
+    def _validate_transaction_type_enum(cls, values):
+        transaction_type = values.get("TransactionType")
+        if not isinstance(transaction_type, TransactionType):
+            try:
+                # Try to convert string to TransactionType enum
+                values["TransactionType"] = TransactionType(transaction_type)
+            except ValueError:
+                raise ValueError(
+                    f"TransactionType must be one of: {[e.value for e in TransactionType]}"
+                )
 
 
 class StkPushSimulateResponse(BaseModel):
@@ -228,6 +241,14 @@ class StkPushSimulateResponse(BaseModel):
             }
         }
     )
+
+    def is_successful(self) -> bool:
+        """Indicates whether the STK Push transaction was successful.
+
+        Returns:
+            bool: True if ResponseCode is 0, False otherwise.
+        """
+        return self.ResponseCode == 0
 
 
 class StkPushSimulateCallbackMetadataItem(BaseModel):
@@ -432,6 +453,17 @@ class StkPushSimulateCallback(BaseModel):
         return self.Body.stkCallback.ResultCode == 0
 
 
+class StkPushSimulateCallbackResponse(BaseModel):
+    """Schema for confirmation acknowledgment from your ConfirmationURL."""
+
+    ResultCode: int = Field(0, description="Always 0 (success).")
+    ResultDesc: str = Field("Success", description="Usually 'Success'.")
+
+    model_config = ConfigDict(
+        json_schema_extra={"example": {"ResultCode": 0, "ResultDesc": "Success"}}
+    )
+
+
 class StkPushQueryRequest(BaseModel):
     """Represents the request payload for querying the status of an M-Pesa STK Push transaction.
 
@@ -501,7 +533,7 @@ class StkPushQueryRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_request(cls, values):
+    def validate(cls, values):
         """Validate the STK Push query request fields."""
         password = values.get("Password")
         passkey = values.get("Passkey")
@@ -541,7 +573,7 @@ class StkPushQueryResponse(BaseModel):
         ...,
         description="Global unique identifier of the processed checkout transaction request.",
     )
-    ResponseCode: int = Field(
+    ResponseCode: int | str = Field(
         ...,
         description="Numeric status code indicating the status of the transaction submission. 0 means success.",
     )
@@ -570,3 +602,9 @@ class StkPushQueryResponse(BaseModel):
             }
         }
     )
+
+    def is_successful(self) -> bool:
+        """Return True if ResponseCode indicates success (e.g., '0', '00000000')."""
+        code = str(self.ResponseCode)
+        # Remove  zeros and check if the result is empty (i.e., all zeros)
+        return code.strip("0") == "" and code != ""

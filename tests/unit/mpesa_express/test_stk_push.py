@@ -64,7 +64,7 @@ def test_push_success(stk_push, mock_http_client):
 
     assert isinstance(response, StkPushSimulateResponse)
     assert response.MerchantRequestID == "12345"
-    assert response.ResponseCode == 0
+    assert response.is_successful() is True
     mock_http_client.post.assert_called_once()
     args, kwargs = mock_http_client.post.call_args
     assert args[0] == "/mpesa/stkpush/v1/processrequest"
@@ -92,7 +92,7 @@ def test_query_success(stk_push, mock_http_client):
     response = stk_push.query(request)
 
     assert isinstance(response, StkPushQueryResponse)
-    assert response.ResultCode == 0
+    assert response.is_successful() is True
     assert response.CheckoutRequestID == "ws_CO_260520211133524545"
     mock_http_client.post.assert_called_once()
     args, kwargs = mock_http_client.post.call_args
@@ -135,3 +135,24 @@ def test_query_handles_http_error(stk_push, mock_http_client):
     with pytest.raises(Exception) as excinfo:
         stk_push.query(request)
     assert "HTTP error" in str(excinfo.value)
+
+
+def test_stk_push_simulate_request_invalid_transaction_type():
+    """Test that StkPushSimulateRequest raises ValueError for invalid TransactionType."""
+    invalid_transaction_type = "InvalidType"
+    valid_kwargs = dict(
+        BusinessShortCode=174379,
+        Password="test_password",
+        Timestamp="20220101010101",
+        TransactionType=invalid_transaction_type,
+        Amount=10,
+        PartyA="254700000000",
+        PartyB="174379",
+        PhoneNumber="254700000000",
+        CallBackURL="https://test.com/callback",
+        AccountReference="TestAccount",
+        TransactionDesc="Test Payment",
+    )
+    with pytest.raises(ValueError) as excinfo:
+        StkPushSimulateRequest(**valid_kwargs)
+    assert "TransactionType must be one of:" in str(excinfo.value)
