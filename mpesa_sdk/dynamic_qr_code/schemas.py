@@ -81,8 +81,21 @@ class DynamicQRGenerateRequest(BaseModel):
         }
     )
 
+    @model_validator(mode="before")
+    def validate(cls, values):
+        """Validates the TrxCode field before model validation."""
+        # Validate the TrxCode field
+        trx_code = values.get("TrxCode")
+        if trx_code is not None:
+            cls._validate_trx_code(trx_code)
+
+        # Normalize CPI for SEND_MONEY transaction type
+        cls._normalize_cpi_for_send_money(values)
+
+        return values
+
     @classmethod
-    def validate_trx_code(cls, value):
+    def _validate_trx_code(cls, value):
         """Validates the transaction code against the DynamicQRTransactionType enum."""
         try:
             DynamicQRTransactionType(value)
@@ -93,7 +106,7 @@ class DynamicQRGenerateRequest(BaseModel):
         return value
 
     @classmethod
-    def normalize_cpi_for_send_money(cls, values):
+    def _normalize_cpi_for_send_money(cls, values):
         """If TrxCode is SEND_MONEY, normalize the CPI (mobile number).
 
         - If it starts with '0', replace with '254'
@@ -111,19 +124,6 @@ class DynamicQRGenerateRequest(BaseModel):
                     "CPI for SEND_MONEY must be a valid Kenyan phone number starting with '0', '+254', or '254'."
                 )
             values["CPI"] = normalized
-        return values
-
-    @model_validator(mode="before")
-    def validate(cls, values):
-        """Validates the TrxCode field before model validation."""
-        # Validate the TrxCode field
-        trx_code = values.get("TrxCode")
-        if trx_code is not None:
-            cls.validate_trx_code(trx_code)
-
-        # Normalize CPI for SEND_MONEY transaction type
-        values = cls.normalize_cpi_for_send_money(values)
-
         return values
 
 
