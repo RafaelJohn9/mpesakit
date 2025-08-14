@@ -96,7 +96,9 @@ known-first-party = ["mpesa_sdk"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v -s --cov=mpesa_sdk --cov-report=html --cov-report=term"
-
+markers = [
+  "live: mark a test as requiring live credentials and environment"
+]
 
 [tool.mypy]
 enable_error_code = ["ignore-without-comment"]

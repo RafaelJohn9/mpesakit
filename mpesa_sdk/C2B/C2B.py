@@ -12,10 +12,6 @@ from mpesa_sdk.http_client import HttpClient
 from .schemas import (
     C2BRegisterUrlRequest,
     C2BRegisterUrlResponse,
-    C2BValidationRequest,
-    C2BValidationResponse,
-    C2BConfirmationResponse,
-    C2BValidationResultCodeType,
 )
 
 
@@ -58,34 +54,3 @@ class C2B(BaseModel):
             )
 
         return C2BRegisterUrlResponse(**response_data)
-
-    def validate_payment(
-        self,
-        result_code: C2BValidationResultCodeType,
-        result_desc: str,
-        request: C2BValidationRequest,
-    ) -> C2BValidationResponse:
-        """Handles validation of incoming C2B payment requests.
-
-        Args:
-            result_code (C2BValidationResultCodeType): Validation result code.
-            result_desc (str): Description of the validation result not more than 90 characters.
-            request (C2BValidationRequest): Incoming payment request.
-
-        Returns:
-            C2BValidationResponse: Response indicating acceptance or rejection of payment.
-        """
-        return C2BValidationResponse(
-            ResultCode=result_code.value,
-            ResultDesc=result_desc,
-            ThirdPartyTransID=request.ThirdPartyTransID,
-        )
-
-    def confirm_payment(self) -> C2BConfirmationResponse:
-        """Returns confirmation acknowledgment for C2B payments.
-
-        Returns:
-            C2BConfirmationResponse: Always indicates success.
-        """
-        # This method is typically called by your server when Safaricom posts to your ConfirmationURL.
-        return C2BConfirmationResponse()
