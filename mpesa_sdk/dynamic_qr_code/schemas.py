@@ -18,7 +18,7 @@ class DynamicQRTransactionType(str, Enum):
     WITHDRAW_CASH = "WA"  # Withdraw Cash at Agent Till
     PAYBILL = "PB"  # Paybill or Business number
     SEND_MONEY = "SM"  # Send Money (Mobile number)
-    SEND_TO_BUSINESS = "SB"  # Sent to Business (Bu.siness number CPI in MSISDN format)
+    SEND_TO_BUSINESS = "SB"  # Sent to Business (Business number CPI in MSISDN format)
 
 
 class DynamicQRGenerateRequest(BaseModel):
