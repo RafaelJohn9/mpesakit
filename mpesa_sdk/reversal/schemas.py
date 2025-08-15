@@ -25,9 +25,10 @@ class ReversalRequest(BaseModel):
     TransactionID: str = Field(..., description="Mpesa Transaction ID to reverse.")
     Amount: int = Field(..., description="Amount to reverse (in KES).")
     ReceiverParty: int = Field(..., description="Organization shortcode (6-9 digits).")
-    RecieverIdentifierType: str = Field(
-        default=ReversalReceiverIdentifierType.SHORT_CODE,
+    ReceiverIdentifierType: str = Field(
+        default=ReversalReceiverIdentifierType.SHORT_CODE.value,
         description="Type of organization receiving the transaction.",
+        alias="RecieverIdentifierType",
     )
     ResultURL: str = Field(..., description="URL for result notifications.")
     QueueTimeOutURL: str = Field(..., description="URL for timeout notifications.")
@@ -47,7 +48,7 @@ class ReversalRequest(BaseModel):
                 "TransactionID": "LKXXXX1234",
                 "Amount": 100,
                 "ReceiverParty": 600610,
-                "RecieverIdentifierType": "11",
+                "ReceiverIdentifierType": "11",
                 "ResultURL": "https://ip:port/result",
                 "QueueTimeOutURL": "https://ip:port/timeout",
                 "Remarks": "Test",
@@ -59,7 +60,7 @@ class ReversalRequest(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate(cls, values):
-        """Validate RecieverIdentifierType and Remarks/Occasion length."""
+        """Validate ReceiverIdentifierType and Remarks/Occasion length."""
         cls._validate_identifier_type(values)
         cls._validate_remarks(values)
         cls._validate_occasion(values)
@@ -67,11 +68,11 @@ class ReversalRequest(BaseModel):
 
     @classmethod
     def _validate_identifier_type(cls, values):
-        identifier_type = values.get("RecieverIdentifierType")
+        identifier_type = values.get("ReceiverIdentifierType")
         valid_types = [e.value for e in ReversalReceiverIdentifierType]
         if identifier_type not in valid_types:
             raise ValueError(
-                f"RecieverIdentifierType must be one of {valid_types}, got '{identifier_type}'"
+                f"ReceiverIdentifierType must be one of {valid_types}, got '{identifier_type}'"
             )
         return values
 

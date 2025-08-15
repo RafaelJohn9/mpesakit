@@ -50,7 +50,7 @@ def valid_reversal_request():
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        RecieverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
+        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="Test",
@@ -165,14 +165,14 @@ def test_reversal_request_invalid_identifier_type_raises(invalid_identifier_type
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        RecieverIdentifierType=invalid_identifier_type,
+        ReceiverIdentifierType=invalid_identifier_type,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="Test",
     )
     with pytest.raises(ValueError) as excinfo:
         ReversalRequest(**kwargs)
-    assert "RecieverIdentifierType must be one of" in str(excinfo.value)
+    assert "ReceiverIdentifierType must be one of" in str(excinfo.value)
 
 
 def test_reversal_request_remarks_too_long_raises():
@@ -184,7 +184,7 @@ def test_reversal_request_remarks_too_long_raises():
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        RecieverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
+        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="A" * 101,
@@ -203,7 +203,7 @@ def test_reversal_request_occasion_too_long_raises():
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        RecieverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
+        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="Test",

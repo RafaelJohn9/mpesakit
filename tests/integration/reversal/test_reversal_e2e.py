@@ -62,13 +62,14 @@ def test_transaction_reversal_e2e(reversal_service):
         TransactionID=transaction_id,
         Amount=amount,
         ReceiverParty=receiver_party,
-        RecieverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE,
+        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL=result_url,
         QueueTimeOutURL=queue_timeout_url,
         Remarks=remarks,
         Occasion=occasion,
     )
-    print(f"📤 Sending Transaction Reversal request: {dict(request)}")
+    request = request.model_dump(by_alias=True)
+    print(f"📤 Sending Transaction Reversal request: {request}")
     response = reversal_service.reverse(request=request)
     print(f"✅ Transaction Reversal response: {response}")
 
