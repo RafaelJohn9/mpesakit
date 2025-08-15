@@ -16,7 +16,6 @@ from mpesa_sdk.http_client import MpesaHttpClient
 from mpesa_sdk.reversal import (
     Reversal,
     ReversalRequest,
-    ReversalReceiverIdentifierType,
 )
 
 load_dotenv()
@@ -58,11 +57,9 @@ def test_transaction_reversal_e2e(reversal_service):
     request = ReversalRequest(
         Initiator=initiator,
         SecurityCredential=security_credential,
-        CommandID="TransactionReversal",
         TransactionID=transaction_id,
         Amount=amount,
         ReceiverParty=receiver_party,
-        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL=result_url,
         QueueTimeOutURL=queue_timeout_url,
         Remarks=remarks,

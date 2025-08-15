@@ -13,7 +13,6 @@ from mpesa_sdk.reversal.reversal import Reversal
 from mpesa_sdk.reversal import (
     ReversalRequest,
     ReversalResponse,
-    ReversalReceiverIdentifierType,
     ReversalResultCallback,
     ReversalResultCallbackResponse,
     ReversalTimeoutCallback,
@@ -46,11 +45,9 @@ def valid_reversal_request():
     return ReversalRequest(
         Initiator="TestInit610",
         SecurityCredential="encrypted_credential",
-        CommandID="TransactionReversal",
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="Test",
@@ -154,25 +151,20 @@ def test_reversal_timeout_callback_response():
     assert "Timeout notification received" in resp.ResultDesc
 
 
-# Keep your validation tests for ReversalRequest as they are
-@pytest.mark.parametrize("invalid_identifier_type", ["99", "", None])
-def test_reversal_request_invalid_identifier_type_raises(invalid_identifier_type):
+def test_reversal_request_identifier_type_is_valid():
     """Test that invalid ReceiverIdentifierType raises ValueError."""
     kwargs = dict(
         Initiator="TestInit610",
         SecurityCredential="encrypted_credential",
-        CommandID="TransactionReversal",
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        ReceiverIdentifierType=invalid_identifier_type,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="Test",
     )
-    with pytest.raises(ValueError) as excinfo:
-        ReversalRequest(**kwargs)
-    assert "ReceiverIdentifierType must be one of" in str(excinfo.value)
+    request = ReversalRequest(**kwargs)
+    assert request.RecieverIdentifierType == "11"
 
 
 def test_reversal_request_remarks_too_long_raises():
@@ -180,11 +172,9 @@ def test_reversal_request_remarks_too_long_raises():
     kwargs = dict(
         Initiator="TestInit610",
         SecurityCredential="encrypted_credential",
-        CommandID="TransactionReversal",
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="A" * 101,
@@ -199,11 +189,9 @@ def test_reversal_request_occasion_too_long_raises():
     kwargs = dict(
         Initiator="TestInit610",
         SecurityCredential="encrypted_credential",
-        CommandID="TransactionReversal",
         TransactionID="LKXXXX1234",
         Amount=100,
         ReceiverParty=600610,
-        ReceiverIdentifierType=ReversalReceiverIdentifierType.SHORT_CODE.value,
         ResultURL="https://ip:port/result",
         QueueTimeOutURL="https://ip:port/timeout",
         Remarks="Test",

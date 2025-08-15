@@ -8,28 +8,14 @@ from pydantic import BaseModel, Field, ConfigDict, model_validator
 from typing import Optional, List
 
 
-class ReversalReceiverIdentifierType(str, Enum):
-    """Allowed values for ReceiverIdentifierType in Reversal requests."""
-
-    SHORT_CODE = "11"  # MSISDN
-
-
 class ReversalRequest(BaseModel):
     """Request schema for Transaction Reversal."""
 
     Initiator: str = Field(..., description="Username used to initiate the request.")
     SecurityCredential: str = Field(..., description="Encrypted security credential.")
-    CommandID: str = Field(
-        default="TransactionReversal", description="Type of transaction to perform."
-    )
     TransactionID: str = Field(..., description="Mpesa Transaction ID to reverse.")
     Amount: int = Field(..., description="Amount to reverse (in KES).")
     ReceiverParty: int = Field(..., description="Organization shortcode (6-9 digits).")
-    ReceiverIdentifierType: str = Field(
-        default=ReversalReceiverIdentifierType.SHORT_CODE.value,
-        description="Type of organization receiving the transaction.",
-        alias="RecieverIdentifierType",
-    )
     ResultURL: str = Field(..., description="URL for result notifications.")
     QueueTimeOutURL: str = Field(..., description="URL for timeout notifications.")
     Remarks: str = Field(
@@ -38,6 +24,9 @@ class ReversalRequest(BaseModel):
     Occasion: Optional[str] = Field(
         None, description="Optional parameter (max 100 chars)."
     )
+
+    CommandID: str = "TransactionReversal"
+    RecieverIdentifierType: str = "11"
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -48,7 +37,7 @@ class ReversalRequest(BaseModel):
                 "TransactionID": "LKXXXX1234",
                 "Amount": 100,
                 "ReceiverParty": 600610,
-                "ReceiverIdentifierType": "11",
+                "RecieverIdentifierType": "11",
                 "ResultURL": "https://ip:port/result",
                 "QueueTimeOutURL": "https://ip:port/timeout",
                 "Remarks": "Test",
@@ -60,20 +49,9 @@ class ReversalRequest(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate(cls, values):
-        """Validate ReceiverIdentifierType and Remarks/Occasion length."""
-        cls._validate_identifier_type(values)
+        """Validates model."""
         cls._validate_remarks(values)
         cls._validate_occasion(values)
-        return values
-
-    @classmethod
-    def _validate_identifier_type(cls, values):
-        identifier_type = values.get("ReceiverIdentifierType")
-        valid_types = [e.value for e in ReversalReceiverIdentifierType]
-        if identifier_type not in valid_types:
-            raise ValueError(
-                f"ReceiverIdentifierType must be one of {valid_types}, got '{identifier_type}'"
-            )
         return values
 
     @classmethod
