@@ -1,7 +1,6 @@
 from .schemas import (
     ReversalRequest,
     ReversalResponse,
-    ReversalReceiverIdentifierType,
     ReversalResultCallback,
     ReversalResultCallbackResponse,
     ReversalTimeoutCallback,
@@ -11,7 +10,6 @@ from .reversal import Reversal
 
 __all__ = [
     "Reversal",
-    "ReversalReceiverIdentifierType",
     "ReversalRequest",
     "ReversalResponse",
     "ReversalResultCallback",
