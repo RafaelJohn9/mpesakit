@@ -10,7 +10,7 @@ from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import HttpClient
 from mpesa_sdk.tax_remittance.tax_remittance import TaxRemittance
 
-from mpesa_sdk.tax_remittance.schemas import (
+from mpesa_sdk.tax_remittance import (
     TaxRemittanceRequest,
     TaxRemittanceResponse,
     TaxRemittanceResultCallback,

@@ -62,7 +62,7 @@ def test_tax_remittance_e2e(tax_remittance_service):
         QueueTimeOutURL=queue_timeout_url,
         ResultURL=result_url,
     )
-    request = request.model_dump(by_alias=True)
+    request = dict(request)
     print(f"📤 Sending Tax Remittance request: {request}")
     response = tax_remittance_service.remittance(request=request)
     print(f"✅ Tax Remittance response: {response}")
