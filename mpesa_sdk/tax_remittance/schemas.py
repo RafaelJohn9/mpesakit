@@ -1,6 +1,5 @@
 """This module defines schemas for M-Pesa Tax Remittance API requests and responses."""
 
-from enum import Enum
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 
