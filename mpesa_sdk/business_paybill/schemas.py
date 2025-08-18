@@ -111,7 +111,7 @@ class BusinessPayBillResultMetadata(BaseModel):
     """Metadata for Business PayBill result notification."""
 
     ResultType: int = Field(..., description="Type of result (0=Success, 1=Failure).")
-    ResultCode: int = Field(..., description="Result code (0=Success).")
+    ResultCode: int | str = Field(..., description="Result code (0=Success).")
     ResultDesc: str = Field(..., description="Result description.")
     OriginatorConversationID: str = Field(
         ..., description="Originator conversation ID."

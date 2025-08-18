@@ -54,7 +54,7 @@ class TaxRemittanceResponse(BaseModel):
     ConversationID: Optional[str] = Field(
         ..., description="Unique ID for the transaction."
     )
-    ResponseCode: str = Field(..., description="Status code, 0 means success.")
+    ResponseCode: str | int = Field(..., description="Status code, 0 means success.")
     ResponseDescription: str = Field(..., description="Status message.")
 
     model_config = ConfigDict(
@@ -108,7 +108,7 @@ class TaxRemittanceResultMetadata(BaseModel):
     """Metadata for Tax Remittance result notification."""
 
     ResultType: int = Field(..., description="Type of result (0=Success, 1=Failure).")
-    ResultCode: int = Field(..., description="Result code (0=Success).")
+    ResultCode: int | str = Field(..., description="Result code (0=Success).")
     ResultDesc: str = Field(..., description="Result description.")
     OriginatorConversationID: str = Field(
         ..., description="Originator conversation ID."
@@ -192,7 +192,8 @@ class TaxRemittanceResultCallback(BaseModel):
 
     def is_successful(self) -> bool:
         """Check if the result indicates success."""
-        return self.Result.ResultCode == 0
+        code = str(self.Result.ResultCode)
+        return code.strip("0") == "" and code != ""
 
 
 class TaxRemittanceResultCallbackResponse(BaseModel):
