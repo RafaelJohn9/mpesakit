@@ -42,7 +42,7 @@ class BillManager(BaseModel):
             "Content-Type": "application/json",
         }
         response_data = self.http_client.post(
-            url, json=request.model_dump_json(), headers=headers
+            url, json=request.model_dump(mode="json"), headers=headers
         )
         return BillManagerOptInResponse(**response_data)
 
@@ -61,10 +61,10 @@ class BillManager(BaseModel):
         headers = {
             "Authorization": f"Bearer {self.token_manager.get_token()}",
             "Content-Type": "application/json",
-            "appKey": self.app_key,
+            "appKey": f"{self.app_key}",
         }
         response_data = self.http_client.post(
-            url, json=request.model_dump_json(), headers=headers
+            url, json=request.model_dump(mode="json"), headers=headers
         )
         return BillManagerUpdateOptInResponse(**response_data)
 
@@ -77,10 +77,10 @@ class BillManager(BaseModel):
         headers = {
             "Authorization": f"Bearer {self.token_manager.get_token()}",
             "Content-Type": "application/json",
-            "appKey": self.app_key,
+            "appKey": f"{self.app_key}",
         }
         response_data = self.http_client.post(
-            url, json=request.model_dump_json(), headers=headers
+            url, json=request.model_dump(mode="json"), headers=headers
         )
         return BillManagerSingleInvoiceResponse(**response_data)
 
@@ -93,10 +93,10 @@ class BillManager(BaseModel):
         headers = {
             "Authorization": f"Bearer {self.token_manager.get_token()}",
             "Content-Type": "application/json",
-            "appKey": self.app_key,
+            "appKey": f"{self.app_key}",
         }
         response_data = self.http_client.post(
-            url, json=request.model_dump_json(), headers=headers
+            url, json=request.model_dump(mode="json"), headers=headers
         )
         return BillManagerBulkInvoiceResponse(**response_data)
 
@@ -109,10 +109,10 @@ class BillManager(BaseModel):
         headers = {
             "Authorization": f"Bearer {self.token_manager.get_token()}",
             "Content-Type": "application/json",
-            "appKey": self.app_key,
+            "appKey": f"{self.app_key}",
         }
         response_data = self.http_client.post(
-            url, json=request.model_dump_json(), headers=headers
+            url, json=request.model_dump(mode="json"), headers=headers
         )
         return BillManagerCancelInvoiceResponse(**response_data)
 
@@ -125,9 +125,9 @@ class BillManager(BaseModel):
         headers = {
             "Authorization": f"Bearer {self.token_manager.get_token()}",
             "Content-Type": "application/json",
-            "appKey": self.app_key,
+            "appKey": f"{self.app_key}",
         }
         response_data = self.http_client.post(
-            url, json=request.model_dump_json(), headers=headers
+            url, json=request.model_dump(mode="json"), headers=headers
         )
         return BillManagerCancelInvoiceResponse(**response_data)

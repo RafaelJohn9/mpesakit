@@ -156,7 +156,7 @@ class BillManagerSingleInvoiceRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate(cls, values: dict) -> "BillManagerSingleInvoiceRequest":
+    def validate(cls, values):
         """Validates the input data and raises ValueError if billedPeriod is invalid.
 
         Returns an instance of BillManagerSingleInvoiceRequest if valid.
@@ -361,9 +361,7 @@ class BillManagerCancelInvoiceResponse(BaseModel):
     Status_Message: str = Field(..., description="Descriptive status message.")
     resmsg: str = Field(..., description="Status message.")
     rescode: str = Field(..., description="Status code (200=success, 409=conflict).")
-    errors: Optional[List[Any]] = Field(
-        default_factory=list, description="List of errors."
-    )
+    errors: Optional[List[Any]] = Field(default=None, description="List of errors.")
 
     model_config = ConfigDict(
         json_schema_extra={
