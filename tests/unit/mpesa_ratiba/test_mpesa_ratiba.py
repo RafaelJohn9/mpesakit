@@ -11,6 +11,9 @@ from mpesa_sdk.http_client import HttpClient
 
 from mpesa_sdk.mpesa_ratiba import (
     MpesaRatiba,
+    FrequencyEnum,
+    TransactionTypeEnum,
+    ReceiverPartyIdentifierTypeEnum,
     StandingOrderRequest,
     StandingOrderResponse,
     StandingOrderCallback,
@@ -45,14 +48,14 @@ def valid_standing_order_request():
         StartDate="20240905",
         EndDate="20250905",
         BusinessShortCode="174379",
-        TransactionType="Standing Order Customer Pay Bill",
-        ReceiverPartyIdentifierType="4",
+        TransactionType=TransactionTypeEnum.STANDING_ORDER_CUSTOMER_PAY_BILL,
+        ReceiverPartyIdentifierType=ReceiverPartyIdentifierTypeEnum.MERCHANT_TILL,
         Amount="4500",
         PartyA="254708374149",
         CallBackURL="https://mydomain.com/pat",
         AccountReference="Test",
         TransactionDesc="Electric Bike",
-        Frequency="2",
+        Frequency=FrequencyEnum.DAILY,
     )
 
 
@@ -172,14 +175,14 @@ def test_standing_order_request_invalid_date_format():
             StartDate="202423305",  # Invalid date
             EndDate="20250905",
             BusinessShortCode="174379",
-            TransactionType="Standing Order Customer Pay Bill",
-            ReceiverPartyIdentifierType="4",
+            TransactionType=TransactionTypeEnum.STANDING_ORDER_CUSTOMER_PAY_BILL,
+            ReceiverPartyIdentifierType=ReceiverPartyIdentifierTypeEnum.MERCHANT_TILL,
             Amount="4500",
             PartyA="254708374149",
             CallBackURL="https://mydomain.com/pat",
             AccountReference="Test",
             TransactionDesc="Electric Bike",
-            Frequency="2",
+            Frequency=FrequencyEnum.DAILY,
         )
     assert "Date must be in 'yyyymmdd' format" in str(excinfo.value)
 
@@ -192,14 +195,14 @@ def test_standing_order_request_invalid_date_value():
             StartDate="20241305",  # Invalid month
             EndDate="20250905",
             BusinessShortCode="174379",
-            TransactionType="Standing Order Customer Pay Bill",
-            ReceiverPartyIdentifierType="4",
+            TransactionType=TransactionTypeEnum.STANDING_ORDER_CUSTOMER_PAY_BILL,
+            ReceiverPartyIdentifierType=ReceiverPartyIdentifierTypeEnum.MERCHANT_TILL,
             Amount="4500",
             PartyA="254708374149",
             CallBackURL="https://mydomain.com/pat",
             AccountReference="Test",
             TransactionDesc="Electric Bike",
-            Frequency="2",
+            Frequency=FrequencyEnum.WEEKLY,
         )
     assert "Date must be in 'yyyymmdd' format" in str(excinfo.value)
 
@@ -211,14 +214,14 @@ def test_standing_order_request_other_date_value():
         StartDate="2024-12-05",  # With separators
         EndDate="20250905",
         BusinessShortCode="174379",
-        TransactionType="Standing Order Customer Pay Bill",
-        ReceiverPartyIdentifierType="4",
+        TransactionType=TransactionTypeEnum.STANDING_ORDER_CUSTOMER_PAY_BILL,
+        ReceiverPartyIdentifierType=ReceiverPartyIdentifierTypeEnum.MERCHANT_TILL,
         Amount="4500",
         PartyA="254708374149",
         CallBackURL="https://mydomain.com/pat",
         AccountReference="Test",
         TransactionDesc="Electric Bike",
-        Frequency="2",
+        Frequency=FrequencyEnum.MONTHLY,
     )
     assert request.StartDate == "20241205"  # Should normalize to yyyymmdd format
 
@@ -231,13 +234,13 @@ def test_invalid_phone_number():
             StartDate="20240905",
             EndDate="20250905",
             BusinessShortCode="174379",
-            TransactionType="Standing Order Customer Pay Bill",
-            ReceiverPartyIdentifierType="4",
+            TransactionType=TransactionTypeEnum.STANDING_ORDER_CUSTOMER_PAY_BILL,
+            ReceiverPartyIdentifierType=ReceiverPartyIdentifierTypeEnum.MERCHANT_TILL,
             Amount="4500",
             PartyA="123456789",  # Invalid phone number
             CallBackURL="https://mydomain.com/pat",
             AccountReference="Test",
             TransactionDesc="Electric Bike",
-            Frequency="2",
+            Frequency=FrequencyEnum.MONTHLY,
         )
     assert "Invalid PartyA phone number" in str(excinfo.value)

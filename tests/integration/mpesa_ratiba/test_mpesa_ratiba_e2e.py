@@ -10,7 +10,13 @@ from dotenv import load_dotenv
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import MpesaHttpClient
 
-from mpesa_sdk.mpesa_ratiba import MpesaRatiba, StandingOrderRequest
+from mpesa_sdk.mpesa_ratiba import (
+    MpesaRatiba,
+    StandingOrderRequest,
+    FrequencyEnum,
+    TransactionTypeEnum,
+    ReceiverPartyIdentifierTypeEnum,
+)
 
 load_dotenv()
 pytestmark = pytest.mark.live
@@ -37,18 +43,14 @@ def test_mpesa_ratiba_e2e(mpesa_ratiba_service):
     start_date = os.getenv("MPESA_RATIBA_START_DATE", "20240905")
     end_date = os.getenv("MPESA_RATIBA_END_DATE", "20250905")
     business_short_code = os.getenv("MPESA_RATIBA_BUSINESS_SHORT_CODE", "174379")
-    transaction_type = os.getenv(
-        "MPESA_RATIBA_TRANSACTION_TYPE", "Standing Order Customer Pay Bill"
-    )
-    receiver_party_identifier_type = os.getenv(
-        "MPESA_RATIBA_RECEIVER_PARTY_IDENTIFIER_TYPE", "4"
-    )
+    transaction_type = TransactionTypeEnum.STANDING_ORDER_CUSTOMER_PAY_BILL
+    receiver_party_identifier_type = ReceiverPartyIdentifierTypeEnum.BUSINESS_SHORT_CODE
     amount = os.getenv("MPESA_RATIBA_AMOUNT", "4500")
     party_a = os.getenv("MPESA_RATIBA_PARTY_A", "254708374149")
     callback_url = os.getenv("MPESA_RATIBA_CALLBACK_URL", "https://mydomain.com/pat")
     account_reference = os.getenv("MPESA_RATIBA_ACCOUNT_REFERENCE", "Test")
     transaction_desc = os.getenv("MPESA_RATIBA_TRANSACTION_DESC", "BikeRepayment")
-    frequency = os.getenv("MPESA_RATIBA_FREQUENCY", "2")
+    frequency = FrequencyEnum.MONTHLY
 
     request = StandingOrderRequest(
         StandingOrderName=standing_order_name,
