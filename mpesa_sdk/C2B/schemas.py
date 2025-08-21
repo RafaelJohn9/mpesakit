@@ -181,7 +181,7 @@ class C2BValidationRequest(BaseModel):
 class C2BValidationResponse(BaseModel):
     """Schema for response to validation requests (accept/reject payment)."""
 
-    ResultCode: str = Field(..., description="0 to accept, error code to reject.")
+    ResultCode: int | str = Field(..., description="0 to accept, error code to reject.")
     ResultDesc: str = Field(..., description="Short description: Accepted or Rejected.")
     ThirdPartyTransID: Optional[str] = Field(
         None, description="Optional partner transaction ID."

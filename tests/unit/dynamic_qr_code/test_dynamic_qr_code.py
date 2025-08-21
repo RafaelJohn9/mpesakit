@@ -50,6 +50,8 @@ def test_generate_dynamic_qr_success(dynamic_qr_service, mock_http_client):
 
     response = dynamic_qr_service.generate(request)
 
+    assert response.is_successful() is True
+
     # Adjust the response class if needed
     assert hasattr(response, "QRCode") or hasattr(response, "qr_code")
     assert (
