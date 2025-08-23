@@ -2,7 +2,7 @@
 
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.services.b2c import B2C, B2CRequest, B2CResponse
+from mpesa_sdk.B2C import B2C, B2CRequest, B2CResponse
 from mpesa_sdk.B2C_account_top_up import (
     B2CAccountTopUp,
     B2CAccountTopUpRequest,
