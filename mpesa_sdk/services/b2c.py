@@ -2,7 +2,7 @@
 
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.services.b2c import B2C, B2CRequest, B2CResponse
+from mpesa_sdk.B2C import B2C, B2CRequest, B2CResponse
 from mpesa_sdk.B2C_account_top_up import (
     B2CAccountTopUp,
     B2CAccountTopUpRequest,
@@ -18,7 +18,7 @@ class B2CService:
         self.http_client = http_client
         self.token_manager = token_manager
         self.b2c = B2C(http_client=self.http_client, token_manager=self.token_manager)
-        self.account_topup = B2CAccountTopUp(
+        self._account_topup = B2CAccountTopUp(
             http_client=self.http_client, token_manager=self.token_manager
         )
 
@@ -112,4 +112,4 @@ class B2CService:
                 if k in B2CAccountTopUpRequest.model_fields
             },
         )
-        return self.account_topup.topup(request)
+        return self._account_topup.topup(request)

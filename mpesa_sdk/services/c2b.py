@@ -3,7 +3,7 @@
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import HttpClient
 
-from mpesa_sdk.services.c2b import (
+from mpesa_sdk.C2B import (
     C2B,
     C2BRegisterUrlRequest,
     C2BRegisterUrlResponse,

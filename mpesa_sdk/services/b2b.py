@@ -16,7 +16,7 @@ class B2BService:
         """Initialize the B2B service facade."""
         self.http_client = http_client
         self.token_manager = token_manager
-        self.express_checkout = B2BExpressCheckout(
+        self._express_checkout = B2BExpressCheckout(
             http_client=self.http_client, token_manager=self.token_manager
         )
 
@@ -60,4 +60,4 @@ class B2BService:
                 if k in B2BExpressCheckoutRequest.model_fields
             },
         )
-        return self.express_checkout.ussd_push(request)
+        return self._express_checkout.ussd_push(request)
