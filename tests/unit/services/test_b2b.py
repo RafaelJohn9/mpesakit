@@ -5,18 +5,12 @@ from unittest.mock import MagicMock
 
 from mpesa_sdk.services.b2b import B2BService
 from mpesa_sdk.business_buy_goods import (
-    BusinessBuyGoods,
-    BusinessBuyGoodsRequest,
     BusinessBuyGoodsResponse,
 )
 from mpesa_sdk.business_paybill import (
-    BusinessPayBill,
-    BusinessPayBillRequest,
     BusinessPayBillResponse,
 )
 from mpesa_sdk.B2B_express_checkout import (
-    B2BExpressCheckout,
-    B2BExpressCheckoutRequest,
     B2BExpressCheckoutResponse,
 )
 from mpesa_sdk.auth import TokenManager
