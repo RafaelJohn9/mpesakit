@@ -90,7 +90,7 @@ convention = "google"
 known-first-party = ["mpesa_sdk"]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["D104", "F401"]
+"__init__.py" = ["D104", "F401"] # Ignore missing docstring and unused imports in __init__.py files
 
 # Testing configuration
 [tool.pytest.ini_options]
@@ -101,5 +101,5 @@ markers = [
 ]
 
 [tool.mypy]
-enable_error_code = ["ignore-without-comment"]
 plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
