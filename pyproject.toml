@@ -73,10 +73,11 @@ packages = ["mpesa_sdk"]
 
 # Ruff configuration
 [tool.ruff]
-target-version = "py310"
+target-version = "py312"
+fix = true  
 
 [tool.ruff.lint]
-select = ["D", "E", "W"]  # Enable docstring checks, pycodestyle errors, and warnings
+select = ["D", "E", "W", "F"]  # Enable docstring checks, pycodestyle errors, and warnings
 ignore = [
   "D104",  # Missing docstring in public package
   "D105",  # Missing docstring in magic method
