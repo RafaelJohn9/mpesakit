@@ -1,6 +1,5 @@
 """Facade for M-Pesa Account Balance API interactions."""
 
-from typing import Optional
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import HttpClient
 from mpesa_sdk.account_balance import (

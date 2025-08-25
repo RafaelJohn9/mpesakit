@@ -1,6 +1,5 @@
 """Facade for M-Pesa Tax Remittance API interactions."""
 
-from typing import Optional
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import HttpClient
 
