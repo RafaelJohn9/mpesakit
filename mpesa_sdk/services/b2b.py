@@ -6,6 +6,7 @@ from mpesa_sdk.http_client import HttpClient
 from mpesa_sdk.business_buy_goods import (
     BusinessBuyGoods,
     BusinessBuyGoodsRequest,
+    BusinessBuyGoodsResponse,
 )
 from mpesa_sdk.business_paybill import (
     BusinessPayBill,
@@ -146,7 +147,7 @@ class B2BService:
         result_url: str,
         occassion: Optional[str] = None,
         **kwargs,
-    ):
+    ) -> BusinessBuyGoodsResponse:
         """Initiate a Business Buy Goods transaction to another merchant.
 
         Args:
