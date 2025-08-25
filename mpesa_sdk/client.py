@@ -22,18 +22,47 @@ class MpesaClient:
 
     def __init__(self, http_client: HttpClient, token_manager: TokenManager):
         """Initialize the MpesaClient with all service facades."""
-        self.config = {
-            "http_client": http_client,
-            "token_manager": token_manager,
-        }
-        self.express = StkPushService(**self.config)
-        self.b2c = B2CService(**self.config)
-        self.b2b = B2BService(**self.config)
-        self.transactions = TransactionService(**self.config)
-        self.tax = TaxService(**self.config)
-        self.balance = BalanceService(**self.config)
-        self.reversal = ReversalService(**self.config)
-        self.bill = BillService(**self.config)
-        self.dynamic_qr = DynamicQRCodeService(**self.config)
-        self.c2b = C2BService(**self.config)
-        self.ratiba = RatibaService(**self.config)
+        # express => M-PESA STK Push
+        self.express = StkPushService(
+            http_client=http_client, token_manager=token_manager
+        )
+
+        # b2c => M-PESA Business to Customer services
+        self.b2c = B2CService(http_client=http_client, token_manager=token_manager)
+
+        # b2b => M-PESA Business to Business services
+        self.b2b = B2BService(http_client=http_client, token_manager=token_manager)
+
+        # transaction => M-PESA Transaction status services
+        self.transactions = TransactionService(
+            http_client=http_client, token_manager=token_manager
+        )
+
+        # tax => M-PESA Tax services
+        self.tax = TaxService(http_client=http_client, token_manager=token_manager)
+
+        # balance => M-PESA Account balance services
+        self.balance = BalanceService(
+            http_client=http_client, token_manager=token_manager
+        )
+
+        # reversal => M-PESA Transaction reversal services
+        self.reversal = ReversalService(
+            http_client=http_client, token_manager=token_manager
+        )
+
+        # bill => M-PESA Bill services
+        self.bill = BillService(http_client=http_client, token_manager=token_manager)
+
+        # dynamic_qr => M-PESA Dynamic QR services
+        self.dynamic_qr = DynamicQRCodeService(
+            http_client=http_client, token_manager=token_manager
+        )
+
+        # c2b => M-PESA Customer to Business services
+        self.c2b = C2BService(http_client=http_client, token_manager=token_manager)
+
+        # ratiba => M-PESA Ratiba services
+        self.ratiba = RatibaService(
+            http_client=http_client, token_manager=token_manager
+        )
