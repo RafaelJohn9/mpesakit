@@ -225,6 +225,7 @@ def test_b2c_request_occasion_too_long_raises():
 
 
 def make_result_parameters(params):
+    """Helper to create list of B2CResultParameter from dict."""
     return [B2CResultParameter(Key=k, Value=v) for k, v in params.items()]
 
 
