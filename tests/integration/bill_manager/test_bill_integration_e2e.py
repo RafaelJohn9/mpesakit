@@ -39,8 +39,6 @@ def test_bill_manager_opt_in_e2e(bill_manager_service):
     print("🔗 Starting E2E Test: Bill Manager Opt-In")
 
     shortcode = os.getenv("MPESA_BILL_MANAGER_SHORTCODE", "600999")
-    organization_name = os.getenv("MPESA_BILL_MANAGER_ORG_NAME", "TestOrg")
-    contact_person = os.getenv("MPESA_BILL_MANAGER_CONTACT_PERSON", "John Doe")
     contact_email = os.getenv("MPESA_BILL_MANAGER_CONTACT_EMAIL", "john@example.com")
     contact_phone = os.getenv("MPESA_BILL_MANAGER_CONTACT_PHONE", "254700000000")
     callbackurl = os.getenv(

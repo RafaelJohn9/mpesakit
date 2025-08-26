@@ -6,7 +6,6 @@ from mpesa_sdk.services.ratiba import RatibaService
 from mpesa_sdk.auth import TokenManager
 from mpesa_sdk.http_client import HttpClient
 from mpesa_sdk.mpesa_ratiba import (
-    StandingOrderRequest,
     StandingOrderResponse,
     TransactionTypeEnum,
     ReceiverPartyIdentifierTypeEnum,

@@ -70,7 +70,6 @@ def test_force_refresh_token(valid_credentials, http_client):
         consumer_secret=valid_credentials["consumer_secret"],
         http_client=http_client,
     )
-    token1 = tm.get_token()
     token2 = tm.get_token(force_refresh=True)
     assert isinstance(token2, str)
     # Token may or may not change, but should be valid
