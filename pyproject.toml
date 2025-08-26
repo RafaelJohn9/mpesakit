@@ -60,6 +60,7 @@ dev = [
   "hatch-vcs",
   "hatchling",
   "mypy",
+  "bandit",
   "pytest",
   "pytest-cov",
   "ruff",
