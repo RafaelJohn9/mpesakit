@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mpesa-sdk"
+name = "mpesakit"
 dynamic = ["version"]
 description = "A Python SDK for integrating with M-Pesa APIs"
 readme = "README.md"
@@ -47,9 +47,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rafaeljohn9/mpesa-sdk"
-Repository = "https://github.com/rafaeljohn9/mpesa-sdk"
-Issues = "https://github.com/rafaeljohn9/mpesa-sdk/issues"
+Homepage = "https://github.com/rafaeljohn9/mpesakit"
+Repository = "https://github.com/rafaeljohn9/mpesakit"
+Issues = "https://github.com/rafaeljohn9/mpesakit/issues"
 
 
 [project.optional-dependencies]
