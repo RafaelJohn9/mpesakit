@@ -6,10 +6,10 @@ process responses correctly, and manage callback/error cases.
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
-from mpesa_sdk.B2B_express_checkout import (
+from mpesakit.B2B_express_checkout import (
     B2BExpressCheckout,
     B2BExpressCheckoutRequest,
     B2BExpressCheckoutResponse,

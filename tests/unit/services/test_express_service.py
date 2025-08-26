@@ -1,12 +1,12 @@
-"""Unit tests for the StkPushService facade in mpesa_sdk.services.express module."""
+"""Unit tests for the StkPushService facade in mpesakit.services.express module."""
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.express import StkPushService
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.services.express import StkPushService
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
-from mpesa_sdk.mpesa_express import (
+from mpesakit.mpesa_express import (
     StkPushSimulateResponse,
     StkPushQueryResponse,
     TransactionType,

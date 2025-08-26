@@ -6,9 +6,9 @@ It ensures that the TokenManager can successfully obtain and manage tokens.
 from dotenv import load_dotenv
 import os
 import pytest
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
-from mpesa_sdk.errors import MpesaApiException
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.errors import MpesaApiException
 
 load_dotenv()
 

@@ -1,7 +1,7 @@
-"""Unit tests for the normalize_phone_number function in mpesa_sdk.utils.phone."""
+"""Unit tests for the normalize_phone_number function in mpesakit.utils.phone."""
 
 import pytest
-from mpesa_sdk.utils.phone import normalize_phone_number
+from mpesakit.utils.phone import normalize_phone_number
 
 
 @pytest.mark.parametrize(

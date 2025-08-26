@@ -2,10 +2,10 @@
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.transaction import TransactionService
-from mpesa_sdk.transaction_status import TransactionStatusResponse
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.services.transaction import TransactionService
+from mpesakit.transaction_status import TransactionStatusResponse
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
 
 @pytest.fixture

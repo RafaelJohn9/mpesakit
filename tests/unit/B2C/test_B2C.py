@@ -3,15 +3,15 @@
 import pytest
 from unittest.mock import MagicMock
 
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.B2C.B2C import B2C
-from mpesa_sdk.B2C.schemas import (
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
+from mpesakit.B2C.B2C import B2C
+from mpesakit.B2C.schemas import (
     B2CResultMetadata,
     B2CResultParameter,
     B2CResultCallback,
 )
-from mpesa_sdk.B2C.schemas import (
+from mpesakit.B2C.schemas import (
     B2CRequest,
     B2CResponse,
     B2CCommandIDType,

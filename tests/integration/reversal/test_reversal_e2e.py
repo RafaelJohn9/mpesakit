@@ -9,11 +9,11 @@ It requires valid credentials and a previously completed transaction.
 import os
 import pytest
 from dotenv import load_dotenv
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
 
 
-from mpesa_sdk.reversal import (
+from mpesakit.reversal import (
     Reversal,
     ReversalRequest,
 )

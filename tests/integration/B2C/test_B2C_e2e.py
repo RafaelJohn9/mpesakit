@@ -10,9 +10,9 @@ import os
 import uuid
 import pytest
 from dotenv import load_dotenv
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
-from mpesa_sdk.B2C import B2C, B2CRequest, B2CCommandIDType
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.B2C import B2C, B2CRequest, B2CCommandIDType
 
 
 load_dotenv()

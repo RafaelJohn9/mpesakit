@@ -5,15 +5,15 @@ This module tests the StkPush class for initiating and querying M-Pesa STK Push 
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.mpesa_express.stk_push import (
+from mpesakit.mpesa_express.stk_push import (
     StkPush,
     StkPushSimulateRequest,
     StkPushSimulateResponse,
     StkPushQueryRequest,
     StkPushQueryResponse,
 )
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
 
 @pytest.fixture

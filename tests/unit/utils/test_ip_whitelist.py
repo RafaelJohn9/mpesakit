@@ -1,7 +1,7 @@
-"""Unit tests for is_mpesa_ip_allowed in mpesa_sdk.utils.ip_whitelist."""
+"""Unit tests for is_mpesa_ip_allowed in mpesakit.utils.ip_whitelist."""
 
 import pytest
-from mpesa_sdk.utils.ip_whitelist import is_mpesa_ip_allowed
+from mpesakit.utils.ip_whitelist import is_mpesa_ip_allowed
 
 
 @pytest.mark.parametrize(

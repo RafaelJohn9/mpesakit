@@ -1,11 +1,11 @@
-"""Unit tests for the DynamicQRCodeService class in mpesa_sdk.services.dynamic_qr module."""
+"""Unit tests for the DynamicQRCodeService class in mpesakit.services.dynamic_qr module."""
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.dynamic_qr import DynamicQRCodeService
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.dynamic_qr_code import (
+from mpesakit.services.dynamic_qr import DynamicQRCodeService
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
+from mpesakit.dynamic_qr_code import (
     DynamicQRGenerateResponse,
     DynamicQRTransactionType,
 )

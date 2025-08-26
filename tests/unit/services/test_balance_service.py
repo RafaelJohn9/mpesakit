@@ -2,10 +2,10 @@
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.balance import BalanceService
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.account_balance import (
+from mpesakit.services.balance import BalanceService
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
+from mpesakit.account_balance import (
     AccountBalanceResponse,
 )
 

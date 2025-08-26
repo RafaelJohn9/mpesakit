@@ -6,13 +6,13 @@ invoicing, cancellation, and error cases.
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.bill_manager.bill_manager import BillManager
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
+from mpesakit.bill_manager.bill_manager import BillManager
 from datetime import datetime
 from pydantic import ValidationError
 
-from mpesa_sdk.bill_manager.schemas import (
+from mpesakit.bill_manager.schemas import (
     BillManagerOptInRequest,
     BillManagerOptInResponse,
     BillManagerUpdateOptInRequest,

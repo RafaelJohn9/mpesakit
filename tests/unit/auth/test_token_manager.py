@@ -1,13 +1,13 @@
-"""Unit tests for the TokenManager class in the mpesa_sdk.auth module.
+"""Unit tests for the TokenManager class in the mpesakit.auth module.
 
 These tests cover token retrieval, caching, and error handling.
 """
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.errors import MpesaApiException, MpesaError
+from mpesakit.http_client import HttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.errors import MpesaApiException, MpesaError
 
 
 @pytest.fixture

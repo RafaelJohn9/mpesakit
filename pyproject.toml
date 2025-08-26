@@ -80,12 +80,12 @@ source = "vcs"
 
 [tool.hatch.build]
 include = [
-  "mpesa_sdk/**/*",
+  "mpesakit/**/*",
   "pyproject.toml",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["mpesa_sdk"]
+packages = ["mpesakit"]
 
 # Ruff configuration-sdk/is
 [tool.ruff]
@@ -109,7 +109,7 @@ ignore = [
 convention = "google"
 
 [tool.ruff.lint.isort]
-known-first-party = ["mpesa_sdk"]
+known-first-party = ["mpesakit"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["D104", "F401"] # Ignore missing docstring and unused imports in __init__.py files
@@ -117,7 +117,7 @@ known-first-party = ["mpesa_sdk"]
 # Testing configuration
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v -s --cov=mpesa_sdk --cov-report=html --cov-report=term"
+addopts = "-v -s --cov=mpesakit --cov-report=html --cov-report=term"
 markers = [
   "live: mark a test as requiring live credentials and environment"
 ]

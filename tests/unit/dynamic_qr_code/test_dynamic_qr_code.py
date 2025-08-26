@@ -2,13 +2,13 @@
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.dynamic_qr_code import (
+from mpesakit.dynamic_qr_code import (
     DynamicQRGenerateRequest,
     DynamicQRCode,
     DynamicQRTransactionType,
 )
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client.mpesa_http_client import MpesaHttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client.mpesa_http_client import MpesaHttpClient
 
 
 @pytest.fixture
@@ -101,7 +101,7 @@ def test_generate_dynamic_qr_send_money_cpi_normalization(monkeypatch):
     """Test CPI normalization for SEND_MONEY TrxCode."""
     # Patch normalize_phone_number to simulate normalization
     monkeypatch.setattr(
-        "mpesa_sdk.dynamic_qr_code.schemas.normalize_phone_number",
+        "mpesakit.dynamic_qr_code.schemas.normalize_phone_number",
         lambda cpi: "254712345678"
         if cpi in ["0712345678", "+254712345678", "254712345678"]
         else None,

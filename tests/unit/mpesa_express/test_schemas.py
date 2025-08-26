@@ -1,7 +1,7 @@
-"""Unit tests for mpesa_sdk.mpesa_express.schemas.
+"""Unit tests for mpesakit.mpesa_express.schemas.
 
 This module contains unit tests for the schemas used in the mpesa_express
-module of the mpesa_sdk package. The tests cover validation, normalization,
+module of the mpesakit package. The tests cover validation, normalization,
 password generation, and parsing logic for STK Push requests, responses,
 and callbacks.
 
@@ -15,7 +15,7 @@ Tested features include:
 """
 
 import pytest
-from mpesa_sdk.mpesa_express import schemas
+from mpesakit.mpesa_express import schemas
 from pydantic import ValidationError
 import base64
 

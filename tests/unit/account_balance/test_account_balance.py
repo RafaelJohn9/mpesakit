@@ -5,10 +5,10 @@ This module tests the AccountBalance class and its methods for querying account 
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
-from mpesa_sdk.account_balance import (
+from mpesakit.account_balance import (
     AccountBalanceIdentifierType,
     AccountBalance,
     AccountBalanceRequest,

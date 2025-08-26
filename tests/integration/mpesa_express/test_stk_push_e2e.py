@@ -14,14 +14,14 @@ from dotenv import load_dotenv
 from pyngrok import ngrok
 import atexit
 
-from mpesa_sdk.mpesa_express import (
+from mpesakit.mpesa_express import (
     StkPush,
     StkPushSimulateRequest,
     StkPushQueryRequest,
     StkPushSimulateCallback,
 )
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
 
 pytestmark = pytest.mark.live
 
