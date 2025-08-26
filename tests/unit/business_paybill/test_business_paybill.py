@@ -6,11 +6,11 @@ process responses correctly, and manage error cases.
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.business_paybill.business_paybill import BusinessPayBill
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
+from mpesakit.business_paybill.business_paybill import BusinessPayBill
 
-from mpesa_sdk.business_paybill.schemas import (
+from mpesakit.business_paybill.schemas import (
     BusinessPayBillRequest,
     BusinessPayBillResponse,
     BusinessPayBillResultCallback,

@@ -2,11 +2,11 @@
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.bill import BillService
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.services.bill import BillService
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
-from mpesa_sdk.bill_manager import (
+from mpesakit.bill_manager import (
     BillManagerOptInResponse,
     BillManagerUpdateOptInResponse,
     BillManagerSingleInvoiceResponse,

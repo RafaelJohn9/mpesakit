@@ -1,11 +1,11 @@
-"""Unit tests for the RatibaService facade in mpesa_sdk.services.ratiba module."""
+"""Unit tests for the RatibaService facade in mpesakit.services.ratiba module."""
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.ratiba import RatibaService
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.mpesa_ratiba import (
+from mpesakit.services.ratiba import RatibaService
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
+from mpesakit.mpesa_ratiba import (
     StandingOrderResponse,
     TransactionTypeEnum,
     ReceiverPartyIdentifierTypeEnum,

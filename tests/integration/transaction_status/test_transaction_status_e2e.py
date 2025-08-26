@@ -9,9 +9,9 @@ It requires valid credentials and a previously initiated transaction.
 import os
 import pytest
 from dotenv import load_dotenv
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
-from mpesa_sdk.transaction_status import (
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.transaction_status import (
     TransactionStatus,
     TransactionStatusRequest,
     TransactionStatusIdentifierType,

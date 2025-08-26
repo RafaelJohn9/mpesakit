@@ -12,7 +12,7 @@ import time
 from datetime import datetime
 
 # 🔗 Your SDK models
-from mpesa_sdk.mpesa_express import StkPushSimulateCallback
+from mpesakit.mpesa_express import StkPushSimulateCallback
 
 # --- Configure Logging ---
 logging.basicConfig(

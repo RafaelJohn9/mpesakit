@@ -2,10 +2,10 @@
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.reversal import ReversalService
-from mpesa_sdk.reversal import ReversalResponse
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.services.reversal import ReversalService
+from mpesakit.reversal import ReversalResponse
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
 
 @pytest.fixture

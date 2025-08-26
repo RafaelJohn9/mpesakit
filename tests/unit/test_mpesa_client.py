@@ -1,11 +1,11 @@
 """Unit tests for MpesaClient and its services."""
 
 import pytest
-from mpesa_sdk.mpesa_client import MpesaClient
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
+from mpesakit.mpesa_client import MpesaClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
 
-from mpesa_sdk.services import (
+from mpesakit.services import (
     B2BService,
     B2CService,
     BalanceService,

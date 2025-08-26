@@ -3,18 +3,18 @@
 import pytest
 from unittest.mock import MagicMock
 
-from mpesa_sdk.services.b2b import B2BService
-from mpesa_sdk.business_buy_goods import (
+from mpesakit.services.b2b import B2BService
+from mpesakit.business_buy_goods import (
     BusinessBuyGoodsResponse,
 )
-from mpesa_sdk.business_paybill import (
+from mpesakit.business_paybill import (
     BusinessPayBillResponse,
 )
-from mpesa_sdk.B2B_express_checkout import (
+from mpesakit.B2B_express_checkout import (
     B2BExpressCheckoutResponse,
 )
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
 
 @pytest.fixture

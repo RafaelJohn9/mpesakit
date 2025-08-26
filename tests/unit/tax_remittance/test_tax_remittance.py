@@ -6,11 +6,11 @@ process responses correctly, and manage error cases.
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
-from mpesa_sdk.tax_remittance.tax_remittance import TaxRemittance
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
+from mpesakit.tax_remittance.tax_remittance import TaxRemittance
 
-from mpesa_sdk.tax_remittance import (
+from mpesakit.tax_remittance import (
     TaxRemittanceRequest,
     TaxRemittanceResponse,
     TaxRemittanceResultCallback,

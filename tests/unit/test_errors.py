@@ -3,7 +3,7 @@
 This module tests the error handling functionality of the Mpesa SDK using Pydantic for validation and serialization.
 """
 
-from mpesa_sdk.errors import MpesaError, MpesaApiException
+from mpesakit.errors import MpesaError, MpesaApiException
 
 
 def test_mpesa_error_str_full_fields():

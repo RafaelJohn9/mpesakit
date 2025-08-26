@@ -9,10 +9,10 @@ It requires valid credentials and a properly configured environment.
 import os
 import pytest
 from dotenv import load_dotenv
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
 
-from mpesa_sdk.business_paybill import (
+from mpesakit.business_paybill import (
     BusinessPayBill,
     BusinessPayBillRequest,
 )

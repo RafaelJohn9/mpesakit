@@ -12,10 +12,10 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from mpesa_sdk.C2B.C2B import C2B
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import MpesaHttpClient
-from mpesa_sdk.C2B import (
+from mpesakit.C2B.C2B import C2B
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.C2B import (
     C2BRegisterUrlRequest,
 )
 

@@ -4,13 +4,13 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from mpesa_sdk.dynamic_qr_code import (
+from mpesakit.dynamic_qr_code import (
     DynamicQRGenerateRequest,
     DynamicQRCode,
     DynamicQRTransactionType,
 )
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client.mpesa_http_client import MpesaHttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client.mpesa_http_client import MpesaHttpClient
 
 pytestmark = pytest.mark.live
 

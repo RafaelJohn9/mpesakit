@@ -5,10 +5,10 @@ This module tests the TransactionStatus class and its methods for querying trans
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
-from mpesa_sdk.transaction_status import (
+from mpesakit.transaction_status import (
     TransactionStatus,
     TransactionStatusRequest,
     TransactionStatusResponse,
@@ -232,7 +232,7 @@ def test_transaction_status_request_msisdn_normalization(monkeypatch):
     """Test that PartyA is normalized to a valid Kenyan MSISDN."""
     # Patch normalize_phone_number to return a valid normalized number
     monkeypatch.setattr(
-        "mpesa_sdk.utils.phone.normalize_phone_number", lambda x: "254712345678"
+        "mpesakit.utils.phone.normalize_phone_number", lambda x: "254712345678"
     )
     req = TransactionStatusRequest(
         Initiator="testapi",
@@ -250,7 +250,7 @@ def test_transaction_status_request_msisdn_normalization(monkeypatch):
 
 def test_transaction_status_request_invalid_msisdn(monkeypatch):
     """Test that invalid PartyA raises ValueError."""
-    monkeypatch.setattr("mpesa_sdk.utils.phone.normalize_phone_number", lambda x: None)
+    monkeypatch.setattr("mpesakit.utils.phone.normalize_phone_number", lambda x: None)
     kwargs = dict(
         Initiator="testapi",
         SecurityCredential="encrypted_credential",

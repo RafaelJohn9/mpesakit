@@ -1,11 +1,11 @@
-"""Unit tests for the C2BService class in mpesa_sdk.services.c2b module."""
+"""Unit tests for the C2BService class in mpesakit.services.c2b module."""
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.c2b import C2BService
-from mpesa_sdk.C2B import C2BRegisterUrlResponse, C2BResponseType
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.services.c2b import C2BService
+from mpesakit.C2B import C2BRegisterUrlResponse, C2BResponseType
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
 
 @pytest.fixture

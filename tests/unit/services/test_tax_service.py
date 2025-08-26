@@ -2,10 +2,10 @@
 
 import pytest
 from unittest.mock import MagicMock
-from mpesa_sdk.services.tax import TaxService
-from mpesa_sdk.tax_remittance import TaxRemittanceResponse
-from mpesa_sdk.auth import TokenManager
-from mpesa_sdk.http_client import HttpClient
+from mpesakit.services.tax import TaxService
+from mpesakit.tax_remittance import TaxRemittanceResponse
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import HttpClient
 
 
 @pytest.fixture
