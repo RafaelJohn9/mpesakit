@@ -134,3 +134,25 @@ def test_express_checkout_filters_kwargs(b2b_service, mock_http_client):
     assert isinstance(resp, B2BExpressCheckoutResponse)
     assert resp.is_successful() is True
     assert resp.status == "USSD Initiated Successfully"
+
+
+def test_b2b_service_initializes_services_correctly(
+    mock_http_client, mock_token_manager
+):
+    """Test B2BService initializes its dependencies with correct arguments."""
+    service = B2BService(
+        http_client=mock_http_client,
+        token_manager=mock_token_manager,
+    )
+    assert service.http_client is mock_http_client
+    assert service.token_manager is mock_token_manager
+    # If B2BService initializes sub-services, check them too
+    if hasattr(service, "express_checkout_service"):
+        assert service.express_checkout_service.http_client is mock_http_client
+        assert service.express_checkout_service.token_manager is mock_token_manager
+    if hasattr(service, "paybill_service"):
+        assert service.paybill_service.http_client is mock_http_client
+        assert service.paybill_service.token_manager is mock_token_manager
+    if hasattr(service, "buygoods_service"):
+        assert service.buygoods_service.http_client is mock_http_client
+        assert service.buygoods_service.token_manager is mock_token_manager

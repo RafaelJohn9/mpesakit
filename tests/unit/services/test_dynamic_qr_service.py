@@ -85,33 +85,11 @@ def test_generate_filters_kwargs(dynamic_qr_service, mock_http_client):
     assert resp.is_successful() is True
 
 
-def test_generate_passes_only_model_fields(dynamic_qr_service, mock_http_client):
-    """Test that only valid model fields are passed to DynamicQRGenerateRequest."""
-    valid_fields = {
-        "merchant_name": "Merchant",
-        "ref_no": "REF789",
-        "amount": 300.0,
-        "trx_code": DynamicQRTransactionType.BUY_GOODS.value,
-        "cpi": "CPI789",
-        "size": "500x500",
-    }
-    extra_fields = {
-        "InvalidField1": "value1",
-        "InvalidField2": "value2",
-    }
-    response_data = {
-        "QRCode": "base64string",
-        "MerchantName": "Merchant",
-        "RefNo": "REF789",
-        "Amount": 300.0,
-        "TrxCode": "PAY",
-        "CPI": "CPI789",
-        "Size": "500x500",
-        "ResponseCode": "0",
-        "ResponseDescription": "QR code generated successfully.",
-    }
-    mock_http_client.post.return_value = response_data
-
-    resp = dynamic_qr_service.generate(**valid_fields, **extra_fields)
-    assert isinstance(resp, DynamicQRGenerateResponse)
-    assert resp.is_successful() is True
+def test_dynamic_qr_service_initializes_correctly(mock_http_client, mock_token_manager):
+    """Test DynamicQRCodeService initializes with correct arguments."""
+    service = DynamicQRCodeService(
+        http_client=mock_http_client,
+        token_manager=mock_token_manager,
+    )
+    assert service.http_client is mock_http_client
+    assert service.token_manager is mock_token_manager

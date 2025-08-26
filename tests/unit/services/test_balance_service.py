@@ -89,3 +89,17 @@ def test_query_filters_kwargs(balance_service, mock_http_client):
     assert (
         hasattr(resp, "unexpected_field") is False
     )  # Response should not have ExtraField
+
+
+def test_balance_service_initializes_account_balance_correctly(
+    mock_http_client, mock_token_manager
+):
+    """Test BalanceService initializes AccountBalance with correct arguments."""
+    service = BalanceService(
+        http_client=mock_http_client,
+        token_manager=mock_token_manager,
+    )
+    assert service.http_client is mock_http_client
+    assert service.token_manager is mock_token_manager
+    assert service.account_balance.http_client is mock_http_client
+    assert service.account_balance.token_manager is mock_token_manager

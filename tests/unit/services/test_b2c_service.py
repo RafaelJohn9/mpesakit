@@ -143,3 +143,17 @@ def test_account_topup_filters_kwargs(b2c_service, mock_http_client):
     assert isinstance(resp, B2CAccountTopUpResponse)
     assert resp.ResponseCode == "0"
     assert resp.ResponseDescription == "TopUp accepted successfully."
+
+
+def test_b2c_service_initializes_b2c_correctly(mock_http_client, mock_token_manager):
+    """Test B2CService initializes with correct arguments."""
+    service = B2CService(
+        http_client=mock_http_client,
+        token_manager=mock_token_manager,
+    )
+    assert service.http_client is mock_http_client
+    assert service.token_manager is mock_token_manager
+    # If B2CService has an internal b2c attribute, check its initialization
+    if hasattr(service, "b2c"):
+        assert service.b2c.http_client is mock_http_client
+        assert service.b2c.token_manager is mock_token_manager

@@ -172,3 +172,19 @@ def test_bill_manager_cancel_bulk_invoice(bill_service_with_app_key, mock_http_c
 
     assert isinstance(resp, BillManagerCancelInvoiceResponse)
     assert resp.is_successful() is True
+
+
+def test_bill_service_initializes_bill_manager_correctly(
+    mock_http_client, mock_token_manager
+):
+    """Test BillService initializes BillManager with correct arguments."""
+    service = BillService(
+        http_client=mock_http_client,
+        token_manager=mock_token_manager,
+        app_key="test_app_key",
+    )
+    assert service.http_client is mock_http_client
+    assert service.token_manager is mock_token_manager
+    assert service.bill_manager.http_client is mock_http_client
+    assert service.bill_manager.token_manager is mock_token_manager
+    assert service.bill_manager.app_key == "test_app_key"

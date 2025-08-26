@@ -72,3 +72,13 @@ def test_register_url_filters_kwargs(c2b_service, mock_http_client):
     assert isinstance(resp, C2BRegisterUrlResponse)
     assert resp.ResponseCode == "0"
     assert resp.ResponseDescription == "URLs registered successfully."
+
+
+def test_c2b_service_initializes_correctly(mock_http_client, mock_token_manager):
+    """Test C2BService initializes with correct arguments."""
+    service = C2BService(
+        http_client=mock_http_client,
+        token_manager=mock_token_manager,
+    )
+    assert service.http_client is mock_http_client
+    assert service.token_manager is mock_token_manager

@@ -137,3 +137,17 @@ def test_query_filters_kwargs(stk_push_service, mock_http_client):
     assert isinstance(resp, StkPushQueryResponse)
     resp.is_successful() is True
     assert not hasattr(resp, "ExtraField")
+
+
+def test_stk_push_service_initializes_stk_push_correctly(
+    mock_http_client, mock_token_manager
+):
+    """Test StkPushService initializes StkPush with correct arguments."""
+    service = StkPushService(
+        http_client=mock_http_client,
+        token_manager=mock_token_manager,
+    )
+    assert service.http_client is mock_http_client
+    assert service.token_manager is mock_token_manager
+    assert service.stk_push.http_client is mock_http_client
+    assert service.stk_push.token_manager is mock_token_manager
