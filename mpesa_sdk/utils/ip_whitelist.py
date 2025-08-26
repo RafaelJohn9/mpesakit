@@ -1,7 +1,7 @@
 """Utility functions for IP whitelisting, specifically for M-Pesa IP ranges."""
 
 import ipaddress
-from typing import List
+from typing import List, Optional
 
 # M-Pesa IP addresses (individual IPs)
 MPESA_IP_ADDRESSES = {
@@ -22,7 +22,9 @@ MPESA_IP_ADDRESSES = {
 }
 
 
-def is_mpesa_ip_allowed(ip_address: str, allowed_ips: List[str] = None) -> bool:
+def is_mpesa_ip_allowed(
+    ip_address: str, allowed_ips: Optional[List[str]] = None
+) -> bool:
     """Check if an IP address is in the M-Pesa allowed IP addresses.
 
     Args:
