@@ -36,7 +36,7 @@ jobs:
         run: uv pip install -e '.[dev]'
 
       - name: Run Ruff
-        run: uv run ruff check mpesa_sdk
+        run: uv run ruff check mpesa_sdk && uv run ruff check tests
 
   mypy:
     runs-on: ubuntu-latest
