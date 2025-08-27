@@ -13,7 +13,7 @@ from mpesakit.business_paybill import (
     BusinessPayBillRequest,
     BusinessPayBillResponse,
 )
-from mpesakit.B2B_express_checkout import (
+from mpesakit.b2b_express_checkout import (
     B2BExpressCheckout,
     B2BExpressCheckoutRequest,
     B2BExpressCheckoutResponse,

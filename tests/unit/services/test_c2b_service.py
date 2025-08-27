@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import MagicMock
 from mpesakit.services.c2b import C2BService
-from mpesakit.C2B import C2BRegisterUrlResponse, C2BResponseType
+from mpesakit.c2b import C2BRegisterUrlResponse, C2BResponseType
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
 

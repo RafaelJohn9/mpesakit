@@ -2,8 +2,8 @@
 
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
-from mpesakit.B2C import B2C, B2CRequest, B2CResponse, B2CCommandIDType
-from mpesakit.B2C_account_top_up import (
+from mpesakit.b2c import B2C, B2CRequest, B2CResponse, B2CCommandIDType
+from mpesakit.b2c_account_top_up import (
     B2CAccountTopUp,
     B2CAccountTopUpRequest,
     B2CAccountTopUpResponse,
