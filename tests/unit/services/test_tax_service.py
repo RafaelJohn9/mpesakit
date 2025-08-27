@@ -49,7 +49,7 @@ def test_remittance_calls_tax_remittance(tax_service, mock_http_client):
         remarks="OK",
         account_reference="353353",
         result_url="https://mydomain.com/b2b/remittax/result/",
-        QueueTimeOutURL="https://mydomain.com/b2b/remittax/queue/",
+        queue_timeout_url="https://mydomain.com/b2b/remittax/queue/",
     )
     assert isinstance(resp, TaxRemittanceResponse)
     assert resp.is_successful() is True
@@ -74,7 +74,7 @@ def test_remittance_filters_kwargs(tax_service, mock_http_client):
         remarks="OK",
         account_reference="353353",
         result_url="https://mydomain.com/b2b/remittax/result/",
-        QueueTimeOutURL="https://mydomain.com/b2b/remittax/queue/",
+        queue_timeout_url="https://mydomain.com/b2b/remittax/queue/",
         unexpected_field="should be ignored",
     )
     assert isinstance(resp, TaxRemittanceResponse)

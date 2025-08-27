@@ -31,6 +31,7 @@ class TaxService:
         remarks: str,
         account_reference: str,
         result_url: str,
+        queue_timeout_url: str,
         **kwargs,
     ) -> TaxRemittanceResponse:
         """Initiate a tax remittance transaction.
@@ -43,6 +44,7 @@ class TaxService:
             remarks: Additional remarks.
             account_reference: Account reference for the transaction.
             result_url: URL for result notification.
+            queue_timeout_url: URL for timeout notification.
             **kwargs: Additional fields for TaxRemittanceRequest.
 
         Returns:
@@ -56,6 +58,7 @@ class TaxService:
             Remarks=remarks,
             AccountReference=account_reference,
             ResultURL=result_url,
+            QueueTimeOutURL=queue_timeout_url,
             **{
                 k: v
                 for k, v in kwargs.items()
