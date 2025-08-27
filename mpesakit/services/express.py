@@ -28,7 +28,6 @@ class StkPushService:
     def push(
         self,
         business_short_code: int,
-        passkey: str,
         transaction_type: str,
         amount: float,
         party_a: str,
@@ -37,6 +36,9 @@ class StkPushService:
         callback_url: str,
         account_reference: str,
         transaction_desc: str,
+        passkey: str | None = None,
+        timestamp: str | None = None,
+        password: str | None = None,
         **kwargs,
     ) -> StkPushSimulateResponse:
         """Initiate an M-Pesa STK Push transaction.
@@ -59,7 +61,6 @@ class StkPushService:
         """
         request = StkPushSimulateRequest(
             BusinessShortCode=business_short_code,
-            Passkey=passkey,
             TransactionType=transaction_type,
             Amount=amount,
             PartyA=party_a,
@@ -68,6 +69,9 @@ class StkPushService:
             CallBackURL=callback_url,
             AccountReference=account_reference,
             TransactionDesc=transaction_desc,
+            Passkey=passkey,
+            Timestamp=timestamp,
+            Password=password,
             **{
                 k: v
                 for k, v in kwargs.items()
