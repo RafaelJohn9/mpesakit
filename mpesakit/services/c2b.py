@@ -3,7 +3,7 @@
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
 
-from mpesakit.C2B import (
+from mpesakit.c2b import (
     C2B,
     C2BRegisterUrlRequest,
     C2BRegisterUrlResponse,

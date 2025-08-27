@@ -7,7 +7,7 @@ from .schemas import (
     C2BValidationResultCodeType,
     C2BResponseType,
 )
-from .C2B import C2B
+from .c2b import C2B
 
 __all__ = [
     "C2BResponseType",
