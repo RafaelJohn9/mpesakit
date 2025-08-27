@@ -7,7 +7,7 @@ from mpesakit.B2C import B2CResponse, B2CCommandIDType
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
 
-from mpesakit.B2C_account_top_up import (
+from mpesakit.b2c_account_top_up import (
     B2CAccountTopUpResponse,
 )
 

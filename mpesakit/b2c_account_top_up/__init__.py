@@ -6,7 +6,7 @@ from .schemas import (
     B2CAccountTopUpTimeoutCallback,
     B2CAccountTopUpTimeoutCallbackResponse,
 )
-from .B2C_account_top_up import B2CAccountTopUp
+from .b2c_account_top_up import B2CAccountTopUp
 
 __all__ = [
     "B2CAccountTopUp",

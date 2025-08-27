@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import MpesaHttpClient
 
-from mpesakit.B2C_account_top_up import (
+from mpesakit.b2c_account_top_up import (
     B2CAccountTopUp,
     B2CAccountTopUpRequest,
 )
