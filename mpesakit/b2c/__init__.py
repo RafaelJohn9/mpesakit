@@ -8,7 +8,7 @@ from .schemas import (
     B2CTimeoutCallback,
     B2CTimeoutCallbackResponse,
 )
-from .B2C import B2C
+from .b2c import B2C
 
 __all__ = [
     "B2C",

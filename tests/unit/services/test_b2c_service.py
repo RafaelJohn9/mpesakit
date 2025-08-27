@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import MagicMock
 from mpesakit.services.b2c import B2CService
-from mpesakit.B2C import B2CResponse, B2CCommandIDType
+from mpesakit.b2c import B2CResponse, B2CCommandIDType
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
 

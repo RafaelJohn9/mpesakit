@@ -12,7 +12,7 @@ import pytest
 from dotenv import load_dotenv
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import MpesaHttpClient
-from mpesakit.B2C import B2C, B2CRequest, B2CCommandIDType
+from mpesakit.b2c import b2c, B2CRequest, B2CCommandIDType
 
 
 load_dotenv()

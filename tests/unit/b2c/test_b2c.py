@@ -5,13 +5,11 @@ from unittest.mock import MagicMock
 
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
-from mpesakit.B2C.B2C import B2C
-from mpesakit.B2C.schemas import (
+from mpesakit.b2c.b2c import B2C
+from mpesakit.b2c.schemas import (
     B2CResultMetadata,
     B2CResultParameter,
     B2CResultCallback,
-)
-from mpesakit.B2C.schemas import (
     B2CRequest,
     B2CResponse,
     B2CCommandIDType,
