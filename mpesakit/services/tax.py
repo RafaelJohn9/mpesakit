@@ -44,6 +44,7 @@ class TaxService:
             remarks: Additional remarks.
             account_reference: Account reference for the transaction.
             result_url: URL for result notification.
+            queue_timeout_url: URL for timeout notification.
             **kwargs: Additional fields for TaxRemittanceRequest.
 
         Returns:

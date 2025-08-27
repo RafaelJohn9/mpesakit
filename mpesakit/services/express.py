@@ -45,7 +45,6 @@ class StkPushService:
 
         Args:
             business_short_code: M-Pesa business shortcode.
-            passkey: M-Pesa passkey.
             transaction_type: Transaction type (e.g., 'CustomerPayBillOnline').
             amount: Transaction amount.
             party_a: MSISDN sending the funds.
@@ -54,6 +53,9 @@ class StkPushService:
             callback_url: URL for receiving the callback.
             account_reference: Reference for the transaction.
             transaction_desc: Description of the transaction.
+            passkey: M-Pesa passkey.
+            timestamp: Timestamp for the transaction.
+            password: Password for the transaction.
             **kwargs: Additional fields for StkPushSimulateRequest.
 
         Returns:
