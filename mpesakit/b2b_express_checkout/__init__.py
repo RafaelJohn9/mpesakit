@@ -5,7 +5,7 @@ from .schemas import (
     B2BExpressCallbackResponse,
 )
 
-from .B2B_express_checkout import B2BExpressCheckout
+from .b2b_express_checkout import B2BExpressCheckout
 
 __all__ = [
     "B2BExpressCheckout",

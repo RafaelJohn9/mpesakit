@@ -10,7 +10,7 @@ from mpesakit.business_buy_goods import (
 from mpesakit.business_paybill import (
     BusinessPayBillResponse,
 )
-from mpesakit.B2B_express_checkout import (
+from mpesakit.b2b_express_checkout import (
     B2BExpressCheckoutResponse,
 )
 from mpesakit.auth import TokenManager

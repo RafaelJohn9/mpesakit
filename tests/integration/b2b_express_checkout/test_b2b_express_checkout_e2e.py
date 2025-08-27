@@ -13,7 +13,7 @@ from mpesakit.auth import TokenManager
 from mpesakit.http_client import MpesaHttpClient
 import uuid
 
-from mpesakit.B2B_express_checkout import (
+from mpesakit.b2b_express_checkout import (
     B2BExpressCheckout,
     B2BExpressCheckoutRequest,
 )

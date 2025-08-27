@@ -20,9 +20,11 @@ from mpesakit.services import (
 class MpesaClient:
     """Unified client for all M-PESA services."""
 
-    def __init__(self, consumer_key: str, consumer_secret: str) -> None:
+    def __init__(
+        self, consumer_key: str, consumer_secret: str, environment: str = "sandbox"
+    ) -> None:
         """Initialize the MpesaClient with all service facades."""
-        self.http_client = MpesaHttpClient()
+        self.http_client = MpesaHttpClient(env=environment)
         self.token_manager = TokenManager(
             http_client=self.http_client,
             consumer_key=consumer_key,
@@ -33,6 +35,8 @@ class MpesaClient:
         self.express = StkPushService(
             http_client=self.http_client, token_manager=self.token_manager
         )
+        self.stk_push = self.express.push  # Alias for convenience
+        self.stk_query = self.express.query  # Alias for convenience
 
         # b2c => M-PESA Business to Customer services
         self.b2c = B2CService(

@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
 
-from mpesakit.B2B_express_checkout import (
+from mpesakit.b2b_express_checkout import (
     B2BExpressCheckout,
     B2BExpressCheckoutRequest,
     B2BExpressCheckoutResponse,
