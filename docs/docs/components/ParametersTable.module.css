@@ -1,0 +1,102 @@
+.tableContainer {
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.parametersTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+}
+
+.parametersTable thead {
+  background: var(--ifm-background-surface-color);
+}
+
+.parametersTable th {
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ifm-font-color-base);
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.parametersTable td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  vertical-align: top;
+}
+
+.parametersTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.parametersTable tbody tr:hover {
+  background: rgba(0, 208, 132, 0.05);
+}
+
+.parameterCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.parameterName {
+  font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  color: #00d084;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.parameterRequired {
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+.parameterType {
+  color: var(--ifm-color-emphasis-600);
+  font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+  background: var(--ifm-background-surface-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.typeLabel {
+  color: var(--ifm-color-emphasis-600);
+  font-weight: 500;
+}
+
+.parameterDescription {
+  color: var(--ifm-font-color-base);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .parametersTable {
+    font-size: 13px;
+  }
+
+  .parametersTable th,
+  .parametersTable td {
+    padding: 1rem 0.75rem;
+  }
+
+  .parameterName {
+    font-size: 13px;
+  }
+}

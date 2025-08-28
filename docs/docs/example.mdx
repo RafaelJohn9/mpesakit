@@ -1,0 +1,266 @@
+---
+title: STK Push API
+description: Initiate secure M-Pesa payments using STK Push (Lipa Na M-Pesa Online)
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader 
+  subtitle="Initiate secure M-Pesa payments using STK Push (Lipa Na M-Pesa Online). This triggers a payment prompt on the user's phone to enter their M-Pesa PIN."
+  gradient={true}
+  size="large"
+/>
+
+<Tabs defaultValue={0}>
+  <Tabs.TabPane label="MpesaClient" icon="🚀">
+    <Alert type="info" title="Recommended Approach">
+      Use MpesaClient for quick integration with sensible defaults and built-in error handling.
+    </Alert>
+
+    <SectionHeader title="Quick Setup" size="small" />
+    
+    <CodeBlock language="python" title="Python">
+{`from mpesakit import MpesaClient
+
+# Initialize client (auto-detects environment from credentials)
+client = MpesaClient(
+    consumer_key="YOUR_CONSUMER_KEY",
+    consumer_secret="YOUR_CONSUMER_SECRET",
+    environment="production"  # or "sandbox"
+)
+
+# Simple STK Push
+response = client.stk_push(
+    business_short_code=174379,
+    amount=500,
+    phone_number="254712345678",
+    callback_url="https://yourdomain.com/api/mpesa/callback",
+    account_reference="INV-1003",
+    transaction_desc="Payment for Invoice 1003"
+)
+
+print(f"Request ID: {response['CheckoutRequestID']}")`}
+    </CodeBlock>
+
+    <Alert type="success" title="Built-in Features">
+      Automatic token management, request validation, retry logic, and standardized error handling.
+    </Alert>
+  </Tabs.TabPane>
+
+  <Tabs.TabPane label="Direct API" icon="⚡">
+    <Alert type="warning" title="Advanced Usage">
+      Direct API access for maximum control and customization. Requires manual token management.
+    </Alert>
+
+    <SectionHeader title="Direct Implementation" size="small" />
+    
+    <CodeBlock language="python" title="Python">
+{`from mpesakit.mpesa_express import STKPush
+from mpesakit.auth import AccessToken
+from mpesakit.mpesa_express.schemas import STKPushRequest
+
+# Manual token management
+auth = AccessToken(
+    consumer_key="YOUR_CONSUMER_KEY",
+    consumer_secret="YOUR_CONSUMER_SECRET",
+    environment="production"
+)
+token = auth.get_token()
+
+# Direct STK Push with custom configuration
+stk_push = STKPush(
+    access_token=token,
+    environment="production",
+    timeout=30,  # Custom timeout
+    retries=3    # Custom retry count
+)
+
+# Create request with full control
+request = STKPushRequest(
+    BusinessShortCode=174379,
+    Amount=500,
+    PhoneNumber="254712345678",
+    CallBackURL="https://yourdomain.com/callback",
+    AccountReference="INV-1003",
+    TransactionDesc="Payment for Invoice 1003",
+    TransactionType="CustomerPayBillOnline",
+    Timestamp="20231201120000",
+    Password="custom_generated_password"
+)
+
+response = stk_push.send_stk_push(request)`}
+    </CodeBlock>
+
+    <Alert type="info" title="Full Control">
+      Access to all request parameters, custom middleware, advanced error handling, and response processing.
+    </Alert>
+  </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Parameters" size="small" />
+
+<ParametersTable 
+  parameters={[
+    {
+      name: "business_short_code",
+      type: "int",
+      dataType: "Integer",
+      required: true,
+      description: "Your PayBill or BuyGoods number. Use 174379 in sandbox environment."
+    },
+    {
+      name: "amount",
+      type: "int", 
+      dataType: "Integer",
+      required: true,
+      description: "Transaction amount in KES. Minimum: 1 (sandbox), 10 (production)."
+    },
+    {
+      name: "phone_number",
+      type: "str",
+      dataType: "String", 
+      required: true,
+      description: "Customer's phone number in format 2547XXXXXXXX."
+    },
+    {
+      name: "callback_url",
+      type: "str",
+      dataType: "String",
+      required: true, 
+      description: "HTTPS endpoint to receive payment results. Must be publicly accessible."
+    },
+    {
+      name: "account_reference",
+      type: "str",
+      dataType: "String",
+      required: true,
+      description: "Transaction identifier like order ID. Maximum 12 characters."
+    },
+    {
+      name: "transaction_desc", 
+      type: "str",
+      dataType: "String",
+      required: true,
+      description: "Description displayed to user. Maximum 13 characters."
+    }
+  ]}
+/>
+
+<SectionHeader title="Success Response" size="small" />
+
+<CodeBlock language="json" title="JSON Response">
+{`{
+  "MerchantRequestID": "29115-34620561-1",
+  "CheckoutRequestID": "ws_CO_191220191020363925",
+  "ResponseCode": "0",
+  "ResponseDescription": "Success. Request accepted for processing",
+  "CustomerMessage": "Enter your PIN to complete payment"
+}`}
+</CodeBlock>
+
+<Alert type="success" title="Success Response">
+  A successful response doesn't guarantee payment completion. Monitor your callback URL for the final payment status.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`from mpesakit import MpesaClient, MpesaError
+
+try:
+    response = client.stk_push(
+        business_short_code=174379,
+        amount=500,
+        phone_number="254712345678",
+        callback_url="https://yourdomain.com/callback",
+        account_reference="INV-001",
+        transaction_desc="Order Payment"
+    )
+    print(f"Request accepted: {response['CheckoutRequestID']}")
+    
+except MpesaError as e:
+    if e.code == 400:
+        print(f"Bad Request: {e.message}")
+    elif e.code == 401:
+        print("Authentication failed - check your credentials")
+    elif e.code == 403:
+        print("Forbidden - insufficient permissions")
+    elif e.code == 500:
+        print("Server error - try again later")
+    else:
+        print(f"Error {e.code}: {e.message}")
+
+except Exception as e:
+    print(f"Unexpected error: {str(e)}")`}
+</CodeBlock>
+
+<SectionHeader title="Common Error Codes" size="small" />
+
+<ParametersTable 
+  parameters={[
+    {
+      name: "400",
+      dataType: "Bad Request",
+      description: "Invalid parameters or malformed request data."
+    },
+    {
+      name: "401", 
+      dataType: "Unauthorized",
+      description: "Invalid or expired access token. Check credentials."
+    },
+    {
+      name: "403",
+      dataType: "Forbidden", 
+      description: "Insufficient permissions or service not enabled."
+    },
+    {
+      name: "500",
+      dataType: "Server Error",
+      description: "Internal server error. Retry with exponential backoff."
+    }
+  ]}
+/>
+
+<SectionHeader title="Environment Configuration" size="small" />
+
+<CodeBlock language="bash" title="Environment Setup">
+{`# Production Environment
+MPESA_CONSUMER_KEY=your_live_consumer_key
+MPESA_CONSUMER_SECRET=your_live_consumer_secret
+MPESA_ENVIRONMENT=production
+MPESA_BUSINESS_SHORTCODE=your_paybill_number
+
+# Sandbox Environment  
+MPESA_CONSUMER_KEY=your_sandbox_consumer_key
+MPESA_CONSUMER_SECRET=your_sandbox_consumer_secret
+MPESA_ENVIRONMENT=sandbox
+MPESA_BUSINESS_SHORTCODE=174379  # Default sandbox shortcode`}
+</CodeBlock>
+
+<CodeBlock language="python" title="Loading from Environment">
+{`# Load from environment
+import os
+from mpesakit import MpesaClient
+
+client = MpesaClient(
+    consumer_key=os.getenv('MPESA_CONSUMER_KEY'),
+    consumer_secret=os.getenv('MPESA_CONSUMER_SECRET'),
+    environment=os.getenv('MPESA_ENVIRONMENT', 'sandbox')
+)`}
+</CodeBlock>
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+  After initiating STK Push, you'll need to handle the callback response. Learn how to set up webhook endpoints and process payment confirmations.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/docs/webhooks) - Handle payment callbacks
+- [🔍 Transaction Status API](/docs/transaction-status) - Query payment status
+- [🏗️ Production Setup](/docs/production) - Go live checklist
