@@ -235,7 +235,6 @@ class StkPushSimulateResponse(BaseModel):
                 "MerchantRequestID": "16813-1590513-1",
                 "CheckoutRequestID": "ws_CO_DMZ_123212312_2342347678234",
                 "ResponseCode": 0,
-                "ResultDesc": "The service request is processed successfully.",
                 "ResponseDescription": "The service request has been accepted successfully",
                 "CustomerMessage": "Success. Request accepted for processing.",
             }
