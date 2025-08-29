@@ -1,7 +1,7 @@
 """Unit tests for is_mpesa_ip_allowed in mpesakit.utils.ip_whitelist."""
 
 import pytest
-from mpesakit.utils.ip_whitelist import is_mpesa_ip_allowed
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
 
 
 @pytest.mark.parametrize(

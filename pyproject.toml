@@ -43,7 +43,8 @@ dependencies = [
   "pydantic >=2.10.6,<3.0.0",
   "pydantic[email] >=2.10.6,<3.0.0",
   "requests >=2.32.3,<3.0.0",
-  "typing_extensions >= 4.12.2,<5.0.0"
+  "typing_extensions >= 4.12.2,<5.0.0",
+  "cryptography >=41.0.7",
 ]
 
 [project.urls]
