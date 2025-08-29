@@ -98,11 +98,10 @@ def test_generate_security_credential_empty_initiator_password(tmp_path):
         generate_security_credential("", cert_path=cert_path)
 
 
-def test_generate_security_credential_with_non_rsa_cert_raises_runtime_error(tmp_path):
-    """A certificate with a non-RSA public key should cause encryption to fail."""
-    # _load_public_key_from_cert will return None for non-RSA, leading to a RuntimeError on encrypt
+def test_generate_security_credential_with_non_rsa_cert_raises_value_error(tmp_path):
+    """A certificate with a non-RSA public key should raise ValueError when loading RSA public key."""
     _, cert_path = _create_self_signed_cert_ec(tmp_path)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         generate_security_credential("pw", cert_path=cert_path)
 
 

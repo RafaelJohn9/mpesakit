@@ -28,16 +28,30 @@ def _load_public_key_from_cert(cert_path: str) -> RSAPublicKey:
     if not os.path.isfile(cert_path):
         raise FileNotFoundError(f"Certificate not found at: {cert_path}")
 
-    data = open(cert_path, "rb").read()
+    with open(cert_path, "rb") as f:
+        data = f.read()
 
     # Try PEM X.509
     try:
         cert = x509.load_pem_x509_certificate(data)
+    except Exception:
+        cert = None
+
+    if cert is not None:
+        public_key = cert.public_key()
+        if isinstance(public_key, RSAPublicKey):
+            return public_key
+
+    # Try DER X.509
+    try:
+        cert = x509.load_der_x509_certificate(data)
         public_key = cert.public_key()
         if isinstance(public_key, RSAPublicKey):
             return public_key
     except Exception:
-        raise ValueError("Could not load an RSA public key from the certificate.")
+        pass
+
+    raise ValueError("Could not load an RSA public key from the certificate.")
 
 
 def generate_security_credential(
