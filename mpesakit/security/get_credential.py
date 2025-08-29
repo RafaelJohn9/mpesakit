@@ -30,7 +30,7 @@ def _load_public_key_from_cert(cert_path: str) -> RSAPublicKey:
 
     data = open(cert_path, "rb").read()
 
-    # Try PEM first
+    # Load PEM certificate
     try:
         cert = x509.load_pem_x509_certificate(data)
         public_key = cert.public_key()
@@ -38,24 +38,8 @@ def _load_public_key_from_cert(cert_path: str) -> RSAPublicKey:
             return public_key
         else:
             raise ValueError("The certificate does not contain an RSA public key.")
-    except Exception:
-        pass  # Fall through to DER attempt or final error
-
-    # Try DER encoding
-    try:
-        cert = x509.load_der_x509_certificate(data)
-        public_key = cert.public_key()
-        if isinstance(public_key, RSAPublicKey):
-            return public_key
-        else:
-            raise ValueError("The certificate does not contain an RSA public key.")
-    except Exception:
-        pass
-
-    # If both PEM and DER fail
-    raise ValueError(
-        "Could not load a valid X.509 certificate (PEM or DER) or no RSA key found."
-    )
+    except Exception as e:
+        raise ValueError(f"Could not load a valid PEM X.509 certificate: {e}")
 
 
 def generate_security_credential(
