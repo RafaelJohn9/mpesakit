@@ -70,11 +70,6 @@ const sidebars: SidebarsConfig = {
       id: 'webhooks-best-practices',
       label: 'Webhooks Best Practices',
     },
-    {
-      type: 'doc',
-      id: 'example',
-      label: 'Example',
-    },
   ],
 };
 
