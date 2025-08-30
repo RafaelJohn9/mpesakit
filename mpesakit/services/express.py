@@ -85,8 +85,10 @@ class StkPushService:
     def query(
         self,
         business_short_code: int,
-        passkey: str,
         checkout_request_id: str,
+        passkey: str | None = None,
+        password: str | None = None,
+        timestamp: str | None = None,
         **kwargs,
     ) -> StkPushQueryResponse:
         """Query the status of an M-Pesa STK Push transaction.
@@ -95,6 +97,8 @@ class StkPushService:
             business_short_code: M-Pesa business shortcode.
             passkey: M-Pesa passkey.
             checkout_request_id: CheckoutRequestID from the push response.
+            password: Password for the transaction.
+            timestamp: Timestamp for the transaction.
             **kwargs: Additional fields for StkPushQueryRequest.
 
         Returns:
@@ -104,6 +108,8 @@ class StkPushService:
             BusinessShortCode=business_short_code,
             Passkey=passkey,
             CheckoutRequestID=checkout_request_id,
+            Password=password,
+            Timestamp=timestamp,
             **{
                 k: v for k, v in kwargs.items() if k in StkPushQueryRequest.model_fields
             },
