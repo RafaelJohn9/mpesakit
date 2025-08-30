@@ -75,7 +75,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
         <Highlight code={children.trim()} language={String(language) as Language} theme={vsDark}>
           {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
             <pre className={`${highlightClass} ${styles.pre}`} style={style}>
-              <code className={styles.codeInner}>
+              <code className={styles.codeInner} style={{ whiteSpace: 'pre' }}>
                 {tokens.map((line, i) => (
                   <div key={i} {...getLineProps({ line, key: i })} className={styles.line}>
                     {line.map((token, key) => (

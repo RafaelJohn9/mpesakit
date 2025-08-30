@@ -1,0 +1,183 @@
+---
+title: STK Query
+description: Query the status of M-Pesa STK Push payments
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+
+<SectionHeader title="Parameters" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "BusinessShortCode",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Merchant shortcode (PayBill or BuyGoods)."
+    },
+    {
+        name: "CheckoutRequestID",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "The CheckoutRequestID returned when the STK Push was initiated."
+    },
+    {
+        name: "Passkey",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Shortcode passkey. If provided, the SDK can derive Password + Timestamp."
+    },
+    {
+        name: "Password",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Base64(Shortcode + Passkey + Timestamp). Provide this together with Timestamp if not using Passkey."
+    },
+    {
+        name: "Timestamp",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Timestamp used when generating Password. Format: YYYYMMDDHHMMSS."
+    },
+]}
+/>
+
+<SectionHeader
+    title="Overview"
+    subtitle="Use STK Query to retrieve the processing result for an STK Push when the callback is missing or to cross-check a callback payload."
+    size="small"
+/>
+
+<Alert type="info" title="When to use STK Query">
+    Use the query API when you didn't receive a callback, want to reconcile a transaction, or need to poll for a final status after initiating an STK Push.
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient" icon="🚀">
+        <Alert type="info" title="Recommended (Facade)">
+            Use the high-level client for token handling and simpler calls.
+        </Alert>
+
+        <SectionHeader title="Example (MpesaClient)" size="small" />
+
+        <CodeBlock language="python">
+{`
+# Build and send a query using the high-level client.
+import os
+from dotenv import load_dotenv
+from mpesakit import MpesaClient
+
+load_dotenv()
+
+# Initialize the client
+client = MpesaClient(
+    consumer_key=os.getenv("MPESA_CONSUMER_KEY"),
+    consumer_secret=os.getenv("MPESA_CONSUMER_SECRET"),
+    environment="sandbox",
+)
+
+# Perform the STK query
+result = client.stk_query(
+    business_short_code=123456,
+    checkout_request_id="ws_CO_20250101_ABC123",
+    passkey="your_passkey_here",          # or provide password + timestamp
+)
+
+if result.is_successful():
+        print("Transaction processed:", result.ResultDesc)
+else:
+        print("Status:", result.ResponseDescription, "| Code:", result.ResponseCode)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            You can give either `Passkey` (SDK generates `Password`+`Timestamp`) or provide `password` and `timestamp` directly by passing them to the `stk_query` method.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced (Direct)">
+            Use the direct service object for custom flows, retries, or middleware.
+        </Alert>
+
+        <SectionHeader title="Example (Direct Service)" size="small" />
+
+        <CodeBlock language="python">
+{`
+from mpesakit.mpesa_express import StkPush, StkPushQueryRequest
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+
+# Initialize TokenManager & HTTP client
+http_client = MpesaHttpClient(env="sandbox")
+token_manager = TokenManager(consumer_key="your_key", consumer_secret="your_secret", http_client=http_client)
+
+# Create the STK service
+stk_service = StkPush(http_client=http_client, token_manager=token_manager)
+
+payload = StkPushQueryRequest(
+        BusinessShortCode=123456,
+        CheckoutRequestID="ws_CO_20250101_ABC123",
+        Passkey="your_passkey_here",  # optional if Password+Timestamp are provided
+)
+
+response = stk_service.query(request=payload)
+
+# Evaluate the response
+if response.is_successful():
+        print("Success:", response.ResultDesc)
+else:
+        print("ResultCode:", response.ResultCode, "→", response.ResultDesc)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Retrying & Polling">
+            If the transaction is still pending, poll the query endpoint a few times (respect rate limits) until a terminal ResultCode is returned or a timeout is reached.
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Response shape & interpretation" size="small" />
+
+- The query response is a `StkPushQueryResponse` Pydantic object that contains identifiers and status fields such as MerchantRequestID, CheckoutRequestID, ResponseCode, ResponseDescription, ResultCode and ResultDesc.
+- Interpreting results:
+    - ResponseCode of 0 generally means the query request was accepted.
+    - ResultCode of 0 indicates the transaction was successful. Other ResultCodes convey errors, timeouts or user cancellation.
+
+<CodeBlock language="python">
+{`
+# Example handling snippet (pseudo)
+resp = stk_service.query(request=q)
+if resp.is_successful():
+        # Final state returned by Daraja
+        handle_success(resp)
+else:
+        # Log / inspect resp.ResponseCode, resp.ResultCode and resp.ResultDesc
+        handle_failure(resp)
+`}
+</CodeBlock>
+
+<Alert type="info" title="Working with the response">
+- If you wish to use the response as a `Dict`, you can do so by `response.model_dump(mode="json")`.
+</Alert>
+
+<Alert type="success" title="Cross-validation">
+    If you received an STK callback, compare its CheckoutRequestID and MerchantRequestID with the query result to ensure they refer to the same transaction.
+</Alert>
+
+
+<SectionHeader title="Next steps" size="small" />
+
+<Alert type="info" title="Follow-up">
+    After confirming final status, update your order state, notify the user, and persist the complete response for auditing.
+</Alert>

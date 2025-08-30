@@ -66,7 +66,7 @@ Here are the common fields mpesakit expects and what they mean:
 
 Set these in your local .env or your secrets manager (never commit .env with real values):
 
-```
+```text
 MPESA_CONSUMER_KEY=your_consumer_key_here
 MPESA_CONSUMER_SECRET=your_consumer_secret_here
 SHORTCODE=174379
@@ -75,6 +75,8 @@ TIMESTAMP=20250806143644
 PASSWORD=Base64Encoded(shortcode+passkey+timestamp)
 SECURITY_CREDENTIAL=encrypted_value_from_portal
 ```
+
+> ℹ️ Info: If you don't have the `PASSWORD`, don't worry — it can be generated as long as you have the `SHORTCODE`, `PASSKEY`. The `PASSWORD` is the Base64 encoding of (SHORTCODE + PASSKEY + TIMESTAMP).
 
 ## Notes & best practices
 

@@ -6,7 +6,7 @@ MpesaKit is a focused SDK that wraps M-Pesa APIs, validation, and common workflo
 
 MpesaKit bundles:
 
-- API clients for common M-Pesa endpoints (payments, reversals, reconciliation, webhooks)
+- API clients for common M-Pesa endpoints (payments, reversals, reconciliation, webhooks) 🛠️
 - Input and response validation to catch errors early
 - Helpers for authentication, retry, and rate-limiting
 - Lightweight utilities for serializing requests and parsing responses
@@ -54,8 +54,8 @@ In short: it turns a lot of boilerplate, error-prone work into a few well-docume
 2. Configure credentials and environment (sandbox/production).
 3. Use the provided client to initiate or query payments and accept webhooks.
 
-A typical flow becomes: configure client → validate input → call SDK method → handle structured response.
+A typical flow becomes: configure client 🔧 → validate input  → call SDK method ⚡ → handle structured response .
 
-## Final note
+## Final note 📌
 
 MpesaKit exists to make M-Pesa integrations predictable and maintainable. If the goal is to move fast while keeping payments code safe and testable, MpesaKit reduces friction and risk so teams can focus on the product.
