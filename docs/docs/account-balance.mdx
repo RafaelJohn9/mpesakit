@@ -15,6 +15,14 @@ import Tabs from '@site/docs/components/Tabs';
     size="large"
 />
 
+<SectionHeader title="User Story" size="small" subtitle="Who can use this service" />
+
+    As a finance or operations user, I want to query my organization's M-Pesa account balance so I can reconcile payments and spot problems quickly.
+
+    - Finance analyst: runs balance checks and reconciliation reports.
+    - Till manager / cashier: monitors till balances and requests top-ups when low.
+    - Backend system / automation: polls balances regularly and creates alerts or workflows on anomalies.
+
 <Alert type="info" title="What this page covers">
     This guide documents the Account Balance flow: how to construct queries, expected acknowledgement responses, how to parse ResultURL callbacks (final balances) and QueueTimeOutURL notifications, and important validation/safety checks to implement on your side.
 </Alert>

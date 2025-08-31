@@ -14,6 +14,19 @@ import ParametersTable from '@site/docs/components/ParametersTable';
   gradient={true}
   size="large"
 />
+<SectionHeader title="User Story" size="small" />
+
+<p>
+  As an e‑commerce merchant, I want to prompt customers to approve payments on their phones so they can complete purchases quickly and securely using M‑Pesa STK Push. When a customer checks out, my backend triggers an STK Push request; the customer receives a prompt to enter their M‑Pesa PIN; once the payment is confirmed via the webhook callback, the order is processed.
+</p>
+
+<ul>
+  <li><strong>Actors:</strong> Merchant, Customer, Developer (integrator)</li>
+  <li><strong>When:</strong> At checkout or when accepting a customer-initiated payment</li>
+  <li><strong>Why:</strong> Fast, secure, and familiar payment flow for users with M‑Pesa</li>
+  <li><strong>Outcome:</strong> Customer authorizes payment on their phone; merchant receives confirmation through the callback and completes the order.</li>
+</ul>
+
 
 <SectionHeader title="Parameters Definition" size="small" />
 

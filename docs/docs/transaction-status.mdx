@@ -15,6 +15,18 @@ import ParametersTable from '@site/docs/components/ParametersTable';
     size="large"
 />
 
+<SectionHeader title="User Stories" size="small" />
+
+As a payments engineer or backend developer at a merchant/PSP, I want to query the status of an M‑Pesa transaction and reliably handle result and timeout callbacks so I can reconcile payments, notify customers, and trigger compensating workflows when needed.
+
+- **Persona:** Payments engineer, reconciliation analyst, or backend developer integrating M‑Pesa.
+- **Goal:** Retrieve definitive transaction state (success, failed, pending) and process callbacks for downstream business logic.
+- **Acceptance criteria:**
+    - Submit a Transaction Status query and receive an accepted response from Daraja.
+    - ResultURL receives structured result payloads and the service acknowledges with ResultCode 0.
+    - QueueTimeOutURL receives timeout notifications that trigger retry or compensation flows.
+    - Request validation prevents invalid MSISDNs, enforces identifier rules, and blocks overly long remarks/occasions.
+
 <SectionHeader title="Parameters Definition" size="small" />
 
 <ParametersTable
