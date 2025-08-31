@@ -12,12 +12,12 @@ const config: Config = {
 
   // Production URL (GitHub Pages URL)
   url: 'https://rafaeljohn9.github.io', // Your GitHub Pages URL
-  baseUrl: '/mpesakit', // Project repo name as base path
+  baseUrl: '/', // Project repo name as base path
 
   // GitHub Pages deployment settings
   organizationName: 'rafaeljohn9', // GitHub username
   projectName: 'mpesakit', // Repository name
-  deploymentBranch: 'gh-pages', // Default for GitHub Pages
+  deploymentBranch: 'master', // Default for GitHub Pages
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
