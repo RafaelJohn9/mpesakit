@@ -1,11 +1,12 @@
-# mpesa-daraja-sdk
+# mpesakit
 
 > ⚡ **Effortless M-Pesa integration** using Safaricom's Daraja API — built for developers, by developers.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-<!-- [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]() -->
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 
+[![PyPI version](https://img.shields.io/pypi/v/mpesakit.svg)](https://pypi.org/project/mpesakit) [![Downloads](https://pepy.tech/badge/mpesakit)](https://pepy.tech/project/mpesakit)
 ---
 
 ## The Problem
@@ -25,7 +26,7 @@ For many developers and startups, this becomes a **huge barrier** to adopting M-
 
 ## The Solution
 
-**`mpesa-daraja-sdk`** eliminates the complexity with a **clean, developer-friendly Python SDK** that:
+**`mpesakit`** eliminates the complexity with a **clean, developer-friendly Python SDK** that:
 
 - **Zero-config setup** — just add your credentials and go
 - **Handles authentication automatically** — OAuth2, tokens, and security
@@ -38,13 +39,19 @@ For many developers and startups, this becomes a **huge barrier** to adopting M-
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| **STK Push** | Ready | Lipa na M-Pesa Online payments |
-| **C2B Payments** | Ready | Customer to Business transactions |
-| **B2C Payments** | Ready | Business to Customer payouts |
-| **Token Management** | Ready | Automatic OAuth2 handling |
-| **Account Balance** | Coming Soon | Check account balances |
-|  **Transaction Reversal** | Coming Soon | Reverse transactions |
-| 🎣 **Webhook Validation** | Coming Soon | Secure callback handling |
+| **STK Push (Lipa na M-Pesa)** | Ready | Initiate customer payment prompts (mpesa-express/stk-push.mdx) |
+| **STK Query** | Ready | Query STK push/payment status (mpesa-express/stk-query.mdx) |
+| **C2B Payments** | Ready | Customer-to-Business payments (c2b.mdx) |
+| **B2C Payments** | Ready | Business-to-Customer payouts (b2c.mdx) |
+| **B2C Account Top-up** | Ready | Account top-up flows for B2C (b2c-account-top-up.mdx) |
+| **Business Paybill** | Ready | Paybill integrations for business collections (business-paybill.mdx) |
+| **Business BuyGoods** | Ready | Till/BuyGoods integrations (business-buygoods.mdx) |
+| **Token Management / Auth** | Ready | Automatic OAuth2 handling and auth utilities (auth.mdx) |
+| **Account Balance** | Ready | Check account balances (account-balance.mdx) |
+| **Transaction Reversal** | Ready | Reverse transactions (reversal.mdx) |
+| **Transaction Status** | Ready | Query transaction status (transaction-status.mdx) |
+| **Dynamic QR** | Ready | Generate and manage dynamic QR payments (dynamic-qr.mdx) |
+| **Tax Remittance** | Ready | Tax remittance flows and docs (tax-remittance.mdx) |
 
 > Built on top of [Arlus/mpesa-py](https://github.com/Arlus/mpesa-py) with ❤️ — modernized, cleaned up, and restructured for today's developer needs.
 
@@ -55,38 +62,14 @@ For many developers and startups, this becomes a **huge barrier** to adopting M-
 ### Installation (coming soon)
 
 ```bash
-pip install mpesa-daraja-sdk
+pip install mpesakit
 ```
 
 ---
 
 ## 📖 Complete Setup Guide
 
-### 1. Get Safaricom Developer Account
-
-1. Visit [developer.safaricom.co.ke](https://developer.safaricom.co.ke)
-2. **Create account** and verify your email
-3. **Create a new app** to get your credentials:
-   - Consumer Key
-   - Consumer Secret
-
-### 2. Obtain Test Credentials (Sandbox)
-
-1. Navigate to [Test Credentials Page](https://developer.safaricom.co.ke/test_credentials)
-2. Copy the following credentials:
-   - **Shortcode** (Business number)
-   - **Initiator Name** (API operator username)
-   - **Initiator Password** (API operator password)
-   - **Security Credential** (Encrypted password)
-
-### 3. Production Setup
-
-For production deployment:
-
-1. **Get Paybill/Till Number** from Safaricom
-2. **Generate Security Credential** using Safaricom's public certificate
-3. **Switch environment** to `"production"` in your client initialization
-4. **Update callback URLs** to your production domain
+- For the complete setup guide kindly check the documentation at: [https://mpesakit.dev](https://mpesakit.dev)
 
 ---
 
@@ -117,8 +100,8 @@ We welcome contributions from the community! Here's how you can help:
 
 ```bash
 # Clone the repository
-git clone https://github.com/rafaeljohn9/mpesa-daraja-sdk.git
-cd mpesa-daraja-sdk
+git clone https://github.com/rafaeljohn9/mpesakit.git
+cd mpesakit
 
 # Create virtual environment
 python -m venv venv
@@ -143,8 +126,8 @@ pytest tests/
 ## 📞 Support & Community
 
 - 📖 **Documentation**: [Full API docs coming soon]
-- 🐛 **Issues**: [GitHub Issues](https://github.com/rafaeljohn9/mpesa-daraja-sdk/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/rafaeljohn9/mpesa-daraja-sdk/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/rafaeljohn9/mpesakit/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/rafaeljohn9/mpesakit/discussions)
 - 📧 **Email**: <johnmkagunda@gmail.com>
 
 ---
@@ -175,6 +158,6 @@ Licensed under the [Apache 2.0 License](LICENSE) — free for commercial and pri
 
 **Made with ❤️ for the Kenyan developer community**
 
-[⭐ Star this repo](https://github.com/rafaeljohn9/mpesa-daraja-sdk) | [🐛 Report Issue](https://github.com/rafaeljohn9/mpesa-daraja-sdk/issues) | [💡 Request Feature](https://github.com/rafaeljohn9/mpesa-daraja-sdk/issues/new)
+[⭐ Star this repo](https://github.com/rafaeljohn9/mpesakit) | [🐛 Report Issue](https://github.com/rafaeljohn9/mpesakit/issues) | [💡 Request Feature](https://github.com/rafaeljohn9/mpesakit/issues/new)
 
 </div>
