@@ -138,11 +138,11 @@ This project began as a fork of the fantastic [`Arlus/mpesa-py`](https://github.
 
 **What we've added:**
 
-- 🏗️ **Modular architecture** for better maintainability
-- 🎯 **Developer-first design** with intuitive APIs
-- 🧪 **Comprehensive testing** suite
-- 📚 **Better documentation** and examples
-- 🚀 **Production-ready** features and error handling
+- **Modular architecture** for better maintainability
+- **Developer-first design** with intuitive APIs
+- **Comprehensive testing** suite
+- **Better documentation** and examples
+- **Production-ready** features and error handling
 
 Special thanks to the original contributors and the broader Python community in Kenya.
 
