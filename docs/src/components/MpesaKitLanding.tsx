@@ -87,7 +87,7 @@ export const MpesaKitLanding: React.FC = () => {
     badges: ["Open Source", "99%+ Test Coverage", "300+ Test Cases", "Community Driven"],
     primaryCTA: {
       text: "🚀 Get Started",
-      href: "https://mpesakit.readthedocs.io/en/latest/quickstart.html"
+      href: "/intro"
     },
     secondaryCTA: {
       text: "⭐ Star on GitHub",
@@ -210,91 +210,91 @@ export const MpesaKitLanding: React.FC = () => {
         name: "Authorization",
         status: "working" as "working" | "down" | "maintenance",
         note: "OAuth token issuance and refresh endpoints operational",
-        link: { text: "Authorization Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#authorization" }
+        link: { text: "Authorization Docs", href: "/auth" }
       },
       {
         name: "Dynamic QR",
         status: "working" as "working" | "down" | "maintenance",
         note: "QR generation and validation working as expected",
-        link: { text: "Dynamic QR Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#dynamic-qr" }
+        link: { text: "Dynamic QR Docs", href: "/dynamic-qr" }
       },
       {
         name: "M-Pesa Express",
         status: "working" as "working" | "down" | "maintenance",
         note: "STK Push / Lipa Na M-Pesa flow operational",
-        link: { text: "M-Pesa Express Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#mpesa-express" }
+        link: { text: "M-Pesa Express Docs", href: "/stk-push" }
       },
       {
         name: "Customer To Business (C2B)",
         status: "working" as "working" | "down" | "maintenance",
         note: "C2B payment endpoints accepting requests",
-        link: { text: "C2B Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#c2b" }
+        link: { text: "C2B Docs", href: "/c2b" }
       },
       {
         name: "Business To Customer (B2C)",
         status: "working" as "working" | "down" | "maintenance",
         note: "B2C payouts processing normally",
-        link: { text: "B2C Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#b2c" }
+        link: { text: "B2C Docs", href: "/b2c" }
       },
       {
         name: "Transaction Status",
         status: "working" as "working" | "down" | "maintenance",
         note: "Status queries returning timely responses",
-        link: { text: "Transaction Status Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#transaction-status" }
+        link: { text: "Transaction Status Docs", href: "/transaction-status" }
       },
       {
         name: "Account Balance",
         status: "working" as "working" | "down" | "maintenance",
         note: "Account balance checks operational",
-        link: { text: "Account Balance Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#account-balance" }
+        link: { text: "Account Balance Docs", href: "/account-balance" }
       },
       {
         name: "Reversals",
         status: "working" as "working" | "down" | "maintenance",
         note: "Reversal endpoints functional",
-        link: { text: "Reversals Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#reversals" }
+        link: { text: "Reversals Docs", href: "/reversal" }
       },
       {
         name: "Tax Remittance",
         status: "working" as "working" | "down" | "maintenance",
         note: "Tax remittance integration working",
-        link: { text: "Tax Remittance Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#tax-remittance" }
+        link: { text: "Tax Remittance Docs", href: "/tax-remittance" }
       },
       {
         name: "Business Pay Bill",
         status: "working" as "working" | "down" | "maintenance",
         note: "PayBill payment flows operational",
-        link: { text: "Pay Bill Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#pay-bill" }
+        link: { text: "Pay Bill Docs", href: "/business-paybill" }
       },
       {
         name: "Business Buy Goods",
         status: "working" as "working" | "down" | "maintenance",
         note: "BuyGoods payment flows operational",
-        link: { text: "Buy Goods Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#buy-goods" }
+        link: { text: "Buy Goods Docs", href: "/business-buygoods" }
       },
       {
         name: "Bill Manager",
         status: "maintenance" as "working" | "down" | "maintenance",
         note: "On hold per Safaricom API support",
-        link: { text: "Bill Manager (notes)", href: "https://mpesakit.readthedocs.io/en/latest/api.html#bill-manager" }
+        link: { text: "Bill Manager (notes)", href: "https://developer.safaricom.co.ke/APIs/BillManager" }
       },
       {
         name: "B2B Express Checkout",
         status: "maintenance" as "working" | "down" | "maintenance",
         note: "On hold per Safaricom API support",
-        link: { text: "B2B Express (notes)", href: "https://mpesakit.readthedocs.io/en/latest/api.html#b2b-express" }
+        link: { text: "B2B Express (notes)", href: "https://developer.safaricom.co.ke/APIs/B2BExpressCheckout" }
       },
       {
         name: "B2C Account Top Up",
         status: "working" as "working" | "down" | "maintenance",
         note: "Account top-up flows functioning normally",
-        link: { text: "B2C Top Up Docs", href: "https://mpesakit.readthedocs.io/en/latest/api.html#b2c-top-up" }
+        link: { text: "B2C Top Up Docs", href: "/b2c-account-top-up" }
       },
       {
         name: "M-Pesa Ratiba",
         status: "maintenance" as "working" | "down" | "maintenance",
         note: "On hold per Safaricom API support",
-        link: { text: "Ratiba (notes)", href: "https://mpesakit.readthedocs.io/en/latest/api.html#ratiba" }
+        link: { text: "Ratiba (notes)", href: "https://developer.safaricom.co.ke/APIs/MpesaRatiba" }
       }
     ]
   };
@@ -309,7 +309,7 @@ export const MpesaKitLanding: React.FC = () => {
         description: "Get up and running in minutes with our step-by-step guide and code examples.",
         link: {
           text: "Start Building",
-          href: "https://mpesakit.readthedocs.io/en/latest/quickstart.html"
+          href: "/intro"
         }
       },
       {
@@ -318,18 +318,9 @@ export const MpesaKitLanding: React.FC = () => {
         description: "Complete API documentation with parameters, responses, and error codes.",
         link: {
           text: "View APIs",
-          href: "https://mpesakit.readthedocs.io/en/latest/api.html"
+          href: "/auth"
         }
       },
-      {
-        icon: "💡",
-        title: "Examples & Tutorials",
-        description: "Real-world examples and tutorials for common integration patterns.",
-        link: {
-          text: "See Examples",
-          href: "https://mpesakit.readthedocs.io/en/latest/examples.html"
-        }
-      }
     ]
   };
 
@@ -338,11 +329,11 @@ export const MpesaKitLanding: React.FC = () => {
     description: "Join hundreds of developers who trust MpesaKit for their M-Pesa integrations. Start building secure, reliable payment solutions today.",
     primaryCTA: {
       text: "🚀 Get Started Now",
-      href: "https://mpesakit.readthedocs.io/en/latest/quickstart.html"
+      href: "/installation"
     },
     secondaryCTA: {
       text: "📖 View Documentation",
-      href: "https://github.com/rafaeljohn9/mpesakit"
+      href: "/intro"
     }
   };
 
@@ -353,10 +344,9 @@ export const MpesaKitLanding: React.FC = () => {
       {
         title: "Resources",
         links: [
-          { text: "Quick Start", href: "https://mpesakit.readthedocs.io/en/latest/quickstart.html" },
-          { text: "API Reference", href: "https://mpesakit.readthedocs.io/en/latest/api.html" },
-          { text: "Examples", href: "https://mpesakit.readthedocs.io/en/latest/examples.html" },
-          { text: "Contributing", href: "https://mpesakit.readthedocs.io/en/latest/contributing.html" }
+          { text: "Quick Start", href: "/intro" },
+          { text: "API Reference", href: "/auth" },
+          { text: "Contributing", href: "https://github.com/RafaelJohn9/mpesakit/blob/master/CONTRIBUTING.md" }
         ]
       },
       {
@@ -372,17 +362,15 @@ export const MpesaKitLanding: React.FC = () => {
       {
         title: "Support",
         links: [
-          { text: "FAQ", href: "https://mpesakit.readthedocs.io/en/latest/faq.html" },
           { text: "Report Bug", href: "https://github.com/rafaeljohn9/mpesakit/issues" },
           { text: "Get Help", href: "https://github.com/rafaeljohn9/mpesakit/discussions" },
-          { text: "Changelog", href: "https://mpesakit.readthedocs.io/en/latest/changelog.html" }
         ]
       }
     ],
     socialLinks: [
       { text: "📱", href: "https://github.com/rafaeljohn9/mpesakit" },
       { text: "📦", href: "https://pypi.org/project/mpesakit/" },
-      { text: "📚", href: "https://mpesakit.readthedocs.io" }
+      { text: "📚", href: "/intro" }
     ],
     copyright: "© 2025 MpesaKit. Open source project by John Kagunda",
     tagline: "Built with ❤️ for the community."
