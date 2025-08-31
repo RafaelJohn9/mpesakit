@@ -1,0 +1,340 @@
+---
+title: Customer to Business (C2B)
+description: Register C2B URLs, validate incoming payments, and acknowledge confirmations for M-Pesa Customer-to-Business flows.
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader
+    subtitle="Manage Customer-to-Business (C2B) flows: register Validation and Confirmation endpoints with Safaricom, validate incoming payments, and send confirmations/acknowledgements."
+    gradient={true}
+    size="large"
+/>
+
+<Alert type="warning" title="C2B Validation Activation">
+    NB: C2B Transaction Validation is an optional feature that needs to be activated on M-Pesa. The owner of the shortcode must request activation by emailing apisupport@safaricom.co.ke or M-pesabusiness@safaricom.co.ke if they need their transactions validated before execution.
+</Alert>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "ShortCode",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Organization's PayBill or Till shortcode to register URLs for."
+    },
+    {
+        name: "ResponseType",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Default behavior if ValidationURL cannot be reached. Allowed: 'Completed' or 'Cancelled'."
+    },
+    {
+        name: "ConfirmationURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive payment confirmation notifications."
+    },
+    {
+        name: "ValidationURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive validation callbacks before accepting payments."
+    },
+    {
+        name: "TransactionType",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Type of transaction in validation payload (e.g. 'Pay Bill', 'Buy Goods')."
+    },
+    {
+        name: "TransID",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Unique M-Pesa transaction identifier."
+    },
+    {
+        name: "TransTime",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Timestamp of transaction in YYYYMMDDHHmmss format."
+    },
+    {
+        name: "TransAmount",
+        type: "float",
+        dataType: "Float",
+        required: true,
+        description: "Amount transacted (whole numbers expected by M-Pesa)."
+    },
+    {
+        name: "BusinessShortCode",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Receiving organization's shortcode included in validation payload."
+    },
+    {
+        name: "MSISDN",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Customer mobile number making the payment."
+    },
+    {
+        name: "BillRefNumber",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Account/reference number supplied by payer (PayBill only)."
+    },
+    {
+        name: "ResultCode",
+        type: "str|int",
+        dataType: "String/Integer",
+        required: true,
+        description: "Validation response code. '0' or one of the defined C2B validation error codes to reject."
+    },
+    {
+        name: "ResultDesc",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Short description for the validation response (<= 90 chars recommended)."
+    },
+    {
+        name: "ThirdPartyTransID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Optional partner transaction id to echo back in responses."
+    }
+]}
+/>
+
+<SectionHeader
+    title="Overview"
+    subtitle="C2B (Customer-to-Business) covers URL registration with Safaricom (so their platform can call your services), validating incoming payments and acknowledging confirmations."
+    size="small"
+/>
+
+<Alert type="info" title="Implementation Options">
+    - Use the MpesaClient facade for simple and safe integration: it manages authentication, header injection and returns typed Pydantic models.  
+    - Use the Direct API (C2B service + TokenManager + HttpClient) if you need full control over request/response handling, middleware, or custom error behaviors.
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient (Recommended)" icon="🚀">
+        <Alert type="info" title="Why use MpesaClient">
+            The facade handles token retrieval and attaches Authorization headers so you can call high-level operations like registering C2B URLs with minimal boilerplate.
+        </Alert>
+
+        <SectionHeader title="Quick Setup" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: register C2B URLs using the high-level client
+from mpesakit import MpesaClient
+from mpesakit.c2b import C2BResponseType
+
+client = MpesaClient(consumer_key="...", consumer_secret="...", environment="sandbox")
+
+resp = client.c2b.register_url(
+        short_code=600999,
+        response_type=C2BResponseType.COMPLETED,
+        confirmation_url="https://your.example/confirmation",
+        validation_url="https://your.example/validation",
+)
+
+if resp.is_successful():
+        print("Registration accepted")
+else:
+        print("Registration failed:", resp.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            - The facade returns typed Pydantic models (e.g., C2BRegisterUrlResponse) for ergonomic access to fields and helpers like is_successful().  
+            - Authentication tokens are handled transparently by the client.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced Usage">
+            Use the lower-level C2B service when you must manipulate raw requests/responses or plug custom middleware.
+        </Alert>
+
+        <SectionHeader title="Direct Implementation" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: construct and send a RegisterURL request using the C2B service
+from mpesakit.c2b import C2B, C2BRegisterUrlRequest
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+
+http_client = MpesaHttpClient(env="sandbox")
+token_manager = TokenManager(consumer_key="...", consumer_secret="...", http_client=http_client)
+c2b = C2B(http_client=http_client, token_manager=token_manager)
+
+request = C2BRegisterUrlRequest(
+        ShortCode=600999,
+        ResponseType="Completed",
+        ConfirmationURL="https://your.example/confirmation",
+        ValidationURL="https://your.example/validation",
+)
+
+response = c2b.register_url(request)
+print(response.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Direct API Details">
+            - The C2B service attaches the Authorization header using the provided TokenManager.  
+            - Implementations handle small inconsistencies in upstream responses (e.g., a common typo like 'OriginatorCoversationID' is normalized).
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Webhook Handling (Validation & Confirmation)" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Example: simple FastAPI endpoints for Validation and Confirmation
+from fastapi import FastAPI, Request, HTTPException
+from mpesakit.c2b import C2BValidationRequest, C2BValidationResponse, C2BConfirmationResponse
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+
+app = FastAPI()
+
+@app.post("/c2b/validation")
+async def validation(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    data = C2BValidationRequest(**payload)  # will validate incoming fields
+    # perform business checks (account exists, limits, etc.)
+    result = C2BValidationResponse(ResultCode="0", ResultDesc="Accepted", ThirdPartyTransID=data.ThirdPartyTransID)
+    return result.model_dump(mode="json")
+
+
+@app.post("/c2b/confirmation")
+async def confirmation(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    # process final payment notification (store transaction, update balance, etc.)
+    ack = C2BConfirmationResponse()  # ResultCode=0, ResultDesc="Success"
+    return ack.model_dump(mode="json")
+    `}
+</CodeBlock>
+
+<Alert type="info" title="Important behavior">
+    - Validation endpoints should return a C2BValidationResponse. Use ResultCode="0" to accept or one of the defined error codes (see Validation Result Codes) to reject.  
+    - Confirmation endpoints should return an acknowledgement (ResultCode 0). This confirms receipt to Safaricom.
+</Alert>
+
+<SectionHeader title="Validation Result Codes" size="small" />
+
+<CodeBlock language="json" title="Common Result Codes">
+{`
+{
+    "0": "Accepted",
+    "C2B00011": "Invalid MSISDN",
+    "C2B00012": "Invalid Account Number",
+    "C2B00013": "Invalid Amount",
+    "C2B00014": "Invalid KYC Details",
+    "C2B00015": "Invalid Shortcode",
+    "C2B00016": "Other Error"
+}
+`}
+</CodeBlock>
+
+<Alert type="warning" title="ResultDesc length">
+    - Keep ResultDesc concise. The library warns if ResultDesc exceeds 90 characters.
+</Alert>
+
+<SectionHeader title="Responses & Helpers" size="small" />
+
+<CodeBlock language="json" title="Example Register URL Success Response">
+{`
+{
+    "OriginatorConversationID": "7619-37765134-1",
+    "ConversationID": "AG_20230601_123456789",
+    "ResponseCode": "0",
+    "ResponseDescription": "success",
+    "CustomerMessage": "URLs registered"
+}
+`}
+</CodeBlock>
+
+<Alert type="info" title="Response Handling">
+    - C2BRegisterUrlResponse provides is_successful() which treats any all-zero string (e.g., "0" or "00000000") as success.  
+    - The SDK normalizes minor provider response typos (e.g., 'OriginatorCoversationID') so fields are accessible reliably.
+</Alert>
+
+<SectionHeader title="Validation & Safety Checks" size="small" />
+
+<Alert type="warning" title="Forbidden URL patterns">
+    - When registering URLs avoid embedding sensitive or provider-related keywords such as 'm-pesa', 'mpesa', 'safaricom' or suspicious file/command keywords (exe, cmd, sql, query). The library warns about such keywords because Safaricom's API may reject them with a 400 error.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Handle errors when calling the service
+try:
+        resp = client.c2b.register_url(...)
+except Exception as exc:
+        # The underlying HTTP client may raise exceptions on network errors; log and retry as appropriate
+        print("Registration failed:", exc)
+`}
+</CodeBlock>
+
+<Alert type="info" title="Notes">
+    - HTTP or network errors raised by the HttpClient bubble up; wrap calls in try/except for robust production behavior.  
+    - Tests exercise error flows to ensure exceptions propagate when the HTTP client fails.
+</Alert>
+
+<SectionHeader title="Testing & Expected Behaviors" size="small" />
+
+- Register URL:
+    - The service posts to /mpesa/c2b/v1/registerurl with Authorization header set via TokenManager.
+    - Responses are returned as C2BRegisterUrlResponse instances.
+    - The implementation tolerates a common provider typo ("OriginatorCoversationID") and maps it to OriginatorConversationID.
+
+- Validation:
+    - Incoming payloads are validated against C2BValidationRequest. Missing required fields or invalid formats will raise validation errors.
+    - Use the provided enums for allowed ResultCode values; invalid codes are rejected by the model validator.
+
+- Confirmation:
+    - Return a C2BConfirmationResponse (ResultCode 0 and ResultDesc "Success") to acknowledge receipt.
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+    - Implement robust webhook handlers for validation and confirmation. Log and persist notifications to support reconciliation.  
+    - Add observability and retry strategies around register_url calls and webhook processing to handle transient failures.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - Best practices for building reliable endpoints
+- [🏗️ Production Setup](/production) - Go-live checklist, security and monitoring

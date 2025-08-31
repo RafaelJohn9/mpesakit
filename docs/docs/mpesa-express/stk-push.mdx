@@ -1,0 +1,344 @@
+---
+title: STK Push
+description: Initiate secure M-Pesa payments using STK Push (Lipa Na M-Pesa Online)
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader 
+  subtitle="Initiate secure M-Pesa payments using STK Push (Lipa Na M-Pesa Online). This triggers a payment prompt on the user's phone to enter their M-Pesa PIN."
+  gradient={true}
+  size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable 
+parameters={[
+    {
+      name: "business_short_code",
+      type: "int",
+      dataType: "Integer",
+      required: true,
+      description: "Your PayBill or BuyGoods number. Use 174379 in sandbox environment."
+    },
+    {
+      name: "amount",
+      type: "int", 
+      dataType: "Integer",
+      required: true,
+      description: "Transaction amount in KES. Minimum: 1."
+    },
+    {
+      name: "phone_number",
+      type: "str",
+      dataType: "String", 
+      required: true,
+      description: "Customer's phone number that receives the STK PIN prompt (usually same as party_a)."
+    },
+    {
+      name: "callback_url",
+      type: "str",
+      dataType: "String",
+      required: true, 
+      description: "HTTPS endpoint to receive payment results. Must be publicly accessible."
+    },
+    {
+      name: "account_reference",
+      type: "str",
+      dataType: "String",
+      required: true,
+      description: "Transaction identifier like order ID. Maximum 12 characters."
+    },
+    {
+      name: "transaction_desc", 
+      type: "str",
+      dataType: "String",
+      required: true,
+      description: "Description displayed to user. Maximum 13 characters."
+    },
+    {
+      name: "transaction_type",
+      type: "str",
+      dataType: "String",
+      required: true,
+      description: "Type of transaction. Use 'CustomerPayBillOnline' or 'CustomerBuyGoodsOnline'."
+    },
+    {
+      name: "party_a",
+      type: "int",
+      dataType: "Integer",
+      required: true,
+      description: "Phone number of the customer initiating the payment (payer)."
+    },
+    {
+      name: "party_b",
+      type: "int",
+      dataType: "Integer",
+      required: true,
+      description: "Receiving shortcode (merchant/organization). Usually same as business_short_code."
+    },
+    {
+      name: "passkey",
+      type: "str",
+      dataType: "String",
+      required: false,
+      description: "Passkey used in STK Push / password generation. Optional if Password and Timestamp are provided."
+    },
+    {
+      name: "password",
+      type: "str",
+      dataType: "String",
+      required: false,
+      description: "Base64-encoded password (shortcode+passkey+timestamp). Optional if Passkey is provided."
+    },
+    {
+      name: "timestamp",
+      type: "str",
+      dataType: "String",
+      required: false,
+      description: "Timestamp used when generating the password. Format: YYYYMMDDHHMMSS."
+    },
+]}
+/>
+
+
+<SectionHeader
+  title="M-Pesa STK Push Integration"
+  subtitle="Easily integrate M-Pesa STK Push (Lipa Na M-Pesa Online) into your Python applications using mpesakit. This guide covers both the recommended MpesaClient approach and direct API usage for advanced control."
+  size="small"
+/>
+
+<Alert type="info" title="Implementation Options">
+  - You can choose MpesaClient for a simple facade that handles `token management`, `defaults` and `error handling` for you, or use the Direct API (`StkPush`, `TokenManager`, `MpesaHttpClient`) when you need full control over `request construction`, `middleware`, and `custom workflows`. 
+
+  - Use `MpesaClient` for fast integration and the `Direct API` for advanced customization.
+</Alert>
+
+
+<Tabs defaultValue={0}>
+  <Tabs.TabPane label="MpesaClient" icon="🚀">
+    <Alert type="info" title="Recommended Approach">
+     For quick and easy integration, use the `MpesaClient` which abstracts away `token management` and `error handling`.
+    </Alert>
+
+    <SectionHeader title="Quick Setup" size="small" />
+    
+    <CodeBlock language="python" title="Python">
+{`
+import os
+from dotenv import load_dotenv
+from mpesakit import MpesaClient
+from mpesakit.mpesa_express import TransactionType # Enum for transaction types (eg. CUSTOMER_PAYBILL_ONLINE, CUSTOMER_BUYGOODS_ONLINE)
+
+load_dotenv()
+
+client = MpesaClient(
+    consumer_key=os.getenv("MPESA_CONSUMER_KEY"),
+    consumer_secret=os.getenv("MPESA_CONSUMER_SECRET"),
+    environment="sandbox",
+)
+
+# Send STK Push
+response = client.stk_push(
+    business_short_code=int(os.getenv("MPESA_SHORTCODE")),
+    passkey=os.getenv("MPESA_PASSKEY"), # It can be used instead of Password and Timestamp fields (optional)
+    transaction_type=TransactionType.CUSTOMER_PAYBILL_ONLINE,
+    amount=1,
+    party_a=os.getenv("MPESA_PHONE_NUMBER"),
+    party_b=os.getenv("MPESA_SHORTCODE"),
+    phone_number=os.getenv("MPESA_PHONE_NUMBER"),
+    callback_url="https://example.com/callback",
+    account_reference="Test123",
+    transaction_desc="Test Payment",
+    timestamp="20231201120000", # it exists together with the Password field (optional)
+    password="custom_generated_password" # it exists together with the Timestamp field (optional)
+)
+`}
+    </CodeBlock>
+
+    <Alert type="info" title="On Passkey, Password, and Timestamp">
+        - You can provide either the `Passkey` or both `Password` and `Timestamp`. If you provide the `Passkey`, the SDK will generate the `Password` and `Timestamp` for you.
+        - The `Password` and `Timestamp` fields must coexist since the `Password` is derived from the `Timestamp` (`Password = shortcode + "your_passkey" + Timestamp`).
+    </Alert>
+  </Tabs.TabPane>
+
+  <Tabs.TabPane label="Direct API" icon="⚡">
+    <Alert type="warning" title="Advanced Usage">
+      Direct API access for maximum control and customization. Requires manual token management.
+    </Alert>
+
+    <SectionHeader title="Direct Implementation" size="small" />
+    
+    <CodeBlock language="python" title="Python">
+{`
+from mpesakit.mpesa_express import (
+    StkPush,
+    StkPushSimulateRequest,
+    TransactionType,
+)
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+import os
+
+# Configure HTTP client and token manager
+http_client = MpesaHttpClient(env=os.getenv("MPESA_ENV", "sandbox"))
+token_manager = TokenManager(
+    consumer_key=os.getenv("MPESA_CONSUMER_KEY"),
+    consumer_secret=os.getenv("MPESA_CONSUMER_SECRET"),
+    http_client=http_client,
+)
+
+# Create STK service
+stk_service = StkPush(http_client=http_client, token_manager=token_manager)
+
+callback_url = os.getenv("MPESA_CALLBACK_URL", "https://example.com/callback")
+
+# Build request
+request = StkPushSimulateRequest(
+    BusinessShortCode=int(os.getenv("MPESA_SHORTCODE", "174379")),
+    Passkey=os.getenv("MPESA_PASSKEY"),
+    TransactionType=TransactionType.CUSTOMER_PAYBILL_ONLINE.value,
+    Amount=1,
+    PartyA=os.getenv("MPESA_TEST_PHONE", "254712345678"),
+    PartyB=os.getenv("MPESA_SHORTCODE", "174379"),
+    PhoneNumber=os.getenv("MPESA_TEST_PHONE", "254712345678"),
+    CallBackURL=callback_url,
+    AccountReference="E2E-Test",
+    TransactionDesc="AutomatedTest",
+)
+
+print("📤 Sending STK Push request...")
+response = stk_service.push(request=request)
+
+print("Response:", response)
+`}
+    </CodeBlock>
+
+    <Alert type="info" title="Full Control">
+      Access to all request parameters, custom middleware, advanced error handling, and response processing.
+    </Alert>
+  </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Response" size="small" />
+
+    Response is an `StkPushSimulateResponse` Pydantic object. If you prefer it as a dictionary, you can convert it using:
+    <CodeBlock language="python" title="Python">
+{`response_dict = response.model_dump(mode="json")  # Convert to dictionary`}
+  </CodeBlock>
+
+    From here on we are going to use it as an object due to the rich methods it provides.
+    We can check if the request was successful by:
+
+    <CodeBlock language="python" title="Python">
+    {`if response.is_successful():
+    print("Request accepted")
+else:
+    print(f"Error: {response.error_message()}")  # Get error message`}
+    </CodeBlock>
+    <Alert type="info" title="Error Handling">
+        Any error in the request will raise an `MpesaError` exception, which we can catch and handle appropriately. We will see how to utilize this later on.
+    </Alert>
+
+
+
+<SectionHeader title="Success Response" size="small" />
+
+<CodeBlock language="json" title="JSON Response">
+{`{
+  "MerchantRequestID": "29115-34620561-1",
+  "CheckoutRequestID": "ws_CO_191220191020363925",
+  "ResponseCode": "0",
+  "ResponseDescription": "Success. Request accepted for processing",
+  "CustomerMessage": "Enter your PIN to complete payment"
+}`}
+</CodeBlock>
+
+- While using the `StkPushSimulateResponse` object, we can access the fields with ease:
+
+<CodeBlock language="python" title="Python">
+{`print(response.MerchantRequestID)  # e.g 29115-34620561-1
+print(response.CheckoutRequestID)   # e.g ws_CO_191220191020363925
+print(response.ResponseCode)        # e.g 0
+print(response.ResponseDescription) # e.g Success. Request accepted for processing
+print(response.CustomerMessage)     # e.g Enter your PIN to complete payment`}
+</CodeBlock>
+
+- This is a much cleaner way of accessing the response fields, since we avoid dealing with raw dictionaries that may lead to typos when accessing keys.
+
+<Alert type="success" title="Success Response">
+  A successful response doesn't guarantee payment completion. Monitor your callback URL for the final payment status.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+from mpesakit.errors import MpesaApiException
+
+try:
+    response = client.stk_push(
+      business_short_code=int(os.getenv("MPESA_SHORTCODE")),
+      passkey=os.getenv("MPESA_PASSKEY"),
+      transaction_type=TransactionType.CUSTOMER_PAYBILL_ONLINE,
+      amount=1,
+      party_a=os.getenv("MPESA_PHONE_NUMBER"),
+      party_b=os.getenv("MPESA_SHORTCODE"),
+      phone_number=os.getenv("MPESA_PHONE_NUMBER"),
+      callback_url="https://example.com/callback",
+      account_reference="Test123",
+      transaction_desc="Test Payment",
+    )
+    data = response.model_dump(mode="json")
+except MpesaApiException as e:
+    err = e.error
+    print("M-Pesa API error:")
+    print(f"  Code: {err.error_code}") # e.g AUTH_INVALID_CREDENTIALS
+    print(f"  Message: {err.error_message}") # e.g Invalid credentials provided. Please check your consumer key and secret.
+    print(f"  HTTP status: {err.status_code}") # e.g 400
+    print(f"  Request ID: {err.request_id}")
+except Exception as exc:
+    print(f"Unexpected error: {exc}")
+`}
+</CodeBlock>
+<Alert type="info" title="Error Handling">
+  - The `MpesaApiException` provides detailed error information including error code, message, HTTP status, and raw response for effective debugging.
+  - Use what you need from the error object to log or handle errors appropriately.
+</Alert>
+
+#### Easier Error Handling with MpesaClient
+
+- We can do this to simplify and have efficient error handling and logging with `MpesaClient`:
+
+<CodeBlock language="python" title="Python">
+{`
+from mpesakit.errors import MpesaApiException
+
+try:
+    response = client.stk_push(
+      YOUR_PARAMETERS=HERE
+    )
+    data = response.model_dump(mode="json")
+except MpesaApiException as e:
+    print(f"M-Pesa API error: {str(e)}")
+except Exception as exc:
+    print(f"Unexpected error: {exc}")
+`}
+</CodeBlock>
+
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+  After initiating STK Push, you'll need to handle the callback response. Learn how to set up webhook endpoints and process payment confirmations.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - Handle payment callbacks
+- [🏗️ Production Setup](/production) - Go live checklist

@@ -1,0 +1,101 @@
+.tabsContainer {
+  margin: 2rem 0;
+}
+
+.tabsList {
+  display: flex;
+  background: var(--ifm-background-surface-color, #f5f5f5);
+  border-radius: 16px;
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.tabTrigger {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  color: var(--ifm-font-color-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tabTrigger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #00d084, #0ea5e9);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.tabTrigger.active {
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 208, 132, 0.3);
+}
+
+.tabTrigger.active::before {
+  opacity: 1;
+}
+
+.tabTrigger:hover:not(.active) {
+  background: rgba(0, 208, 132, 0.1);
+  color: #00d084;
+  transform: translateY(-1px);
+}
+
+.tabIcon {
+  font-size: 1em;
+}
+
+.tabContent {
+  min-height: 200px;
+}
+
+.tabPane {
+  display: none;
+  animation: fadeInUp 0.5s ease;
+}
+
+.tabPane.active {
+  display: block;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .tabsList {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .tabTrigger {
+    text-align: left;
+    justify-content: flex-start;
+  }
+}

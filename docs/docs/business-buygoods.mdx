@@ -1,0 +1,347 @@
+---
+title: Business Buy Goods
+description: Make business-to-business payments to Buy Goods accounts using M-Pesa by initiating payment requests and handling asynchronous result notifications.
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader
+    subtitle="Make business-to-business payments to Buy Goods accounts using M-Pesa by initiating payment requests and handling asynchronous result notifications."
+    gradient={true}
+    size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "Initiator",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "M-Pesa API operator username (must be pre-approved by Safaricom)."
+    },
+    {
+        name: "SecurityCredential",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Encrypted security credential of the initiator (base64 encoded)."
+    },
+    {
+        name: "Amount",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Transaction amount to be transferred between accounts."
+    },
+    {
+        name: "PartyA",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Shortcode from which money is deducted for the payment."
+    },
+    {
+        name: "PartyB",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Shortcode to which money is credited (Buy Goods till number)."
+    },
+    {
+        name: "AccountReference",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Account number associated with the payment."
+    },
+    {
+        name: "Requester",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Consumer's mobile number (optional)."
+    },
+    {
+        name: "Remarks",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Additional transaction information (maximum 100 characters)."
+    },
+    {
+        name: "QueueTimeOutURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive timeout notifications."
+    },
+    {
+        name: "ResultURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive result notifications."
+    },
+    {
+        name: "Occassion",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Additional transaction information (optional)."
+    },
+    {
+        name: "CommandID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Command ID for the transaction (default: 'BusinessBuyGoods')."
+    },
+    {
+        name: "SenderIdentifierType",
+        type: "int",
+        dataType: "Integer",
+        required: false,
+        description: "Identifier type for sender (default: 4 for shortcode)."
+    },
+    {
+        name: "RecieverIdentifierType",
+        type: "int",
+        dataType: "Integer",
+        required: false,
+        description: "Identifier type for receiver (default: 4 for shortcode)."
+    },
+    {
+        name: "OriginatorConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique ID for the request message (returned in response)."
+    },
+    {
+        name: "ConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique ID for the transaction (returned in response)."
+    },
+    {
+        name: "ResponseCode",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Status code of the request (0 means success, returned in response)."
+    },
+    {
+        name: "ResponseDescription",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Status message describing the request outcome (returned in response)."
+    }
+]}
+/>
+
+<SectionHeader
+    title="Overview"
+    subtitle="Business Buy Goods enables businesses to make payments to Buy Goods accounts. It's an asynchronous operation with callbacks for results and timeouts."
+    size="small"
+/>
+
+<Alert type="info" title="Implementation Options">
+    - Use the `MpesaClient` facade for simple and safe integration: it manages authentication, header injection and returns typed Pydantic models.  
+    - Use the Direct API (`BusinessBuyGoods` service + `TokenManager` + `HttpClient`) if you need full control over request/response handling, middleware, or custom error behaviors.
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient (Recommended)" icon="🚀">
+        <Alert type="info" title="Why use MpesaClient">
+            The facade handles token retrieval and attaches Authorization headers so you can call high-level operations like initiating Business Buy Goods payments with minimal boilerplate.
+        </Alert>
+
+        <SectionHeader title="Quick Setup" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: initiate Business Buy Goods payment using the high-level client
+from mpesakit import MpesaClient
+
+client = MpesaClient(consumer_key="...", consumer_secret="...", environment="sandbox")
+
+resp = client.b2b.buygoods(
+    initiator="API_Username",
+    security_credential="encrypted_credential",
+    amount=239,
+    party_a=123456,
+    party_b=654321,
+    account_reference="353353",
+    requester="254700000000",
+    remarks="Payment for goods",
+    result_url="https://your.example/result",
+    queue_timeout_url="https://your.example/timeout",
+    occassion="Purchase"
+)
+
+if resp.is_successful():
+    print("Business Buy Goods payment initiated successfully")
+else:
+    print("Business Buy Goods payment failed:", resp.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            - The facade returns typed Pydantic models (e.g., `BusinessBuyGoodsResponse`) for ergonomic access to fields and helpers like `is_successful()`.  
+            - Authentication tokens are handled transparently by the client.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced Usage">
+            Use the lower-level BusinessBuyGoods service when you must manipulate raw requests/responses or plug custom middleware.
+        </Alert>
+
+        <SectionHeader title="Direct Implementation" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: construct and send a Business Buy Goods request using the BusinessBuyGoods service
+from mpesakit.business_buy_goods import BusinessBuyGoods, BusinessBuyGoodsRequest
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+
+http_client = MpesaHttpClient(env="sandbox")
+token_manager = TokenManager(consumer_key="...", consumer_secret="...", http_client=http_client)
+business_buy_goods = BusinessBuyGoods(http_client=http_client, token_manager=token_manager)
+
+request = BusinessBuyGoodsRequest(
+    Initiator="API_Username",
+    SecurityCredential="encrypted_credential",
+    Amount=239,
+    PartyA=123456,
+    PartyB=654321,
+    AccountReference="353353",
+    Requester="254700000000",
+    Remarks="Payment for goods",
+    ResultURL="https://your.example/result",
+    QueueTimeOutURL="https://your.example/timeout",
+    Occassion="Purchase"
+)
+
+response = business_buy_goods.buy_goods(request)
+print(response.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Direct API Details">
+            - The BusinessBuyGoods service attaches the Authorization header using the provided TokenManager.  
+            - Implementations handle small inconsistencies in upstream responses (e.g., a common typo like 'OriginatorCoversationID' is normalized).
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Webhook Handling (Result & Timeout)" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Example: simple FastAPI endpoints for Business Buy Goods Result and Timeout
+from fastapi import FastAPI, Request, HTTPException
+from mpesakit.business_buy_goods import BusinessBuyGoodsResultCallback, BusinessBuyGoodsResultCallbackResponse, BusinessBuyGoodsTimeoutCallback, BusinessBuyGoodsTimeoutCallbackResponse
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+
+app = FastAPI()
+
+@app.post("/b2b/buygoods/result")
+async def buygoods_result(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    data = BusinessBuyGoodsResultCallback(**payload)  # will validate incoming fields
+    # process the result (update database, notify user, etc.)
+    ack = BusinessBuyGoodsResultCallbackResponse()
+    return ack.model_dump(mode="json")
+
+
+@app.post("/b2b/buygoods/timeout")
+async def buygoods_timeout(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    # process timeout notification (log, retry logic, etc.)
+    ack = BusinessBuyGoodsTimeoutCallbackResponse()
+    return ack.model_dump(mode="json")
+`}
+</CodeBlock>
+
+<Alert type="info" title="Important behavior">
+    - Result and timeout endpoints should return acknowledgements (ResultCode 0). This confirms receipt to Safaricom.  
+    - Process the actual Business Buy Goods result asynchronously based on the data in the result callback.
+</Alert>
+
+<SectionHeader title="Responses & Helpers" size="small" />
+
+<CodeBlock language="json" title="Example Business Buy Goods Success Response">
+{`
+{
+    "OriginatorConversationID": "5118-111210482-1",
+    "ConversationID": "AG_20230420_2010759fd5662ef6d054",
+    "ResponseCode": "0",
+    "ResponseDescription": "Accept the service request successfully."
+}
+`}
+</CodeBlock>
+
+<Alert type="info" title="Response Handling">
+    - BusinessBuyGoodsResponse provides is_successful() which normalizes success checks.
+    - The SDK normalizes minor provider response typos (e.g., 'OriginatorCoversationID') so fields are accessible reliably.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Handle errors when calling the service
+try:
+    resp = client.b2b.buygoods(...)
+except Exception as exc:
+    # The underlying HTTP client may raise exceptions on network errors; log and retry as appropriate
+    print("Business Buy Goods payment failed:", exc)
+`}
+</CodeBlock>
+
+<Alert type="info" title="Notes">
+    - HTTP or network errors raised by the HttpClient bubble up; wrap calls in try/except for robust production behavior.  
+    - Tests exercise error flows to ensure exceptions propagate when the HTTP client fails.
+</Alert>
+
+<SectionHeader title="Testing & Expected Behaviors" size="small" />
+
+- Business Buy Goods:
+    - The service posts to `/mpesa/b2b/v1/paymentrequest` with Authorization header set via TokenManager.
+    - Responses are returned as `BusinessBuyGoodsResponse` instances.
+    - The implementation tolerates a common provider typo ("OriginatorCoversationID") and maps it to `OriginatorConversationID`.
+
+- Validation:
+    - Incoming payloads are validated against `BusinessBuyGoodsResultCallback` and `BusinessBuyGoodsTimeoutCallback`. Missing required fields or invalid formats will raise validation errors.
+    - Use the provided response schemas for acknowledgements; invalid codes are rejected by the model validator.
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+    - Implement robust webhook handlers for result and timeout notifications. Log and persist notifications to support reconciliation.  
+    - Add observability and retry strategies around Business Buy Goods calls and webhook processing to handle transient failures.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - Best practices for building reliable endpoints
+- [🏗️ Production Setup](/production) - Go-live checklist, security and monitoring

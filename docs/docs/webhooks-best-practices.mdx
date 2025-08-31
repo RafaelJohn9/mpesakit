@@ -1,0 +1,168 @@
+---
+title: Webhooks Best Practices
+---
+
+## Webhooks and IP Whitelisting with M-Pesa
+
+### What is a Webhook?
+
+A webhook is an HTTP callback: an HTTP POST request that is sent to your server by a third-party service when a specific event occurs. In the context of M-Pesa, webhooks are used to notify your application about payment events such as successful transactions, reversals, or confirmations.
+
+When a transaction is completed on the M-Pesa platform, Safaricom's servers send a notification to your predefined **validation**, **confirmation**, or **timeout** URL. This allows your application to update payment status, trigger business logic, or initiate fulfillment.
+
+Because these requests come from Safaricom's systems, it's critical to verify that the incoming request actually originates from M-Pesa and not from a malicious actor.
+
+---
+
+### Why IP Whitelisting is Important
+
+Verifying the source IP address of incoming webhook requests is a fundamental security measure. By ensuring that requests come only from known M-Pesa IP addresses, you protect your application from:
+
+- Fake transaction notifications
+- Replay attacks
+- Unauthorized access to your payment processing endpoints
+
+The `mpesakit.security.ip_whitelist` module provides a secure and easy way to validate incoming requests by checking their origin against the official M-Pesa IP ranges.
+
+---
+
+### Using `is_mpesa_ip_allowed` for Security
+
+The `is_mpesa_ip_allowed` function checks whether a given IP address belongs to Safaricom's M-Pesa infrastructure. It uses a pre-defined list of trusted IPs and supports custom IP lists for testing or regional variations.
+
+Using this function at the start of your webhook handler ensures only legitimate M-Pesa traffic is processed.
+
+```python
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+```
+
+This function should be used to guard your webhook endpoints before processing any payload.
+
+---
+
+### Webhook Examples by Framework
+
+Below are secure implementations of M-Pesa webhook handlers using popular Python web frameworks.
+
+#### FastAPI
+
+```python
+from fastapi import FastAPI, Request, HTTPException
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+
+app = FastAPI()
+
+@app.post("/mpesa/confirmation")
+async def confirmation(request: Request):
+    client_ip = request.client.host
+    if not is_mpesa_ip_allowed(client_ip):
+        raise HTTPException(status_code=403, detail="IP not allowed")
+
+    payload = await request.json()
+    # Process M-Pesa confirmation
+    print("Received confirmation:", payload)
+    return {"ResultCode": 0, "ResultDesc": "Success"}
+```
+
+#### Flask
+
+```python
+from flask import Flask, request, jsonify
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+
+app = Flask(__name__)
+
+@app.route('/mpesa/confirmation', methods=['POST'])
+def confirmation():
+    client_ip = request.remote_addr
+    if not is_mpesa_ip_allowed(client_ip):
+        return jsonify({"error": "IP not allowed"}), 403
+
+    payload = request.get_json()
+    # Process M-Pesa confirmation
+    print("Received confirmation:", payload)
+    return jsonify({"ResultCode": 0, "ResultDesc": "Success"})
+```
+
+#### Django
+
+```python
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+import json
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def confirmation(request):
+    client_ip = get_client_ip(request)
+    if not is_mpesa_ip_allowed(client_ip):
+        return JsonResponse({"error": "IP not allowed"}, status=403)
+
+    payload = json.loads(request.body)
+    # Process M-Pesa confirmation
+    print("Received confirmation:", payload)
+    return JsonResponse({"ResultCode": 0, "ResultDesc": "Success"})
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+```
+
+---
+
+### Using `ngrok` for Development
+
+During development, your server runs locally and isn't publicly accessible. To test M-Pesa webhooks, you need a public URL that forwards to your local server.
+
+[ngrok](https://ngrok.com) creates a secure public tunnel to your localhost.
+
+#### Step 1: Install ngrok
+
+Download and install ngrok from [https://ngrok.com/download](https://ngrok.com/download), or use via npm:
+
+```bash
+npm install -g ngrok
+```
+
+#### Step 2: Start Your App and Tunnel
+
+Start your development server (e.g., FastAPI on port 8000):
+
+```bash
+uvicorn main:app --reload
+```
+
+In another terminal, start ngrok:
+
+```bash
+ngrok http 8000
+```
+
+You'll get a URL like `https://abc123.ngrok.io`.
+
+#### Step 3: Register Webhook URL
+
+Use the ngrok URL as your callback in the M-Pesa Daraja API:
+
+```
+https://abc123.ngrok.io/mpesa/confirmation
+```
+
+> ⚠️ Note: During development, `is_mpesa_ip_allowed` will reject requests from ngrok IPs. To test locally, you can temporarily bypass IP checks **only in development mode**:
+
+```python
+if not app.debug and not is_mpesa_ip_allowed(client_ip):
+    raise HTTPException(status_code=403, detail="IP not allowed")
+```
+
+Never disable IP checks in production.
+
+---
+
+By combining secure IP validation with proper webhook handling, you ensure that your M-Pesa integration is both functional and resilient to attacks.

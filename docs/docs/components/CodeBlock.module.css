@@ -1,0 +1,72 @@
+.codeBlock {
+  background: var(--ifm-code-background, #1e1e1e);
+  border: 1px solid var(--ifm-color-emphasis-300, #333333);
+  border-radius: 16px;
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.codeBlock:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+}
+
+.codeHeader {
+  background: var(--ifm-background-color, #1a1a1a);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300, #333);
+}
+
+.codeLanguage {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-600, #737373);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.copyButton {
+  background: rgba(0, 208, 132, 0.1);
+  color: #00d084;
+  border: 1px solid #00d084;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copyButton:hover {
+  background: #00d084;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.codeContent {
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.codeContent pre {
+  margin: 0;
+  font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ifm-font-color-base);
+}
+
+.codeContent code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}

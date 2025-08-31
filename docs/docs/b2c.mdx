@@ -1,0 +1,400 @@
+---
+title: Business to Customer (B2C)
+description: Initiate Business-to-Customer payouts, handle result and timeout callbacks, and inspect result metadata from M-Pesa B2C flows.
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader
+    subtitle="Send payouts (salary, business or promotional payments) from your organization's disbursement account to customers, and handle result/timeout callbacks."
+    gradient={true}
+    size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "OriginatorConversationID",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Unique identifier for this request (used for tracing/reconciliation)."
+    },
+    {
+        name: "InitiatorName",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "API initiator username configured with Safaricom."
+    },
+    {
+        name: "SecurityCredential",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Encrypted security credential for the initiator."
+    },
+    {
+        name: "CommandID",
+        type: "str",
+        dataType: "Enum",
+        required: true,
+        description: "Type of payment. Allowed: SalaryPayment, BusinessPayment, PromotionPayment."
+    },
+    {
+        name: "Amount",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Amount to disburse to the recipient."
+    },
+    {
+        name: "PartyA",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Shortcode (Bulk Disbursement Account shortcode) sending the funds."
+    },
+    {
+        name: "PartyB",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Recipient MSISDN. Will be normalized/validated as a Kenyan phone number."
+    },
+    {
+        name: "Remarks",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Free text remarks (max 100 chars)."
+    },
+    {
+        name: "QueueTimeOutURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "URL to receive timeout notifications if processing exceeds the provider timeout window."
+    },
+    {
+        name: "ResultURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "URL to receive the final result callback for the payment."
+    },
+    {
+        name: "Occasion",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Optional occasion (max 100 chars)."
+    },
+    {
+        name: "ConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Returned by provider to identify the asynchronous processing conversation."
+    },
+    {
+        name: "ResponseCode",
+        type: "str|int",
+        dataType: "String/Integer",
+        required: true,
+        description: "'0' (or all-zero string) indicates success in service responses."
+    },
+    {
+        name: "Result.ResultParameters",
+        type: "list",
+        dataType: "List[Key/Value]",
+        required: false,
+        description: "Result callback parameters (TransactionAmount, TransactionReceipt, etc.)."
+    }
+]}
+/>
+
+<SectionHeader title="Overview" subtitle="Initiate B2C payouts and handle callbacks." size="small" />
+
+<Alert type="warning" title="NOTE">
+    For you to use this API in production you are required to apply for a `Bulk Disbursement Account` and obtain a `Shortcode`; you cannot perform these payments from a `Pay Bill` or `Buy Goods` (Till Number). To apply for a Bulk Disbursement Account, visit <a href="https://www.safaricom.co.ke/business/sme/m-pesa-payment-solutions" target="_blank" rel="noopener">https://www.safaricom.co.ke/business/sme/m-pesa-payment-solutions</a>
+</Alert>
+
+<Alert type="info" title="Integration Options">
+    - Use the MpesaClient facade (recommended) for a simple, token-managed API to submit B2C payment requests and receive typed response models.  
+    - Use the direct B2C service when you need fine-grained control over requests, headers, or custom behavior (token manager + http client).
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient (Recommended)" icon="🚀">
+        <Alert type="info" title="Why use MpesaClient">
+            The facade handles authentication and returns Pydantic models (responses & helpers) so you can focus on business logic.
+        </Alert>
+
+        <SectionHeader title="Quick Setup" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: using the MpesaClient facade to submit a B2C payment and inspect the typed response.
+from mpesakit.client import MpesaClient
+from mpesakit.b2c import B2CCommandIDType, B2CResponse
+
+# Initialize the client with your credentials and environment
+client = MpesaClient(consumer_key="...", consumer_secret="...", environment="sandbox")
+
+# Build and send a B2C payment request
+resp: B2CResponse = client.b2c.send_payment(
+    originator_conversation_id="ocid-1234-5678",
+    initiator_name="api_initiator",
+    security_credential="ENCRYPTED_SECURITY_CREDENTIAL",
+    command_id=B2CCommandIDType.BusinessPayment,
+    amount=1500,
+    party_a="600999",               # Bulk disbursement shortcode
+    party_b="254712345678",         # Recipient MSISDN (normalized by SDK)
+    remarks="Salary payout",
+    queue_timeout_url="https://example.com/b2c/timeout",
+    result_url="https://example.com/b2c/result",
+    occasion="JulySalary",
+)
+
+# Inspect the typed response
+if resp.is_successful():
+    print("B2C sent:", resp.ResponseDescription)
+else:
+    print("B2C failed:", resp.ResponseDescription, "code:", resp.ResponseCode)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            - Facade calls return typed responses (e.g., B2CResponse).  
+            - The client manages Authorization headers via the TokenManager automatically.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced Usage">
+            Use the lower-level B2C service when you need to craft raw requests, add middleware, or change retry/error semantics.
+        </Alert>
+
+        <SectionHeader title="Direct Implementation" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Direct B2C implementation using MpesaHttpClient + TokenManager
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.b2c.b2c import B2C
+from mpesakit.b2c.schemas import B2CRequest, B2CResponse, B2CCommandIDType
+
+# Initialize lower-level pieces (provide real creds in production)
+token_manager = TokenManager(consumer_key="...", consumer_secret="...", environment="sandbox")
+http_client = MpesaHttpClient(environment="sandbox")
+
+# Create the service that wires the token manager and HTTP client
+b2c = B2C(http_client=http_client, token_manager=token_manager)
+
+# Build a validated B2CRequest model
+req = B2CRequest(
+    OriginatorConversationID="ocid-1234-5678",
+    InitiatorName="api_initiator",
+    SecurityCredential="ENCRYPTED_SECURITY_CREDENTIAL",
+    CommandID=B2CCommandIDType.BusinessPayment.value,
+    Amount=1500,
+    PartyA=600999,
+    PartyB=254712345678,
+    Remarks="Salary payout",
+    QueueTimeOutURL="https://example.com/b2c/timeout",
+    ResultURL="https://example.com/b2c/result",
+    Occasion="JulySalary",
+)
+
+# Send the payment via the B2C service. The service will:
+#  - acquire the bearer token from TokenManager
+#  - post to /mpesa/b2c/v3/paymentrequest with Authorization: Bearer <token>
+#  - return a typed B2CResponse model
+try:
+    resp: B2CResponse = b2c.send_payment(req)
+    if resp.is_successful():
+        print("B2C sent:", resp.ResponseDescription)
+    else:
+        print("B2C failed:", resp.ResponseDescription, "code:", resp.ResponseCode)
+except Exception as exc:
+    # Network/HTTP errors bubble up from the underlying HttpClient
+    print("Error sending B2C payment:", exc)
+
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Direct API Details">
+            - The B2C service injects the Bearer token from TokenManager into outgoing requests.  
+            - Primary payment request endpoint used by the SDK: /mpesa/b2c/v3/paymentrequest (SDK tests assert this path).
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Callbacks (Result & Timeout)" size="small" />
+
+<CodeBlock language="python" title="Webhook receivers (FastAPI)">
+{`# Minimal FastAPI webhook receivers for B2C Result & Timeout callbacks.
+# - Validates caller IP using is_mpesa_ip_allowed
+# - Parses payload into SDK schemas (B2CResultCallback / B2CTimeoutCallback)
+# - Persists/queues the payload for downstream processing (TODO)
+# - Returns the acknowledgement JSON expected by M-Pesa Daraja API
+
+from fastapi import FastAPI, Request, HTTPException, status
+from fastapi.responses import JSONResponse
+from mpesakit.security import is_mpesa_ip_allowed
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.b2c.schemas import (
+    B2CResultCallback,
+    B2CTimeoutCallback,
+    B2CResultCallbackResponse,
+    B2CTimeoutCallbackResponse,
+)
+import logging
+
+log = logging.getLogger(__name__)
+app = FastAPI()
+
+# Optional HTTP client for any outgoing calls to MPesa (not required to accept callbacks)
+mpesa_http = MpesaHttpClient(environment="sandbox")  # or "production"
+
+def _get_remote_ip(request: Request) -> str:
+    xff = request.headers.get("x-forwarded-for")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.client.host
+
+@app.post("/webhooks/b2c/result")
+async def b2c_result(request: Request):
+    remote_ip = _get_remote_ip(request)
+    if not is_mpesa_ip_allowed(remote_ip):
+        log.warning("Rejected B2C result callback from disallowed IP: %s", remote_ip)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        log.exception("Failed reading JSON payload from %s: %s", remote_ip, exc)
+        return JSONResponse(
+            status_code=400,
+            content=B2CResultCallbackResponse(ResultCode=1, ResultDesc="Invalid JSON payload.").model_dump(),
+        )
+
+    try:
+        callback = B2CResultCallback.model_validate(payload)
+    except Exception as exc:
+        log.exception("B2C result callback validation error: %s", exc)
+        return JSONResponse(
+            status_code=400,
+            content=B2CResultCallbackResponse(ResultCode=1, ResultDesc=f"Invalid payload: {exc}").model_dump(),
+        )
+
+    # TODO: persist callback (DB/queue) for reconciliation and business processing.
+    log.info(
+        "Received B2C result: OriginatorConversationID=%s ConversationID=%s ResultCode=%s",
+        callback.Result.OriginatorConversationID,
+        callback.Result.ConversationID,
+        callback.Result.ResultCode,
+    )
+
+    ack = B2CResultCallbackResponse()  # default success ack
+    return JSONResponse(status_code=200, content=ack.model_dump())
+
+@app.post("/webhooks/b2c/timeout")
+async def b2c_timeout(request: Request):
+    remote_ip = _get_remote_ip(request)
+    if not is_mpesa_ip_allowed(remote_ip):
+        log.warning("Rejected B2C timeout callback from disallowed IP: %s", remote_ip)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        log.exception("Failed reading JSON payload from %s: %s", remote_ip, exc)
+        return JSONResponse(
+            status_code=400,
+            content=B2CTimeoutCallbackResponse(ResultCode=1, ResultDesc="Invalid JSON payload.").model_dump(),
+        )
+
+    try:
+        callback = B2CTimeoutCallback.model_validate(payload)
+    except Exception as exc:
+        log.exception("B2C timeout callback validation error: %s", exc)
+        return JSONResponse(
+            status_code=400,
+            content=B2CTimeoutCallbackResponse(ResultCode=1, ResultDesc=f"Invalid payload: {exc}").model_dump(),
+        )
+
+    # TODO: persist/queue timeout notification and trigger compensating workflows.
+    log.info(
+        "Received B2C timeout: OriginatorConversationID=%s ConversationID=%s ResultCode=%s",
+        callback.Result.OriginatorConversationID,
+        callback.Result.ConversationID,
+        callback.Result.ResultCode,
+    )
+
+    ack = B2CTimeoutCallbackResponse()  # default success ack
+    return JSONResponse(status_code=200, content=ack.model_dump(mode="json"))
+`}
+</CodeBlock>
+
+<Alert type="info" title="Best practices for webhook handlers">
+    - Validate incoming payloads against the provided schemas (`B2CResultCallback` / `B2CTimeoutCallback`).  
+    - Persist notifications for reconciliation before returning a success acknowledgement.  
+    - Use `is_mpesa_ip_allowed` to restrict callers to known Safaricom IP ranges.  
+    - Run your app behind a trusted proxy and ensure `X-Forwarded-For` handling is correct for IP validation.
+</Alert>
+
+<SectionHeader title="Schemas & Runtime Behavior" size="small" />
+
+<Alert type="info" title="Request validation">
+    - `CommandID` must be one of the supported enum values (`SalaryPayment`, `BusinessPayment`, `PromotionPayment`). Invalid CommandID raises a validation error.  
+    - `PartyB` (recipient) is normalized/validated as a Kenyan phone number; invalid numbers raise a validation error.  
+    - `Remarks` and `Occasion` are length-restricted (100 characters); exceeding the limit raises a validation error.
+</Alert>
+
+<Alert type="info" title="Response helpers">
+    - `B2CResponse.is_successful()` treats any all-zero string (e.g., "0" or "00000000") as success. Empty strings or mixed non-zero codes are not considered successful.  
+    - `B2CResultMetadata` exposes convenience properties for common result parameters:
+        - `transaction_amount`, `transaction_receipt`, `recipient_is_registered` (`returns True/False/None`), `receiver_party_public_name`, `transaction_completed_datetime`, `charges`/`utility`/`working account balances`.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+
+<Alert type="warning" title="Edge cases & normalization">
+    - The SDK normalizes minor upstream inconsistencies so fields remain accessible (tests show the SDK tolerates typical provider quirks).  
+    - Ensure you log and surface provider conversation IDs (`OriginatorConversationID` / `ConversationID`) for troubleshooting and reconciliation.
+</Alert>
+
+<SectionHeader title="Testing & Expectations" size="small" />
+
+- Send payment:
+    - The service posts payment requests to the provider using the configured `HttpClient` and supplies Authorization via `TokenManager`.  
+    - Successful responses are returned as `B2CResponse` instances; call `is_successful()` to check outcome.
+
+- Request validation:
+    - Invalid `CommandID`, malformed `PartyB` or overly long `Remarks`/`Occasion` should raise validation errors during model construction.
+
+- Result metadata:
+    - ResultParameters are provided as a list of Key/Value items. The SDK caches these into a dictionary so callers can access values using typed helper properties (`transaction_amount`, `transaction_receipt`, etc.).  
+    - `recipient_is_registered` returns True for 'Y', False for 'N', and None for missing/invalid values.
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+    - Implement robust webhook receivers for `ResultURL` and `QueueTimeOutURL`; persist notifications and return the acknowledged response model.  
+    - Add observability around sends and callbacks, and establish retry/compensation flows for transient failures.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - Reliable endpoints and security best practices  
+- [🏗️ Production Setup](/production) - Go-live checklist, security and monitoring

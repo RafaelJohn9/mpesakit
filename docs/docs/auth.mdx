@@ -1,0 +1,193 @@
+---
+title: Auth & Token Management
+description: How mpesakit retrieves, caches and refreshes access tokens automatically for M-Pesa APIs.
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import ParametersTable from '@site/docs/components/ParametersTable';
+import Tabs from '@site/docs/components/Tabs';
+
+<SectionHeader
+    subtitle="Explanation of automatic token retrieval, caching and refresh behavior in mpesakit. Includes recommended usage with MpesaClient and the Direct API pattern using TokenManager."
+    gradient={true}
+    size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable 
+parameters={[
+        {
+            name: "consumer_key",
+            type: "str",
+            dataType: "String",
+            required: true,
+            description: "Your M-Pesa consumer key from Safaricom developer portal."
+        },
+        {
+            name: "consumer_secret",
+            type: "str",
+            dataType: "String",
+            required: true,
+            description: "Your M-Pesa consumer secret."
+        },
+        {
+            name: "http_client",
+            type: "HttpClient",
+            dataType: "Object",
+            required: true,
+            description: "An instance of mpesakit's HttpClient (MpesaHttpClient) used to call the token endpoint."
+        },
+        {
+            name: "force_refresh",
+            type: "bool",
+            dataType: "Boolean",
+            required: false,
+            description: "When True, forces the TokenManager to bypass cache and request a new token."
+        },
+]}
+/>
+
+<SectionHeader title="Overview" size="small" />
+
+mpesakit centralizes authentication via a TokenManager that:
+- Retrieves an OAuth token from `/oauth/v1/generate` using client credentials.
+- Caches the token together with its creation time and expiry (AccessToken).
+- Returns a cached token until it is expired (or force_refresh is used).
+- Raises a clear MpesaApiException for invalid credentials so you can handle it.
+
+Use MpesaClient for most integrations, it handles token management for you. Use TokenManager directly when you need full control.
+
+<Alert type="info" title="Recommended">
+    Prefer MpesaClient for fast integration. Use TokenManager + HttpClient when you need fine-grained control (custom middleware, retries, or special header handling).
+</Alert>
+
+<SectionHeader title="AccessToken (schema)" size="small" />
+
+<CodeBlock language="python" title="AccessToken (illustration)">
+{`
+from pydantic import BaseModel
+from datetime import datetime, timedelta
+
+class AccessToken(BaseModel):
+        token: str
+        creation_datetime: datetime
+        expiration_time: int = 3600  # seconds
+
+        def is_expired(self) -> bool:
+                return datetime.now() > self.creation_datetime + timedelta(seconds=self.expiration_time)
+`}
+</CodeBlock>
+
+- AccessToken.is_expired() is used by TokenManager to decide whether to reuse the cached token.
+
+<SectionHeader title="TokenManager: behavior & usage" size="small" />
+
+- TokenManager stores the last AccessToken in-memory and returns it until it expires.
+- get_token(force_refresh=False) will:
+    - Return cached token if present and not expired (and force_refresh is False).
+    - Call the `/oauth/v1/generate` endpoint to get a new token otherwise.
+    - Raise a MpesaApiException with a clear AUTH_INVALID_CREDENTIALS error when credentials are invalid (HTTP 400 with empty body).
+
+<CodeBlock language="python" title="TokenManager (usage)">
+{`
+# Create TokenManager
+http_client = MpesaHttpClient(env="sandbox")
+token_manager = TokenManager(
+        consumer_key="YOUR_KEY",
+        consumer_secret="YOUR_SECRET",
+        http_client=http_client,
+)
+
+# Get token (cached if still valid)
+token = token_manager.get_token()
+
+# Force refresh
+fresh_token = token_manager.get_token(force_refresh=True)
+`}
+</CodeBlock>
+
+<SectionHeader title="Direct API: common pattern (handle 401/expired tokens)" size="small" />
+
+- Even with caching, remote services may invalidate a token. Recommended pattern when using direct API calls:
+
+<CodeBlock language="python" title="Direct API: safe request with refresh on 401">
+{`
+from mpesakit.errors import MpesaApiException
+
+def post_with_token_refresh(http_client, token_manager, url, json_payload):
+        # Attempt with cached token first
+        token = token_manager.get_token()
+        headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+        try:
+                return http_client.post(url, json=json_payload, headers=headers)
+        except MpesaApiException as e:
+                # If the server returns 401/invalid token, force refresh and retry once
+                if e.error.status_code == 401:
+                        token = token_manager.get_token(force_refresh=True)
+                        headers["Authorization"] = f"Bearer {token}"
+                        return http_client.post(url, json=json_payload, headers=headers)
+                raise
+`}
+</CodeBlock>
+
+<SectionHeader title="MpesaClient: token management is automatic" size="small" />
+
+- MpesaClient wraps services and TokenManager internally. You don't need to call get_token() or manage tokens when using MpesaClient.
+- Instantiate MpesaClient with your consumer key/secret and call high-level methods (stk_push, account_balance, etc.). The client will:
+    - Create an internal TokenManager
+    - Automatically refresh tokens when necessary
+
+<CodeBlock language="python" title="MpesaClient (quick example)">
+{`
+from mpesakit import MpesaClient
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+client = MpesaClient(
+        consumer_key=os.getenv("MPESA_CONSUMER_KEY"),
+        consumer_secret=os.getenv("MPESA_CONSUMER_SECRET"),
+        environment="sandbox",
+)
+
+# No token handling required — MpesaClient does it
+response = client.account_balance(
+        Initiator="my_initiator",
+        SecurityCredential=os.getenv("MPESA_SECURITY_CREDENTIAL"),
+        CommandID="AccountBalance",
+        PartyA=int(os.getenv("MPESA_SHORTCODE")),
+        IdentifierType=1,
+        Remarks="Check balance",
+        QueueTimeOutURL="https://example.com/timeout",
+        ResultURL="https://example.com/result",
+)
+`}
+</CodeBlock>
+
+<SectionHeader title="Error handling & common pitfalls" size="small" />
+
+- `Invalid credentials`: TokenManager surfaces a MpesaApiException with error code AUTH_INVALID_CREDENTIALS. Check your consumer key/secret and environment.
+- `Single in-memory cache`: TokenManager caches token in-memory. For multi-process deployments, ensure each process has its own TokenManager or implement a shared token store.
+- `Reuse TokenManager`: Instantiate one TokenManager and pass it to multiple service classes (AccountBalance, StkPush, etc.) to avoid duplicate token requests.
+
+<Alert type="info" title="Best practices">
+    - Share a single TokenManager instance per process.
+    - Rely on MpesaClient for typical applications.
+    - Implement a retry-on-401 pattern for custom integrations using TokenManager + HttpClient.
+</Alert>
+
+<SectionHeader title="Next steps" size="small" />
+
+- See the STK Push and Account Balance docs for examples that use MpesaClient and TokenManager.
+- For webhook handling and production checklist, check related docs.
+
+## Related Documentation
+
+- [STK Push](/docs/authors/stk-push) - STK Push integration examples
+- [Account Balance](/docs/account-balance) - Account balance usage
+- [Webhooks Best Practices](/webhooks-best-practices)

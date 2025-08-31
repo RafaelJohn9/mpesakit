@@ -1,0 +1,393 @@
+---
+title: Transaction Status
+description: Query the status of an M-Pesa transaction and handle result/timeout callbacks (ResultURL / QueueTimeOutURL).
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader
+    subtitle="Request transaction status from M-Pesa, receive result or timeout callbacks, and validate/interpret response metadata."
+    gradient={true}
+    size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "Initiator",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "API username used to initiate the Transaction Status request."
+    },
+    {
+        name: "SecurityCredential",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Encrypted security credential (provided by M-Pesa Daraja API) used to authenticate the request."
+    },
+    {
+        name: "CommandID",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "The operation type. Use 'TransactionStatusQuery'."
+    },
+    {
+        name: "TransactionID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "M-Pesa transaction identifier to query. Either this or OriginalConversationID must be provided."
+    },
+    {
+        name: "OriginalConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Original conversation id for the earlier request. Can be used when TransactionID is unavailable."
+    },
+    {
+        name: "PartyA",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Organization shortcode or MSISDN depending on IdentifierType."
+    },
+    {
+        name: "IdentifierType",
+        type: "int",
+        dataType: "Integer (enum)",
+        required: true,
+        description: "Identifier type for PartyA. Allowed: 1 (MSISDN), 2 (Till Number), 4 (Short Code)."
+    },
+    {
+        name: "ResultURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive the result callback when the query completes."
+    },
+    {
+        name: "QueueTimeOutURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive a timeout notification if the query times out."
+    },
+    {
+        name: "Remarks",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Short comment describing the query (max 100 characters)."
+    },
+    {
+        name: "Occasion",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Optional occasion string (max 100 characters)."
+    }
+]}
+/>
+
+<SectionHeader title="Overview" size="small" />
+<p>
+    The Transaction Status API lets you ask M-Pesa Daraja API for the current state of a previously submitted M‑Pesa transaction.
+    The request is asynchronous: M-Pesa will post the result to your configured `ResultURL` when processing completes, or to the `QueueTimeOutURL` if processing times out.
+</p>
+
+<Alert type="info" title="Implementation Options">
+    - Use the `MpesaClient` facade for simple integration (handles tokens, headers and returns typed models).  
+    - Use the lower-level TransactionStatus service with `TokenManager` and `HttpClient` if you need direct control over requests, headers or middleware.
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient (Recommended)" icon="🚀">
+        <Alert type="info" title="Why use MpesaClient">
+            The facade abstracts authentication, header injection and returns Pydantic models so you can call query operations with minimal boilerplate.
+        </Alert>
+
+        <SectionHeader title="Quick Setup" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example (conceptual): query transaction status using the high-level client
+from mpesakit import MpesaClient
+from mpesakit.transaction_status import TransactionStatusIdentifierType
+
+
+client = MpesaClient(consumer_key="...", consumer_secret="...", environment="sandbox")
+
+resp = client.transaction.query_status(
+        initiator="api_user",
+        security_credential="ENCRYPTED_CREDENTIAL",
+        transaction_id="LK12345",
+        party_a=600000,
+        identifier_type=TransactionStatusIdentifierType.SHORT_CODE.value,
+        result_url="https://your.example/result",
+        queue_timeout_url="https://your.example/timeout",
+        remarks="Check status"
+)
+
+if resp.is_successful():
+        print("Request accepted:", resp.ResponseDescription)
+else:
+        print("Request failed:", resp.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            - The facade returns typed response models with helpers (e.g., is_successful()).  
+            - Use the facade unless you require custom HTTP handling.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced Usage">
+            Use the TransactionStatus service directly when you need to control raw payloads, headers or implement custom retry/middleware behavior.
+        </Alert>
+
+        <SectionHeader title="Direct Implementation" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example (conceptual): using the TransactionStatus service directly
+from mpesakit.transaction_status import TransactionStatus, TransactionStatusRequest
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.transaction_status import TransactionStatusIdentifierType
+
+http = MpesaHttpClient(env="sandbox")
+tokens = TokenManager(consumer_key="...", consumer_secret="...", http_client=http)
+ts = TransactionStatus(http_client=http, token_manager=tokens)
+
+req = TransactionStatusRequest(
+        Initiator="api_user",
+        SecurityCredential="ENCRYPTED_CREDENTIAL",
+        TransactionID="LK12345",
+        PartyA=600000,
+        IdentifierType=TransactionStatusIdentifierType.SHORT_CODE.value,
+        ResultURL="https://your.example/result",
+        QueueTimeOutURL="https://your.example/timeout",
+        Remarks="Status check"
+)
+
+response = ts.query(req)
+print(response.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Direct API Details">
+            - The service attaches Authorization headers using the TokenManager.  
+            - Expect the HTTP client to return raw JSON that the SDK converts to typed models.
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Result & Timeout Callbacks (webhooks)" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Minimal FastAPI webhook receivers for Transaction Status Result & Timeout callbacks.
+# - Validates caller IP using is_mpesa_ip_allowed
+# - Parses payload into SDK schemas (TransactionStatusResultCallback / TransactionStatusTimeoutCallback)
+# - Persists/queues the payload for downstream processing (TODO)
+# - Returns the acknowledgement JSON expected by M-Pesa Daraja API
+
+from fastapi import FastAPI, Request, HTTPException, status
+from fastapi.responses import JSONResponse
+import logging
+
+from mpesakit.security import is_mpesa_ip_allowed
+from mpesakit.http_client import MpesaHttpClient
+from mpesakit.transaction_status import (
+    TransactionStatusResultCallback,
+    TransactionStatusTimeoutCallback,
+    TransactionStatusResultCallbackResponse,
+    TransactionStatusTimeoutCallbackResponse,
+)
+
+log = logging.getLogger(__name__)
+app = FastAPI()
+
+# Optional HTTP client for any outgoing calls to MPesa (not required to accept callbacks)
+mpesa_http = MpesaHttpClient(environment="sandbox")  # or "production"
+
+
+def _get_remote_ip(request: Request) -> str:
+    xff = request.headers.get("x-forwarded-for")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.client.host
+
+
+@app.post("/webhooks/transaction-status/result")
+async def transaction_status_result(request: Request):
+    remote_ip = _get_remote_ip(request)
+    if not is_mpesa_ip_allowed(remote_ip):
+        log.warning("Rejected TransactionStatus result callback from disallowed IP: %s", remote_ip)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        log.exception("Failed reading JSON payload from %s: %s", remote_ip, exc)
+        return JSONResponse(
+            status_code=400,
+            content=TransactionStatusResultCallbackResponse(
+                ResultCode=1, ResultDesc="Invalid JSON payload."
+            ).model_dump(),
+        )
+
+    try:
+        callback = TransactionStatusResultCallback.model_validate(payload)
+    except Exception as exc:
+        log.exception("TransactionStatus result callback validation error: %s", exc)
+        return JSONResponse(
+            status_code=400,
+            content=TransactionStatusResultCallbackResponse(
+                ResultCode=1, ResultDesc=f"Invalid payload: {exc}"
+            ).model_dump(),
+        )
+
+    # TODO: persist callback (DB/queue) for reconciliation and business processing.
+    log.info(
+        "Received TransactionStatus result: OriginatorConversationID=%s ConversationID=%s ResultCode=%s TransactionID=%s",
+        callback.Result.OriginatorConversationID,
+        callback.Result.ConversationID,
+        callback.Result.ResultCode,
+        getattr(callback.Result, "TransactionID", None),
+    )
+
+    ack = TransactionStatusResultCallbackResponse()  # default success ack (ResultCode 0)
+    return JSONResponse(status_code=200, content=ack.model_dump())
+
+
+@app.post("/webhooks/transaction-status/timeout")
+async def transaction_status_timeout(request: Request):
+    remote_ip = _get_remote_ip(request)
+    if not is_mpesa_ip_allowed(remote_ip):
+        log.warning("Rejected TransactionStatus timeout callback from disallowed IP: %s", remote_ip)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        log.exception("Failed reading JSON payload from %s: %s", remote_ip, exc)
+        return JSONResponse(
+            status_code=400,
+            content=TransactionStatusTimeoutCallbackResponse(
+                ResultCode=1, ResultDesc="Invalid JSON payload."
+            ).model_dump(),
+        )
+
+    try:
+        callback = TransactionStatusTimeoutCallback.model_validate(payload)
+    except Exception as exc:
+        log.exception("TransactionStatus timeout callback validation error: %s", exc)
+        return JSONResponse(
+            status_code=400,
+            content=TransactionStatusTimeoutCallbackResponse(
+                ResultCode=1, ResultDesc=f"Invalid payload: {exc}"
+            ).model_dump(),
+        )
+
+    # TODO: persist/queue timeout notification and trigger compensating workflows.
+    log.info(
+        "Received TransactionStatus timeout: OriginatorConversationID=%s ConversationID=%s ResultCode=%s",
+        callback.Result.OriginatorConversationID,
+        callback.Result.ConversationID,
+        callback.Result.ResultCode,
+    )
+
+    ack = TransactionStatusTimeoutCallbackResponse()  # default success ack (ResultCode 0)
+    return JSONResponse(status_code=200, content=ack.model_dump())
+`}
+</CodeBlock>
+
+<Alert type="info" title="Important behavior">
+    - TransactionStatusRequest validation enforces:
+        - `IdentifierType` must be one of [1, 2, 4].  
+        - When `IdentifierType` == 1 (`MSISDN`) the `PartyA` value is normalized to a Kenyan MSISDN; invalid numbers raise validation errors.  
+        - At least one of `TransactionID` or `OriginalConversationID` must be provided.  
+        - `Remarks` and `Occasion` must not exceed 100 characters.
+    - TransactionStatusResponse provides `is_successful()` to check if the request was accepted.
+</Alert>
+
+<SectionHeader title="Result Payload (ResultParameters)" size="small" />
+
+<CodeBlock language="json" title="Common ResultParameters">
+{`
+{
+    "Result": {
+        "ResultType": 0,
+        "ResultCode": 0,
+        "ResultDesc": "The service request is processed successfully.",
+        "OriginatorConversationID": "...",
+        "ConversationID": "...",
+        "TransactionID": "LKXXXX1234",
+        "ResultParameters": [
+            {"Key": "TransactionAmount", "Value": 1000},
+            {"Key": "TransactionReceipt", "Value": "LKXXXX1234"},
+            {"Key": "Status", "Value": "Completed"},
+            {"Key": "Reason", "Value": "Optional failure reason"}
+        ]
+    }
+}
+`}
+</CodeBlock>
+
+<Alert type="info" title="Helper properties">
+    The result metadata exposes convenience accessors:
+    - transaction_amount — numeric amount (if present).  
+    - transaction_receipt — transaction receipt string.  
+    - transaction_status — status string (e.g., "Completed", "Failed").  
+    - transaction_reason — optional reason for failure.
+</Alert>
+
+<SectionHeader title="Error Handling & Validation" size="small" />
+
+<Alert type="warning" title="Validation errors">
+    - Constructing a TransactionStatusRequest raises clear ValueErrors for:
+        - invalid IdentifierType,
+        - missing TransactionID and OriginalConversationID,
+        - overly long Remarks/Occasion,
+        - invalid MSISDN normalization when IdentifierType == 1.
+</Alert>
+
+
+<SectionHeader title="Testing & Expected Behaviors" size="small" />
+
+- Request validation:
+    - Invalid identifier types or invalid MSISDN values should raise errors during model construction.
+    - At least one of TransactionID or OriginalConversationID must be present.
+
+- HTTP interactions:
+    - The TransactionStatus service posts to /mpesa/transactionstatus/v1/query with Authorization header from TokenManager.
+    - On successful acceptance the service returns a TransactionStatusResponse; use is_successful() to determine accepted requests.
+
+- Callbacks:
+    - ResultURL receives TransactionStatusResultCallback with Result metadata; reply with ResultCode 0 to acknowledge receipt.
+    - QueueTimeOutURL receives a timeout notification; handle and reconcile as needed.
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+    - Implement secure webhook endpoints (validate source IPs or signatures), persist callbacks for reconciliation, and build compensation/retry flows for timeouts.  
+    - Add observability around transaction queries and callbacks to surface failed or delayed operations.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - tips for resilient webhook processing  
+- [🔐 Authentication & Token Management](/auth) - how TokenManager works with services  
+- [🏗️ Production Setup](/production) - go-live checklist, security and monitoring

@@ -1,0 +1,128 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+
+/* Developer-friendly color palette using modern green shades */
+:root {
+  /* Primary green - excellent for code and developer tools */
+  --ifm-color-primary: #22c55e;
+  --ifm-color-primary-dark: #16a34a;
+  --ifm-color-primary-darker: #15803d;
+  --ifm-color-primary-darkest: #14532d;
+  --ifm-color-primary-light: #4ade80;
+  --ifm-color-primary-lighter: #86efac;
+  --ifm-color-primary-lightest: #bbf7d0;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(34, 197, 94, 0.1);
+}
+
+/* Dark theme with adjusted green palette for better contrast */
+[data-theme='dark'] {
+  --ifm-color-primary: #4ade80;
+  --ifm-color-primary-dark: #22c55e;
+  --ifm-color-primary-darker: #16a34a;
+  --ifm-color-primary-darkest: #15803d;
+  --ifm-color-primary-light: #86efac;
+  --ifm-color-primary-lighter: #bbf7d0;
+  --ifm-color-primary-lightest: #dcfce7;
+  --docusaurus-highlighted-code-line-bg: rgba(74, 222, 128, 0.15);
+}
+
+/* Hide the top navbar/header */
+/* .navbar,
+header.navbar {
+  display: none !important;
+} */
+
+/* Glass-like header styling */
+.navbar {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Dark mode glass header */
+[data-theme='dark'] .navbar {
+  background: linear-gradient(to right, rgba(25, 36, 30, 0.5), rgba(26, 32, 29, 0.5)) !important;
+  border-bottom: 1px solid rgba(74, 222, 128, 0.1) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+
+/* Hide the footer */
+footer.footer,
+.footer {
+  display: none !important;
+}
+
+/* Remove extra top spacing so content moves up */
+.main-wrapper,
+.mainContainer,
+.docMainContainer,
+.theme-doc-markdown {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+
+/* Sidebar menu styling with complementary colors for green theme */
+.menu__link {
+  /* Base link color using theme variables */
+  color: var(--ifm-color-primary-darker, #15803d) !important;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+/* Hover state with subtle green background */
+.menu__link:hover {
+  color: var(--ifm-color-primary-darkest, #14532d) !important;
+  background-color: rgba(34, 197, 94, 0.08);
+  border-radius: 4px;
+}
+
+/* Active state with teal accent (complementary to green) */
+.menu__link--active,
+.menu__link--active:hover {
+  color: #ffffff !important;
+  background-color: rgba(20, 184, 166, 0.2);
+  border-left: 3px solid var(--ifm-color-primary);
+  padding-left: calc(0.75rem - 3px);
+  font-weight: 500;
+}
+
+/* Category headers with subtle distinction */
+.menu__list-item--collapsible .menu__link {
+  color: #0f766e !important;
+  /* dark teal - complements green */
+  font-weight: 600;
+}
+
+/* Dark theme adjustments */
+[data-theme='dark'] .menu__link {
+  color: var(--ifm-color-primary-light, #86efac) !important;
+}
+
+[data-theme='dark'] .menu__link:hover {
+  color: #dcfce7 !important;
+  background-color: rgba(20, 83, 45, 0.5);
+}
+
+[data-theme='dark'] .menu__link--active,
+[data-theme='dark'] .menu__link--active:hover {
+  color: #ffffff !important;
+  background-color: rgba(20, 184, 166, 0.3);
+  border-left-color: var(--ifm-color-primary-light);
+}
+
+[data-theme='dark'] .menu__list-item--collapsible .menu__link {
+  color: #5eead4 !important;
+  /* light teal for dark mode */
+}
