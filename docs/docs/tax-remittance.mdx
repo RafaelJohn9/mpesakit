@@ -1,0 +1,327 @@
+---
+title: Tax Remittance
+description: Remit taxes to KRA using M-Pesa by initiating tax payment requests and handling asynchronous result notifications.
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader
+    subtitle="Remit taxes to KRA using M-Pesa by initiating tax payment requests and handling asynchronous result notifications."
+    gradient={true}
+    size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "Initiator",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Username used to initiate the request (must be pre-approved by Safaricom)."
+    },
+    {
+        name: "SecurityCredential",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Encrypted security credential of the initiator (base64 encoded)."
+    },
+    {
+        name: "Amount",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Transaction amount in KES to be remitted to KRA."
+    },
+    {
+        name: "PartyA",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Shortcode from which money is deducted for tax remittance."
+    },
+    {
+        name: "AccountReference",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Payment Registration Number (PRN) issued by KRA for the tax payment."
+    },
+    {
+        name: "Remarks",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Additional information for the transaction (maximum 100 characters)."
+    },
+    {
+        name: "QueueTimeOutURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive timeout notifications."
+    },
+    {
+        name: "ResultURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive result notifications."
+    },
+    {
+        name: "PartyB",
+        type: "int",
+        dataType: "Integer",
+        required: false,
+        description: "KRA shortcode (default: 572572)."
+    },
+    {
+        name: "CommandID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Command ID for the transaction (default: 'PayTaxToKRA')."
+    },
+    {
+        name: "SenderIdentifierType",
+        type: "int",
+        dataType: "Integer",
+        required: false,
+        description: "Identifier type for sender (default: 4 for shortcode)."
+    },
+    {
+        name: "RecieverIdentifierType",
+        type: "int",
+        dataType: "Integer",
+        required: false,
+        description: "Identifier type for receiver (default: 4 for shortcode)."
+    },
+    {
+        name: "OriginatorConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique ID for the request message (returned in response)."
+    },
+    {
+        name: "ConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique ID for the transaction (returned in response)."
+    },
+    {
+        name: "ResponseCode",
+        type: "str|int",
+        dataType: "String/Integer",
+        required: false,
+        description: "Status code of the request (0 means success, returned in response)."
+    },
+    {
+        name: "ResponseDescription",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Status message describing the request outcome (returned in response)."
+    }
+]}
+/>
+
+<SectionHeader
+    title="Overview"
+    subtitle="Tax Remittance enables businesses to pay taxes directly to KRA through M-Pesa. It's an asynchronous operation with callbacks for results and timeouts."
+    size="small"
+/>
+
+<Alert type="info" title="Implementation Options">
+    - Use the `MpesaClient` facade for simple and safe integration: it manages authentication, header injection and returns typed Pydantic models.  
+    - Use the Direct API (`TaxRemittance` service + `TokenManager` + `HttpClient`) if you need full control over request/response handling, middleware, or custom error behaviors.
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient (Recommended)" icon="🚀">
+        <Alert type="info" title="Why use MpesaClient">
+            The facade handles token retrieval and attaches Authorization headers so you can call high-level operations like initiating tax remittance with minimal boilerplate.
+        </Alert>
+
+        <SectionHeader title="Quick Setup" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: initiate tax remittance using the high-level client
+from mpesakit import MpesaClient
+
+client = MpesaClient(consumer_key="...", consumer_secret="...", environment="sandbox")
+
+resp = client.tax.remittance(
+    initiator="TaxPayer",
+    security_credential="encrypted_credential",
+    amount=239,
+    party_a=888880,
+    account_reference="353353",
+    remarks="Tax payment for Q1",
+    result_url="https://your.example/result",
+    queue_timeout_url="https://your.example/timeout"
+)
+
+if resp.is_successful():
+    print("Tax remittance initiated successfully")
+else:
+    print("Tax remittance failed:", resp.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            - The facade returns typed Pydantic models (e.g., TaxRemittanceResponse) for ergonomic access to fields and helpers like is_successful().  
+            - Authentication tokens are handled transparently by the client.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced Usage">
+            Use the lower-level TaxRemittance service when you must manipulate raw requests/responses or plug custom middleware.
+        </Alert>
+
+        <SectionHeader title="Direct Implementation" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: construct and send a Tax Remittance request using the TaxRemittance service
+from mpesakit.tax_remittance import TaxRemittance, TaxRemittanceRequest
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+
+http_client = MpesaHttpClient(env="sandbox")
+token_manager = TokenManager(consumer_key="...", consumer_secret="...", http_client=http_client)
+tax_remittance = TaxRemittance(http_client=http_client, token_manager=token_manager)
+
+request = TaxRemittanceRequest(
+    Initiator="TaxPayer",
+    SecurityCredential="encrypted_credential",
+    Amount=239,
+    PartyA=888880,
+    AccountReference="353353",
+    Remarks="Tax payment for Q1",
+    ResultURL="https://your.example/result",
+    QueueTimeOutURL="https://your.example/timeout"
+)
+
+response = tax_remittance.remittance(request)
+print(response.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Direct API Details">
+            - The TaxRemittance service attaches the Authorization header using the provided TokenManager.  
+            - Implementations handle small inconsistencies in upstream responses (e.g., a common typo like 'OriginatorCoversationID' is normalized).
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Webhook Handling (Result & Timeout)" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Example: simple FastAPI endpoints for Tax Remittance Result and Timeout
+from fastapi import FastAPI, Request, HTTPException
+from mpesakit.tax_remittance import TaxRemittanceResultCallback, TaxRemittanceResultCallbackResponse, TaxRemittanceTimeoutCallback, TaxRemittanceTimeoutCallbackResponse
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+
+app = FastAPI()
+
+@app.post("/tax/result")
+async def tax_result(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    data = TaxRemittanceResultCallback(**payload)  # will validate incoming fields
+    # process the result (update database, notify user, etc.)
+    ack = TaxRemittanceResultCallbackResponse()
+    return ack.model_dump(mode="json")
+
+
+@app.post("/tax/timeout")
+async def tax_timeout(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    # process timeout notification (log, retry logic, etc.)
+    ack = TaxRemittanceTimeoutCallbackResponse()
+    return ack.model_dump(mode="json")
+`}
+</CodeBlock>
+
+<Alert type="info" title="Important behavior">
+    - Result and timeout endpoints should return acknowledgements (ResultCode 0). This confirms receipt to Mpesa Daraja API.  
+    - Process the actual tax remittance result asynchronously based on the data in the result callback.
+</Alert>
+
+<SectionHeader title="Responses & Helpers" size="small" />
+
+<CodeBlock language="json" title="Example Tax Remittance Success Response">
+{`
+{
+    "OriginatorConversationID": "5118-111210482-1",
+    "ConversationID": "AG_20230420_2010759fd5662ef6d054",
+    "ResponseCode": "0",
+    "ResponseDescription": "Accept the service request successfully."
+}
+`}
+</CodeBlock>
+
+<Alert type="info" title="Response Handling">
+    - TaxRemittanceResponse provides is_successful() which treats any all-zero string (e.g., "0" or "00000000") as success.  
+    - The SDK normalizes minor provider response typos (e.g., 'OriginatorCoversationID') so fields are accessible reliably.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Handle errors when calling the service
+try:
+    resp = client.tax.remittance(...)
+except Exception as exc:
+    # The underlying HTTP client may raise exceptions on network errors; log and retry as appropriate
+    print("Tax remittance failed:", exc)
+`}
+</CodeBlock>
+
+<Alert type="info" title="Notes">
+    - HTTP or network errors raised by the HttpClient bubble up; wrap calls in try/except for robust production behavior.  
+    - Tests exercise error flows to ensure exceptions propagate when the HTTP client fails.
+</Alert>
+
+<SectionHeader title="Testing & Expected Behaviors" size="small" />
+
+- Tax Remittance:
+    - The service posts to `/mpesa/b2bpayment/v1/remittax` with `Authorization` header set via `TokenManager`.
+    - Responses are returned as `TaxRemittanceResponse` instances.
+    - The implementation tolerates a common provider typo ("OriginatorCoversationID") and maps it to `OriginatorConversationID`.
+
+- Validation:
+    - Incoming payloads are validated against `TaxRemittanceResultCallback` and `TaxRemittanceTimeoutCallback`. Missing required fields or invalid formats will raise validation errors.
+    - Use the provided response schemas for acknowledgements; invalid codes are rejected by the model validator.
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+    - Implement robust webhook handlers for result and timeout notifications. Log and persist notifications to support reconciliation.  
+    - Add observability and retry strategies around tax remittance calls and webhook processing to handle transient failures.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - Best practices for building reliable endpoints
+- [🏗️ Production Setup](/production) - Go-live checklist, security and monitoring

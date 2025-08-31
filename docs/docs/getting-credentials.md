@@ -37,24 +37,24 @@ Here are the common fields mpesakit expects and what they mean:
 ## Steps — in plain language
 
 1. Create your developer account at [https://developer.safaricom.co.ke](https://developer.safaricom.co.ke).
-      ![Create account](image.png)
+      ![Create account](./imgs/image.png)
 
 2. Create an app from the "My Apps" tab.
       - Give it a name and enable the APIs you need.
-      ![Create app](image-1.png)
+      ![Create app](./imgs/image-1.png)
       - Tip: checking the API boxes enables those APIs for this specific app.
 
 3. Get the Consumer Key and Consumer Secret.
       - Open your app details and copy the Consumer Key and Consumer Secret to a secure place (password manager or secrets store).
 
-      ![Keys](image-5.png)
+      ![Keys](./imgs/image-5.png)
 
 4. Generate or retrieve the SecurityCredential.
       - In "My Apps", open the dropdown and choose "Test Credentials" to create sandbox or production SecurityCredential entries.
 
-      ![Apps dropdown](image-3.png)
+      ![Apps dropdown](./imgs/image-3.png)
 
-      ![Test credentials](image-4.png)
+      ![Test credentials](./imgs/image-4.png)
 
       - The SecurityCredential is an encrypted value you’ll use for certain B2B/B2C operations.
 

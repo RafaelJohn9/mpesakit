@@ -1,0 +1,308 @@
+---
+title: Reversal
+description: Reverse completed M-Pesa transactions by initiating a reversal request and handling asynchronous result notifications.
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader
+    subtitle="Reverse completed M-Pesa transactions by initiating a reversal request and handling asynchronous result notifications."
+    gradient={true}
+    size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "Initiator",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Name of the initiating user (must be pre-approved by Safaricom)."
+    },
+    {
+        name: "SecurityCredential",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Encrypted credential of the user (base64 encoded)."
+    },
+    {
+        name: "TransactionID",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Unique M-Pesa transaction ID to reverse."
+    },
+    {
+        name: "Amount",
+        type: "float",
+        dataType: "Float",
+        required: true,
+        description: "Amount to reverse (should match original transaction)."
+    },
+    {
+        name: "ReceiverParty",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Party receiving the reversed funds (shortcode or MSISDN)."
+    },
+    {
+        name: "ResultURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive the result notification."
+    },
+    {
+        name: "QueueTimeOutURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive timeout notifications."
+    },
+    {
+        name: "Remarks",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Reason for the reversal (<= 100 characters)."
+    },
+    {
+        name: "Occasion",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Optional additional information (<= 100 characters)."
+    },
+    {
+        name: "OriginatorConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique identifier for the conversation (returned in response)."
+    },
+    {
+        name: "ConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique conversation ID assigned by M-Pesa (returned in response)."
+    },
+    {
+        name: "ResponseCode",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Status code of the reversal request (returned in response)."
+    },
+    {
+        name: "ResponseDescription",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Description of the reversal request status (returned in response)."
+    }
+]}
+/>
+
+<SectionHeader
+    title="Overview"
+    subtitle="Reversal allows you to cancel or reverse a previously completed M-Pesa transaction. It is an asynchronous operation with callbacks for results and timeouts."
+    size="small"
+/>
+
+<Alert type="info" title="Implementation Options">
+    - Use the `MpesaClient` facade for simple and safe integration: it manages authentication, header injection and returns typed Pydantic models.  
+    - Use the Direct API (`Reversal service` + `TokenManager` + `HttpClient`) if you need full control over request/response handling, middleware, or custom error behaviors.
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient (Recommended)" icon="🚀">
+        <Alert type="info" title="Why use MpesaClient">
+            The facade handles token retrieval and attaches Authorization headers so you can call high-level operations like initiating a reversal with minimal boilerplate.
+        </Alert>
+
+        <SectionHeader title="Quick Setup" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: initiate a reversal using the high-level client
+from mpesakit import MpesaClient
+
+client = MpesaClient(consumer_key="...", consumer_secret="...", environment="sandbox")
+
+resp = client.reversal.reverse(
+    initiator="TestInit610",
+    security_credential="encrypted_credential",
+    transaction_id="LKXXXX1234",
+    amount=100,
+    receiver_party=600610,
+    result_url="https://your.example/result",
+    queue_timeout_url="https://your.example/timeout",
+    remarks="Wrong recipient",
+    occasion="Refund"
+)
+
+if resp.is_successful():
+    print("Reversal initiated successfully")
+else:
+    print("Reversal failed:", resp.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            - The facade returns typed Pydantic models (e.g., ReversalResponse) for ergonomic access to fields and helpers like is_successful().  
+            - Authentication tokens are handled transparently by the client.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced Usage">
+            Use the lower-level Reversal service when you must manipulate raw requests/responses or plug custom middleware.
+        </Alert>
+
+        <SectionHeader title="Direct Implementation" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: construct and send a Reversal request using the Reversal service
+from mpesakit.reversal import Reversal, ReversalRequest
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+
+http_client = MpesaHttpClient(env="sandbox")
+token_manager = TokenManager(consumer_key="...", consumer_secret="...", http_client=http_client)
+reversal = Reversal(http_client=http_client, token_manager=token_manager)
+
+request = ReversalRequest(
+    Initiator="TestInit610",
+    SecurityCredential="encrypted_credential",
+    TransactionID="LKXXXX1234",
+    Amount=100,
+    ReceiverParty=600610,
+    ResultURL="https://your.example/result",
+    QueueTimeOutURL="https://your.example/timeout",
+    Remarks="Wrong recipient",
+    Occasion="Refund"
+)
+
+response = reversal.reverse(request)
+print(response.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Direct API Details">
+            - The Reversal service attaches the Authorization header using the provided TokenManager.  
+            - Implementations handle small inconsistencies in upstream responses (e.g., a common typo like 'OriginatorCoversationID' is normalized).
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Webhook Handling (Result & Timeout)" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Example: simple FastAPI endpoints for Reversal Result and Timeout
+from fastapi import FastAPI, Request, HTTPException
+from mpesakit.reversal import ReversalResultCallback, ReversalResultCallbackResponse, ReversalTimeoutCallback, ReversalTimeoutCallbackResponse
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+
+app = FastAPI()
+
+@app.post("/reversal/result")
+async def reversal_result(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    data = ReversalResultCallback(**payload)  # will validate incoming fields
+    # process the result (update database, notify user, etc.)
+    ack = ReversalResultCallbackResponse()
+    return ack.model_dump(mode="json")
+
+
+@app.post("/reversal/timeout")
+async def reversal_timeout(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    # process timeout notification (log, retry logic, etc.)
+    ack = ReversalTimeoutCallbackResponse()
+    return ack.model_dump(mode="json")
+`}
+</CodeBlock>
+
+<Alert type="info" title="Important behavior">
+    - Result and timeout endpoints should return acknowledgements (ResultCode 0). This confirms receipt to Safaricom.  
+    - Process the actual reversal result asynchronously based on the data in the result callback.
+</Alert>
+
+<SectionHeader title="Responses & Helpers" size="small" />
+
+<CodeBlock language="json" title="Example Reversal Success Response">
+{`
+{
+    "OriginatorConversationID": "71840-27539181-07",
+    "ConversationID": "AG_20210709_12346c8e6f8858d7b70a",
+    "ResponseCode": "0",
+    "ResponseDescription": "Accept the service request successfully."
+}
+`}
+</CodeBlock>
+
+<Alert type="info" title="Response Handling">
+    - ReversalResponse provides is_successful() which validates the ResponseCode for easy success checks.
+    - The SDK normalizes minor provider response typos (e.g., 'OriginatorCoversationID') so fields are accessible reliably.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Handle errors when calling the service
+try:
+    resp = client.reversal.reverse(...)
+except Exception as exc:
+    # The underlying HTTP client may raise exceptions on network errors; log and retry as appropriate
+    print("Reversal failed:", exc)
+`}
+</CodeBlock>
+
+<Alert type="info" title="Notes">
+    - HTTP or network errors raised by the HttpClient bubble up; wrap calls in try/except for robust production behavior.  
+    - Tests exercise error flows to ensure exceptions propagate when the HTTP client fails.
+</Alert>
+
+<SectionHeader title="Testing & Expected Behaviors" size="small" />
+
+- Reversal:
+    - The service posts to `/mpesa/reversal/v1/request` with `Authorization` header set via `TokenManager`.
+    - Responses are returned as `ReversalResponse` instances.
+    - The implementation tolerates a common provider typo ("OriginatorCoversationID") and maps it to `OriginatorConversationID`.
+
+- Validation:
+    - Incoming payloads are validated against `ReversalResultCallback` and `ReversalTimeoutCallback`. Missing required fields or invalid formats will raise validation errors.
+    - Use the provided response schemas for acknowledgements; invalid codes are rejected by the model validator.
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+    - Implement robust webhook handlers for result and timeout notifications. Log and persist notifications to support reconciliation.  
+    - Add observability and retry strategies around reversal calls and webhook processing to handle transient failures.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - Best practices for building reliable endpoints
+- [🏗️ Production Setup](/production) - Go-live checklist, security and monitoring

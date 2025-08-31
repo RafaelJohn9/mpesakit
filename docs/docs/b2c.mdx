@@ -122,6 +122,10 @@ parameters={[
 
 <SectionHeader title="Overview" subtitle="Initiate B2C payouts and handle callbacks." size="small" />
 
+<Alert type="warning" title="NOTE">
+    For you to use this API in production you are required to apply for a `Bulk Disbursement Account` and obtain a `Shortcode`; you cannot perform these payments from a `Pay Bill` or `Buy Goods` (Till Number). To apply for a Bulk Disbursement Account, visit <a href="https://www.safaricom.co.ke/business/sme/m-pesa-payment-solutions" target="_blank" rel="noopener">https://www.safaricom.co.ke/business/sme/m-pesa-payment-solutions</a>
+</Alert>
+
 <Alert type="info" title="Integration Options">
     - Use the MpesaClient facade (recommended) for a simple, token-managed API to submit B2C payment requests and receive typed response models.  
     - Use the direct B2C service when you need fine-grained control over requests, headers, or custom behavior (token manager + http client).
@@ -342,24 +346,24 @@ async def b2c_timeout(request: Request):
 </CodeBlock>
 
 <Alert type="info" title="Best practices for webhook handlers">
-    - Validate incoming payloads against the provided schemas (B2CResultCallback / B2CTimeoutCallback).  
+    - Validate incoming payloads against the provided schemas (`B2CResultCallback` / `B2CTimeoutCallback`).  
     - Persist notifications for reconciliation before returning a success acknowledgement.  
-    - Use is_mpesa_ip_allowed to restrict callers to known Safaricom IP ranges.  
-    - Run your app behind a trusted proxy and ensure X-Forwarded-For handling is correct for IP validation.
+    - Use `is_mpesa_ip_allowed` to restrict callers to known Safaricom IP ranges.  
+    - Run your app behind a trusted proxy and ensure `X-Forwarded-For` handling is correct for IP validation.
 </Alert>
 
 <SectionHeader title="Schemas & Runtime Behavior" size="small" />
 
 <Alert type="info" title="Request validation">
-    - CommandID must be one of the supported enum values (SalaryPayment, BusinessPayment, PromotionPayment). Invalid CommandID raises a validation error.  
-    - PartyB (recipient) is normalized/validated as a Kenyan phone number; invalid numbers raise a validation error.  
-    - Remarks and Occasion are length-restricted (100 characters); exceeding the limit raises a validation error.
+    - `CommandID` must be one of the supported enum values (`SalaryPayment`, `BusinessPayment`, `PromotionPayment`). Invalid CommandID raises a validation error.  
+    - `PartyB` (recipient) is normalized/validated as a Kenyan phone number; invalid numbers raise a validation error.  
+    - `Remarks` and `Occasion` are length-restricted (100 characters); exceeding the limit raises a validation error.
 </Alert>
 
 <Alert type="info" title="Response helpers">
-    - B2CResponse.is_successful() treats any all-zero string (e.g., "0" or "00000000") as success. Empty strings or mixed non-zero codes are not considered successful.  
-    - B2CResultMetadata exposes convenience properties for common result parameters:
-        - transaction_amount, transaction_receipt, recipient_is_registered (returns True/False/None), receiver_party_public_name, transaction_completed_datetime, charges/utility/working account balances.
+    - `B2CResponse.is_successful()` treats any all-zero string (e.g., "0" or "00000000") as success. Empty strings or mixed non-zero codes are not considered successful.  
+    - `B2CResultMetadata` exposes convenience properties for common result parameters:
+        - `transaction_amount`, `transaction_receipt`, `recipient_is_registered` (`returns True/False/None`), `receiver_party_public_name`, `transaction_completed_datetime`, `charges`/`utility`/`working account balances`.
 </Alert>
 
 <SectionHeader title="Error Handling" size="small" />
@@ -367,26 +371,26 @@ async def b2c_timeout(request: Request):
 
 <Alert type="warning" title="Edge cases & normalization">
     - The SDK normalizes minor upstream inconsistencies so fields remain accessible (tests show the SDK tolerates typical provider quirks).  
-    - Ensure you log and surface provider conversation IDs (OriginatorConversationID / ConversationID) for troubleshooting and reconciliation.
+    - Ensure you log and surface provider conversation IDs (`OriginatorConversationID` / `ConversationID`) for troubleshooting and reconciliation.
 </Alert>
 
 <SectionHeader title="Testing & Expectations" size="small" />
 
 - Send payment:
-    - The service posts payment requests to the provider using the configured HttpClient and supplies Authorization via TokenManager.  
-    - Successful responses are returned as B2CResponse instances; call is_successful() to check outcome.
+    - The service posts payment requests to the provider using the configured `HttpClient` and supplies Authorization via `TokenManager`.  
+    - Successful responses are returned as `B2CResponse` instances; call `is_successful()` to check outcome.
 
 - Request validation:
-    - Invalid CommandID, malformed PartyB or overly long Remarks/Occasion should raise validation errors during model construction.
+    - Invalid `CommandID`, malformed `PartyB` or overly long `Remarks`/`Occasion` should raise validation errors during model construction.
 
 - Result metadata:
-    - ResultParameters are provided as a list of Key/Value items. The SDK caches these into a dictionary so callers can access values using typed helper properties (transaction_amount, transaction_receipt, etc.).  
-    - recipient_is_registered returns True for 'Y', False for 'N', and None for missing/invalid values.
+    - ResultParameters are provided as a list of Key/Value items. The SDK caches these into a dictionary so callers can access values using typed helper properties (`transaction_amount`, `transaction_receipt`, etc.).  
+    - `recipient_is_registered` returns True for 'Y', False for 'N', and None for missing/invalid values.
 
 <SectionHeader title="Next Steps" size="small" />
 
 <Alert type="info" title="What's Next?">
-    - Implement robust webhook receivers for ResultURL and QueueTimeOutURL; persist notifications and return the acknowledged response model.  
+    - Implement robust webhook receivers for `ResultURL` and `QueueTimeOutURL`; persist notifications and return the acknowledged response model.  
     - Add observability around sends and callbacks, and establish retry/compensation flows for transient failures.
 </Alert>
 

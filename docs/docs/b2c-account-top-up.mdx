@@ -1,0 +1,341 @@
+---
+title: B2C Account TopUp
+description: Top up business accounts using M-Pesa by initiating account top-up requests and handling asynchronous result notifications.
+---
+
+import SectionHeader from '@site/docs/components/SectionHeader';
+import CodeBlock from '@site/docs/components/CodeBlock';
+import Alert from '@site/docs/components/Alert';
+import Tabs from '@site/docs/components/Tabs';
+import ParametersTable from '@site/docs/components/ParametersTable';
+
+<SectionHeader
+    subtitle="Top up business accounts using M-Pesa by initiating account top-up requests and handling asynchronous result notifications."
+    gradient={true}
+    size="large"
+/>
+
+<SectionHeader title="Parameters Definition" size="small" />
+
+<ParametersTable
+parameters={[
+    {
+        name: "Initiator",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "M-Pesa API operator username (must be pre-approved by Safaricom)."
+    },
+    {
+        name: "SecurityCredential",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Encrypted password of the API operator (base64 encoded)."
+    },
+    {
+        name: "Amount",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Transaction amount to be transferred for top-up."
+    },
+    {
+        name: "PartyA",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Shortcode from which money will be deducted for the top-up."
+    },
+    {
+        name: "PartyB",
+        type: "int",
+        dataType: "Integer",
+        required: true,
+        description: "Shortcode to which money will be moved for the top-up."
+    },
+    {
+        name: "AccountReference",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "Reference for the transaction."
+    },
+    {
+        name: "Requester",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Consumer's mobile number on behalf of whom you are paying (optional)."
+    },
+    {
+        name: "Remarks",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Additional information for the transaction (optional)."
+    },
+    {
+        name: "QueueTimeOutURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive timeout notifications."
+    },
+    {
+        name: "ResultURL",
+        type: "str",
+        dataType: "String",
+        required: true,
+        description: "HTTPS endpoint that will receive result notifications."
+    },
+    {
+        name: "CommandID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Command ID for the transaction (default: 'BusinessPayToBulk')."
+    },
+    {
+        name: "SenderIdentifierType",
+        type: "int",
+        dataType: "Integer",
+        required: false,
+        description: "Identifier type for sender (default: 4 for shortcode)."
+    },
+    {
+        name: "RecieverIdentifierType",
+        type: "int",
+        dataType: "Integer",
+        required: false,
+        description: "Identifier type for receiver (default: 4 for shortcode)."
+    },
+    {
+        name: "OriginatorConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique request identifier assigned by Daraja (returned in response)."
+    },
+    {
+        name: "ConversationID",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Unique request identifier assigned by M-Pesa (returned in response)."
+    },
+    {
+        name: "ResponseCode",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Status code for request submission. 0 indicates success (returned in response)."
+    },
+    {
+        name: "ResponseDescription",
+        type: "str",
+        dataType: "String",
+        required: false,
+        description: "Descriptive message of the request submission status (returned in response)."
+    }
+]}
+/>
+
+<SectionHeader
+    title="Overview"
+    subtitle="B2C Account TopUp enables businesses to top up their accounts. It's an asynchronous operation with callbacks for results and timeouts."
+    size="small"
+/>
+
+<Alert type="info" title="Implementation Options">
+    - Use the `MpesaClient` facade for simple and safe integration: it manages authentication, header injection and returns typed Pydantic models.  
+    - Use the Direct API (`B2CAccountTopUp` service + `TokenManager` + `HttpClient`) if you need full control over request/response handling, middleware, or custom error behaviors.
+</Alert>
+
+<Tabs defaultValue={0}>
+    <Tabs.TabPane label="MpesaClient (Recommended)" icon="🚀">
+        <Alert type="info" title="Why use MpesaClient">
+            The facade handles token retrieval and attaches Authorization headers so you can call high-level operations like initiating B2C Account TopUp with minimal boilerplate.
+        </Alert>
+
+        <SectionHeader title="Quick Setup" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: initiate B2C Account TopUp using the high-level client
+from mpesakit import MpesaClient
+
+client = MpesaClient(consumer_key="...", consumer_secret="...", environment="sandbox")
+
+resp = client.b2c.account_topup(
+    initiator="testapi",
+    security_credential="encrypted_credential",
+    amount=239,
+    party_a=600979,
+    party_b=600000,
+    account_reference="353353",
+    requester="254708374149",
+    remarks="Account top-up",
+    result_url="https://your.example/result",
+    queue_timeout_url="https://your.example/timeout"
+)
+
+if resp.is_successful():
+    print("B2C Account TopUp initiated successfully")
+else:
+    print("B2C Account TopUp failed:", resp.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Notes">
+            - The facade returns typed `Pydantic models` (e.g., `B2CAccountTopUpResponse`) for ergonomic access to fields and helpers like `is_successful()`.  
+            - Authentication tokens are handled transparently by the client.
+        </Alert>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane label="Direct API" icon="⚡">
+        <Alert type="warning" title="Advanced Usage">
+            Use the lower-level B2CAccountTopUp service when you must manipulate raw requests/responses or plug custom middleware.
+        </Alert>
+
+        <SectionHeader title="Direct Implementation" size="small" />
+
+        <CodeBlock language="python" title="Python">
+{`
+# Example: construct and send a B2C Account TopUp request using the B2C service
+from mpesakit.b2c_account_top_up import B2CAccountTopUpRequest
+from mpesakit.auth import TokenManager
+from mpesakit.http_client import MpesaHttpClient
+
+http_client = MpesaHttpClient(env="sandbox")
+token_manager = TokenManager(consumer_key="...", consumer_secret="...", http_client=http_client)
+
+# Assuming B2C service handles account topup
+# You may need to adjust this based on your actual implementation
+b2c_service = B2C(http_client=http_client, token_manager=token_manager)
+
+request = B2CAccountTopUpRequest(
+    Initiator="testapi",
+    SecurityCredential="encrypted_credential",
+    Amount=239,
+    PartyA=600979,
+    PartyB=600000,
+    AccountReference="353353",
+    Requester="254708374149",
+    Remarks="Account top-up",
+    ResultURL="https://your.example/result",
+    QueueTimeOutURL="https://your.example/timeout"
+)
+
+response = b2c_service.account_topup(request) # This method needs to be implemented
+print(response.ResponseDescription)
+`}
+        </CodeBlock>
+
+        <Alert type="info" title="Direct API Details">
+            - The B2C service attaches the Authorization header using the provided TokenManager.  
+            - Implementations handle small inconsistencies in upstream responses (e.g., a common typo like 'OriginatorCoversationID' is normalized).
+        </Alert>
+    </Tabs.TabPane>
+</Tabs>
+
+<SectionHeader title="Webhook Handling (Result & Timeout)" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Example: simple FastAPI endpoints for B2C Account TopUp Result and Timeout
+from fastapi import FastAPI, Request, HTTPException
+from mpesakit.b2c_account_top_up import B2CAccountTopUpCallback, B2CAccountTopUpCallbackResponse, B2CAccountTopUpTimeoutCallback, B2CAccountTopUpTimeoutCallbackResponse
+from mpesakit.security.ip_whitelist import is_mpesa_ip_allowed
+
+app = FastAPI()
+
+@app.post("/b2c/account-topup/result")
+async def account_topup_result(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    data = B2CAccountTopUpCallback(**payload)  # will validate incoming fields
+    # process the result (update database, notify user, etc.)
+    ack = B2CAccountTopUpCallbackResponse()
+    return ack.model_dump(mode="json")
+
+
+@app.post("/b2c/account-topup/timeout")
+async def account_topup_timeout(request: Request):
+    payload = await request.json()
+    caller_ip = (request.headers.get("x-forwarded-for") or request.client.host).split(",")[0].strip()
+    if not is_mpesa_ip_allowed(caller_ip):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    # process timeout notification (log, retry logic, etc.)
+    ack = B2CAccountTopUpTimeoutCallbackResponse()
+    return ack.model_dump(mode="json")
+`}
+        </CodeBlock>
+
+<Alert type="info" title="Important behavior">
+    - Result and timeout endpoints should return acknowledgements (ResultCode 0). This confirms receipt to Safaricom.  
+    - Process the actual B2C Account TopUp result asynchronously based on the data in the result callback.
+</Alert>
+
+<SectionHeader title="Responses & Helpers" size="small" />
+
+<CodeBlock language="json" title="Example B2C Account TopUp Success Response">
+{`
+{
+    "OriginatorConversationID": "5118-111210482-1",
+    "ConversationID": "AG_20230420_2010759fd5662ef6d054",
+    "ResponseCode": "0",
+    "ResponseDescription": "Accept the service request successfully."
+}
+`}
+</CodeBlock>
+
+<Alert type="info" title="Response Handling">
+    - B2CAccountTopUpResponse provides is_successful() which normalizes success checks.
+    - The SDK normalizes minor provider response typos (e.g., 'OriginatorCoversationID') so fields are accessible reliably.
+</Alert>
+
+<SectionHeader title="Error Handling" size="small" />
+
+<CodeBlock language="python" title="Python">
+{`
+# Handle errors when calling the service
+try:
+    resp = client.b2c.account_topup(...)
+except Exception as exc:
+    # The underlying HTTP client may raise exceptions on network errors; log and retry as appropriate
+    print("B2C Account TopUp failed:", exc)
+`}
+</CodeBlock>
+
+<Alert type="info" title="Notes">
+    - HTTP or network errors raised by the HttpClient bubble up; wrap calls in try/except for robust production behavior.  
+    - Tests exercise error flows to ensure exceptions propagate when the HTTP client fails.
+</Alert>
+
+<SectionHeader title="Testing & Expected Behaviors" size="small" />
+
+- B2C Account TopUp:
+    - The service posts to `/mpesa/b2c/v3/paymentrequest` with Authorization header set via TokenManager.
+    - Responses are returned as `B2CAccountTopUpResponse` instances.
+    - The implementation tolerates a common provider typo ("OriginatorCoversationID") and maps it to `OriginatorConversationID`.
+
+- Validation:
+    - Incoming payloads are validated against `B2CAccountTopUpCallback` and `B2CAccountTopUpTimeoutCallback`. Missing required fields or invalid formats will raise validation errors.
+    - Use the provided response schemas for acknowledgements; invalid codes are rejected by the model validator.
+
+<SectionHeader title="Next Steps" size="small" />
+
+<Alert type="info" title="What's Next?">
+    - Implement robust webhook handlers for result and timeout notifications. Log and persist notifications to support reconciliation.  
+    - Add observability and retry strategies around B2C Account TopUp calls and webhook processing to handle transient failures.
+</Alert>
+
+## Related Documentation
+
+- [📡 Webhook Setup Guide](/webhooks-best-practices) - Best practices for building reliable endpoints
+- [🏗️ Production Setup](/production) - Go-live checklist, security and monitoring
