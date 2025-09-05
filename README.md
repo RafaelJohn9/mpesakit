@@ -111,7 +111,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e ".[dev]"
 
 # Run tests
-pytest tests/
+pytest tests/unit
 ```
 
 ### Code Standards
