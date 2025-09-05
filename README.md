@@ -59,7 +59,7 @@ For many developers and startups, this becomes a **huge barrier** to adopting M-
 
 ## Quick Start
 
-### Installation (coming soon)
+### Installation (already here :) )
 
 ```bash
 pip install mpesakit
