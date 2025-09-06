@@ -222,7 +222,7 @@ export const MpesaKitLanding: React.FC = () => {
         name: "M-Pesa Express",
         status: "working" as "working" | "down" | "maintenance",
         note: "STK Push / Lipa Na M-Pesa flow operational",
-        link: { text: "M-Pesa Express Docs", href: "/stk-push" }
+        link: { text: "M-Pesa Express Docs", href: "/mpesa-express/stk-push" }
       },
       {
         name: "Customer To Business (C2B)",
