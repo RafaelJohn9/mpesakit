@@ -58,7 +58,8 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/favicon.svg', // Default image for social sharing
+    Favicon: 'img/favicon.ico',
+    Image: 'img/favicon.svg',
     docs: {
       sidebar: {
         hideable: false, // This is the default, shows the sidebar
