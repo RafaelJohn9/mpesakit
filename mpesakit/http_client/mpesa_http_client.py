@@ -21,15 +21,21 @@ class MpesaHttpClient(HttpClient):
     """
 
     base_url: str
+    _session: Optional[requests.Session]=None
 
-    def __init__(self, env: str = "sandbox"):
+    def __init__(self, env: str = "sandbox",use_session:bool=False):
         """Initializes the MpesaHttpClient with the specified environment.
 
         Args:
             env (str): The environment to use, either 'sandbox' or 'production'.
                 Defaults to 'sandbox'.
+            use_session (bool): Whether to use a persistent HTTP session.
+                            Defaults to False.
         """
         self.base_url = self._resolve_base_url(env)
+        if use_session:
+            self._session = requests.Session()
+            self._session.trust_env = False
 
     def _resolve_base_url(self, env: str) -> str:
         if env.lower() == "production":
@@ -54,7 +60,10 @@ class MpesaHttpClient(HttpClient):
         """
         try:
             full_url = f"{self.base_url}{url}"
-            response = requests.post(full_url, json=json, headers=headers, timeout=10)
+            if self._session:
+                response = self._session.post(full_url, json=json, headers=headers, timeout=10)
+            else:
+                 response = requests.post(full_url, json=json, headers=headers, timeout=10)
 
             try:
                 response_data = response.json()
@@ -123,10 +132,12 @@ class MpesaHttpClient(HttpClient):
             if headers is None:
                 headers = {}
             full_url = f"{self.base_url}{url}"
-
-            response = requests.get(
+            if self._session:
+                response = self._session.get(
                 full_url, params=params, headers=headers, timeout=10
             )  # Add timeout
+            else:
+                response=requests.get(full_url,params=params,headers=headers,timeout=10)
 
             try:
                 response_data = response.json()
