@@ -11,11 +11,11 @@ from mpesakit.http_client.mpesa_http_client import MpesaHttpClient
 from mpesakit.errors import MpesaApiException
 
 
-@pytest.fixture
-def client():
-    """Fixture to provide a MpesaHttpClient instance in sandbox environment."""
-    client = MpesaHttpClient(env="sandbox")
-    return client
+@pytest.fixture(params=[True,False])
+def client(request):
+    """Fixture to provide a MpesaHttpClient instance in sandbox environment both in session and non-session modes."""
+    use_session=request.param
+    return MpesaHttpClient(env='sandbox',use_session=use_session)
 
 
 def test_base_url_sandbox():
@@ -32,7 +32,12 @@ def test_base_url_production():
 
 def test_post_success(client):
     """Test successful POST request returns expected JSON."""
-    with patch("mpesakit.http_client.mpesa_http_client.requests.Session.post") as mock_post:
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.post"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.post"
+
+    with patch(patch_target) as mock_post:
         mock_response = Mock()
         mock_response.ok = True
         mock_response.json.return_value = {"foo": "bar"}
@@ -45,7 +50,11 @@ def test_post_success(client):
 
 def test_post_http_error(client):
     """Test POST request returns MpesaApiException on HTTP error."""
-    with patch("mpesakit.http_client.mpesa_http_client.requests.Session.post") as mock_post:
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.post"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.post"
+    with patch(patch_target) as mock_post:
         mock_response = Mock()
         mock_response.ok = False
         mock_response.status_code = 400
@@ -60,7 +69,11 @@ def test_post_http_error(client):
 
 def test_post_json_decode_error(client):
     """Test POST request handles JSON decode error gracefully."""
-    with patch("mpesakit.http_client.mpesa_http_client.requests.Session.post") as mock_post:
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.post"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.post"
+    with patch(patch_target) as mock_post:
         mock_response = Mock()
         mock_response.ok = False
         mock_response.status_code = 500
@@ -76,8 +89,11 @@ def test_post_json_decode_error(client):
 
 def test_post_request_exception(client):
     """Test POST request raises MpesaApiException on generic exception."""
-    with patch(
-        "mpesakit.http_client.mpesa_http_client.requests.Session.post",
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.post"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.post"
+    with patch(patch_target,
         side_effect=requests.RequestException("boom"),
     ):
         with pytest.raises(MpesaApiException) as exc:
@@ -87,8 +103,11 @@ def test_post_request_exception(client):
 
 def test_post_timeout(client):
     """Test POST request raises MpesaApiException on timeout."""
-    with patch(
-        "mpesakit.http_client.mpesa_http_client.requests.Session.post",
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.post"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.post"
+    with patch(patch_target,
         side_effect=requests.Timeout,
     ):
         with pytest.raises(MpesaApiException) as exc:
@@ -98,8 +117,11 @@ def test_post_timeout(client):
 
 def test_post_connection_error(client):
     """Test POST request raises MpesaApiException on connection error."""
-    with patch(
-        "mpesakit.http_client.mpesa_http_client.requests.Session.post",
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.post"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.post"
+    with patch(patch_target,
         side_effect=requests.ConnectionError,
     ):
         with pytest.raises(MpesaApiException) as exc:
@@ -109,7 +131,11 @@ def test_post_connection_error(client):
 
 def test_get_success(client):
     """Test successful GET request returns expected JSON."""
-    with patch("mpesakit.http_client.mpesa_http_client.requests.Session.get") as mock_get:
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.get"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.get"
+    with patch(patch_target) as mock_get:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"foo": "bar"}
@@ -122,7 +148,11 @@ def test_get_success(client):
 
 def test_get_http_error(client):
     """Test GET request returns MpesaApiException on HTTP error."""
-    with patch("mpesakit.http_client.mpesa_http_client.requests.Session.get") as mock_get:
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.get"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.get"
+    with patch(patch_target) as mock_get:
         mock_response = Mock()
         mock_response.ok = False
         mock_response.status_code = 404
@@ -137,7 +167,11 @@ def test_get_http_error(client):
 
 def test_get_json_decode_error(client):
     """Test GET request handles JSON decode error gracefully."""
-    with patch("mpesakit.http_client.mpesa_http_client.requests.Session.get") as mock_get:
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.get"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.get"
+    with patch(patch_target) as mock_get:
         mock_response = Mock()
         mock_response.ok = False
         mock_response.status_code = 500
@@ -153,8 +187,11 @@ def test_get_json_decode_error(client):
 
 def test_get_request_exception(client):
     """Test GET request raises MpesaApiException on generic exception."""
-    with patch(
-        "mpesakit.http_client.mpesa_http_client.requests.Session.get",
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.get"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.get"
+    with patch(patch_target,
         side_effect=requests.RequestException("boom"),
     ):
         with pytest.raises(MpesaApiException) as exc:
@@ -164,8 +201,11 @@ def test_get_request_exception(client):
 
 def test_get_timeout(client):
     """Test GET request raises MpesaApiException on timeout."""
-    with patch(
-        "mpesakit.http_client.mpesa_http_client.requests.Session.get",
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.get"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.get"
+    with patch(patch_target,
         side_effect=requests.Timeout,
     ):
         with pytest.raises(MpesaApiException) as exc:
@@ -175,8 +215,11 @@ def test_get_timeout(client):
 
 def test_get_connection_error(client):
     """Test GET request raises MpesaApiException on connection error."""
-    with patch(
-        "mpesakit.http_client.mpesa_http_client.requests.Session.get",
+    if client._session:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.Session.get"
+    else:
+        patch_target="mpesakit.http_client.mpesa_http_client.requests.get"
+    with patch(patch_target,
         side_effect=requests.ConnectionError,
     ):
         with pytest.raises(MpesaApiException) as exc:
