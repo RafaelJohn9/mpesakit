@@ -29,6 +29,8 @@ class MpesaHttpClient(HttpClient):
         Args:
             env (str): The environment to use, either 'sandbox' or 'production'.
                 Defaults to 'sandbox'.
+            use_session (bool): Whether to use a persistent HTTP session.
+                            Defaults to False.
         """
         self.base_url = self._resolve_base_url(env)
         if use_session:
