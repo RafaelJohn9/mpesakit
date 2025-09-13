@@ -21,6 +21,7 @@ class MpesaHttpClient(HttpClient):
     """
 
     base_url: str
+    _session: requests.Session
 
     def __init__(self, env: str = "sandbox"):
         """Initializes the MpesaHttpClient with the specified environment.
@@ -30,6 +31,7 @@ class MpesaHttpClient(HttpClient):
                 Defaults to 'sandbox'.
         """
         self.base_url = self._resolve_base_url(env)
+        self._session = requests.Session()
 
     def _resolve_base_url(self, env: str) -> str:
         if env.lower() == "production":
@@ -54,7 +56,7 @@ class MpesaHttpClient(HttpClient):
         """
         try:
             full_url = f"{self.base_url}{url}"
-            response = requests.post(full_url, json=json, headers=headers, timeout=10)
+            response = self._session.post(full_url, json=json, headers=headers, timeout=10)
 
             try:
                 response_data = response.json()
@@ -124,7 +126,7 @@ class MpesaHttpClient(HttpClient):
                 headers = {}
             full_url = f"{self.base_url}{url}"
 
-            response = requests.get(
+            response = self._session.get(
                 full_url, params=params, headers=headers, timeout=10
             )  # Add timeout
 
