@@ -62,7 +62,7 @@ class MpesaHttpClient(HttpClient):
             except ValueError:
                 response_data = {"errorMessage": response.text.strip() or ""}
 
-            if not response.is_success:
+            if response.status_code >= 400:
                 error_message = response_data.get("errorMessage", "")
                 raise MpesaApiException(
                     MpesaError(
