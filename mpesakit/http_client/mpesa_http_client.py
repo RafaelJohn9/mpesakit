@@ -21,8 +21,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def handle_request_error(response: requests.Response):
-    """
-    Handles non-successful HTTP responses.
+    """Handles non-successful HTTP responses.
+
     This function is now responsible for converting HTTP status codes
     and JSON parsing errors into MpesaApiException.
     """
@@ -43,25 +43,31 @@ def handle_request_error(response: requests.Response):
         )
 
 def handle_retry_exception(retry_state: RetryCallState):
-    """
-    Custom hook to handle exceptions after all retries fail.
+    """Custom hook to handle exceptions after all retries fail.
+
     It raises a custom MpesaApiException with the appropriate error code.
     """
-    exception = retry_state.outcome.exception()
     
-    if isinstance(exception, requests.exceptions.Timeout):
+    if retry_state.outcome:
+        exception = retry_state.outcome.exception()
+        
+        if isinstance(exception, requests.exceptions.Timeout):
+            raise MpesaApiException(
+                MpesaError(error_code="REQUEST_TIMEOUT", error_message=str(exception))
+            ) from exception
+        elif isinstance(exception, requests.exceptions.ConnectionError):
+            raise MpesaApiException(
+                MpesaError(error_code="CONNECTION_ERROR", error_message=str(exception))
+            ) from exception
+        
         raise MpesaApiException(
-            MpesaError(error_code="REQUEST_TIMEOUT", error_message=str(exception))
-        ) from exception
-    elif isinstance(exception, requests.exceptions.ConnectionError):
-        raise MpesaApiException(
-            MpesaError(error_code="CONNECTION_ERROR", error_message=str(exception))
+            MpesaError(error_code="REQUEST_FAILED", error_message=str(exception))
         ) from exception
     
-   
+    
     raise MpesaApiException(
-        MpesaError(error_code="REQUEST_FAILED", error_message=str(exception))
-    ) from exception
+        MpesaError(error_code="REQUEST_FAILED", error_message="An unknown retry error occurred.")
+    )
 
 
 class MpesaHttpClient(HttpClient):
@@ -71,6 +77,12 @@ class MpesaHttpClient(HttpClient):
     _session: Optional[requests.Session] = None
 
     def __init__(self, env: str = "sandbox", use_session: bool = False):
+        """Initializes the MpesaHttpClient instance.
+
+        Args:
+            env (str): The environment to connect to ('sandbox' or 'production').
+            use_session (bool): Whether to use a persistent session.
+        """
         self.base_url = self._resolve_base_url(env)
         if use_session:
             self._session = requests.Session()
@@ -92,14 +104,22 @@ class MpesaHttpClient(HttpClient):
     def post(
         self, url: str, json: Dict[str, Any], headers: Dict[str, str]
     ) -> Dict[str, Any]:
-        """Sends a POST request to the M-Pesa API."""
+        """Sends a POST request to the M-Pesa API.
+
+        Args:
+            url (str): The URL path for the request.
+            json (Dict[str, Any]): The JSON payload for the request body.
+            headers (Dict[str, str]): The HTTP headers for the request.
+
+        Returns:
+            Dict[str, Any]: The JSON response from the API.
+        """
         full_url = f"{self.base_url}{url}"
         if self._session:
             response = self._session.post(full_url, json=json, headers=headers, timeout=10)
         else:
             response = requests.post(full_url, json=json, headers=headers, timeout=10)
 
-       
         handle_request_error(response)
         
         return response.json()
@@ -119,7 +139,16 @@ class MpesaHttpClient(HttpClient):
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
-        """Sends a GET request to the M-Pesa API."""
+        """Sends a GET request to the M-Pesa API.
+
+        Args:
+            url (str): The URL path for the request.
+            params (Optional[Dict[str, Any]]): The URL parameters.
+            headers (Optional[Dict[str, str]]): The HTTP headers.
+
+        Returns:
+            Dict[str, Any]: The JSON response from the API.
+        """
         if headers is None:
             headers = {}
         full_url = f"{self.base_url}{url}"
@@ -128,7 +157,6 @@ class MpesaHttpClient(HttpClient):
         else:
             response = requests.get(full_url, params=params, headers=headers, timeout=10)
 
-        
         handle_request_error(response)
 
         return response.json()
