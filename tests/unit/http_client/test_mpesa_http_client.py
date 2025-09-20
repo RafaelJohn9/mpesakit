@@ -100,6 +100,7 @@ def test_post_request_exception_is_not_retried_and_raises_api_exception(client):
 def test_post_retries_and_succeeds(client):
     """
     Test that a POST request succeeds after transient failures.
+
     This test ensures the retry mechanism works as intended.
     """
     patch_target = get_patch_target(client, "post")
@@ -124,6 +125,7 @@ def test_post_retries_and_succeeds(client):
 def test_post_fails_after_max_retries(client):
     """
     Test that a POST request raises an exception after all retries fail.
+
     This test ensures the retry mechanism eventually gives up.
     """
     patch_target = get_patch_target(client, "post")
@@ -202,9 +204,7 @@ def test_get_request_exception_is_not_retried_and_raises_api_exception(client):
         assert exc.value.error.error_code == "REQUEST_FAILED"
 
 def test_get_retries_and_succeeds(client):
-    """
-    Test that a GET request succeeds after transient failures.
-    """
+    """Test that a GET request succeeds after transient failures."""
     patch_target = get_patch_target(client, "get")
 
     with patch(patch_target) as mock_get:
@@ -223,9 +223,7 @@ def test_get_retries_and_succeeds(client):
         assert result == {"ResultCode": 0}
 
 def test_get_fails_after_max_retries(client):
-    """
-    Test that a GET request raises an exception after all retries fail.
-    """
+    """Test that a GET request raises an exception after all retries fail."""
     patch_target = get_patch_target(client, "get")
 
     with patch(patch_target) as mock_get:
