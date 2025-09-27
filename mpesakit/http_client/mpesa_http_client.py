@@ -5,33 +5,72 @@ Handles GET and POST requests with error handling for common HTTP issues.
 
 from typing import Dict, Any, Optional
 import requests
-
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_fixed,
+    retry_if_exception_type,
+    RetryCallState
+)
+import logging
 from mpesakit.errors import MpesaError, MpesaApiException
 from .http_client import HttpClient
 
 
-class MpesaHttpClient(HttpClient):
-    """A client for making HTTP requests to the M-Pesa API.
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-    This client handles GET and POST requests, including error handling for common HTTP issues.
-    It supports both sandbox and production environments.
-
-    Attributes:
-        base_url (str): The base URL for the M-Pesa API, depending on the environment.
+def handle_request_error(response: requests.Response):
     """
+    Handles non-successful HTTP responses.
+    This function is now responsible for converting HTTP status codes
+    and JSON parsing errors into MpesaApiException.
+    """
+    try:
+        response_data = response.json()
+    except ValueError:
+        response_data = {"errorMessage": response.text.strip() or ""}
+
+    if not response.ok:
+        error_message = response_data.get("errorMessage", "")
+        raise MpesaApiException(
+            MpesaError(
+                error_code=f"HTTP_{response.status_code}",
+                error_message=error_message,
+                status_code=response.status_code,
+                raw_response=response_data,
+            )
+        )
+
+def handle_retry_exception(retry_state: RetryCallState):
+    """
+    Custom hook to handle exceptions after all retries fail.
+    It raises a custom MpesaApiException with the appropriate error code.
+    """
+    exception = retry_state.outcome.exception()
+    
+    if isinstance(exception, requests.exceptions.Timeout):
+        raise MpesaApiException(
+            MpesaError(error_code="REQUEST_TIMEOUT", error_message=str(exception))
+        ) from exception
+    elif isinstance(exception, requests.exceptions.ConnectionError):
+        raise MpesaApiException(
+            MpesaError(error_code="CONNECTION_ERROR", error_message=str(exception))
+        ) from exception
+    
+   
+    raise MpesaApiException(
+        MpesaError(error_code="REQUEST_FAILED", error_message=str(exception))
+    ) from exception
+
+
+class MpesaHttpClient(HttpClient):
+    """A client for making HTTP requests to the M-Pesa API."""
 
     base_url: str
-    _session: Optional[requests.Session]=None
+    _session: Optional[requests.Session] = None
 
-    def __init__(self, env: str = "sandbox",use_session:bool=False):
-        """Initializes the MpesaHttpClient with the specified environment.
-
-        Args:
-            env (str): The environment to use, either 'sandbox' or 'production'.
-                Defaults to 'sandbox'.
-            use_session (bool): Whether to use a persistent HTTP session.
-                            Defaults to False.
-        """
+    def __init__(self, env: str = "sandbox", use_session: bool = False):
         self.base_url = self._resolve_base_url(env)
         if use_session:
             self._session = requests.Session()
