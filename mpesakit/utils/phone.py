@@ -31,7 +31,7 @@ def normalize_phone_number(phone: str) -> str | None:
         normalized
         and normalized.isdigit()
         and len(normalized) == 12
-        and normalized.startswith("2547")
+        and normalized.startswith("254")
     ):
         return normalized
     else:
