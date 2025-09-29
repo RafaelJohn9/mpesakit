@@ -5,32 +5,83 @@ Handles GET and POST requests with error handling for common HTTP issues.
 
 from typing import Dict, Any, Optional
 import requests
-
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_fixed,
+    retry_if_exception_type,
+    RetryCallState
+)
+import logging
 from mpesakit.errors import MpesaError, MpesaApiException
 from .http_client import HttpClient
 
 
-class MpesaHttpClient(HttpClient):
-    """A client for making HTTP requests to the M-Pesa API.
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-    This client handles GET and POST requests, including error handling for common HTTP issues.
-    It supports both sandbox and production environments.
+def handle_request_error(response: requests.Response):
+    """Handles non-successful HTTP responses.
 
-    Attributes:
-        base_url (str): The base URL for the M-Pesa API, depending on the environment.
+    This function is now responsible for converting HTTP status codes
+    and JSON parsing errors into MpesaApiException.
     """
+    try:
+        response_data = response.json()
+    except ValueError:
+        response_data = {"errorMessage": response.text.strip() or ""}
+
+    if not response.ok:
+        error_message = response_data.get("errorMessage", "")
+        raise MpesaApiException(
+            MpesaError(
+                error_code=f"HTTP_{response.status_code}",
+                error_message=error_message,
+                status_code=response.status_code,
+                raw_response=response_data,
+            )
+        )
+
+def handle_retry_exception(retry_state: RetryCallState):
+    """Custom hook to handle exceptions after all retries fail.
+
+    It raises a custom MpesaApiException with the appropriate error code.
+    """
+    
+    if retry_state.outcome:
+        exception = retry_state.outcome.exception()
+        
+        if isinstance(exception, requests.exceptions.Timeout):
+            raise MpesaApiException(
+                MpesaError(error_code="REQUEST_TIMEOUT", error_message=str(exception))
+            ) from exception
+        elif isinstance(exception, requests.exceptions.ConnectionError):
+            raise MpesaApiException(
+                MpesaError(error_code="CONNECTION_ERROR", error_message=str(exception))
+            ) from exception
+        
+        raise MpesaApiException(
+            MpesaError(error_code="REQUEST_FAILED", error_message=str(exception))
+        ) from exception
+    
+    
+    raise MpesaApiException(
+        MpesaError(error_code="REQUEST_FAILED", error_message="An unknown retry error occurred.")
+    )
+
+
+class MpesaHttpClient(HttpClient):
+    """A client for making HTTP requests to the M-Pesa API."""
 
     base_url: str
-    _session: Optional[requests.Session]=None
+    _session: Optional[requests.Session] = None
 
-    def __init__(self, env: str = "sandbox",use_session:bool=False):
-        """Initializes the MpesaHttpClient with the specified environment.
+    def __init__(self, env: str = "sandbox", use_session: bool = False):
+        """Initializes the MpesaHttpClient instance.
 
         Args:
-            env (str): The environment to use, either 'sandbox' or 'production'.
-                Defaults to 'sandbox'.
-            use_session (bool): Whether to use a persistent HTTP session.
-                            Defaults to False.
+            env (str): The environment to connect to ('sandbox' or 'production').
+            use_session (bool): Whether to use a persistent session.
         """
         self.base_url = self._resolve_base_url(env)
         if use_session:
@@ -42,73 +93,46 @@ class MpesaHttpClient(HttpClient):
             return "https://api.safaricom.co.ke"
         return "https://sandbox.safaricom.co.ke"
 
+    @retry(
+        retry=retry_if_exception_type(requests.exceptions.Timeout) |
+              retry_if_exception_type(requests.exceptions.ConnectionError)|
+              retry_if_exception_type(requests.exceptions.RequestException),
+        wait=wait_fixed(2),
+        stop=stop_after_attempt(3),
+        retry_error_callback=handle_retry_exception
+    )
     def post(
         self, url: str, json: Dict[str, Any], headers: Dict[str, str]
     ) -> Dict[str, Any]:
         """Sends a POST request to the M-Pesa API.
 
         Args:
-            url (str): The endpoint URL to send the POST request to.
-            json (Dict[str, Any]): The JSON payload to include in the request body.
-            headers (Dict[str, str]): The headers to include in the request.
+            url (str): The URL path for the request.
+            json (Dict[str, Any]): The JSON payload for the request body.
+            headers (Dict[str, str]): The HTTP headers for the request.
 
         Returns:
-            Dict[str, Any]: The JSON response from the M-Pesa API.
-
-        Raises:
-            MpesaApiException: If the request fails or returns an error response.
+            Dict[str, Any]: The JSON response from the API.
         """
-        try:
-            full_url = f"{self.base_url}{url}"
-            if self._session:
-                response = self._session.post(full_url, json=json, headers=headers, timeout=10)
-            else:
-                 response = requests.post(full_url, json=json, headers=headers, timeout=10)
+        full_url = f"{self.base_url}{url}"
+        if self._session:
+            response = self._session.post(full_url, json=json, headers=headers, timeout=10)
+        else:
+            response = requests.post(full_url, json=json, headers=headers, timeout=10)
 
-            try:
-                response_data = response.json()
-            except ValueError:
-                response_data = {"errorMessage": response.text.strip() or ""}
+        handle_request_error(response)
+        
+        return response.json()
 
-            if not response.ok:
-                error_message = response_data.get("errorMessage", "")
-                raise MpesaApiException(
-                    MpesaError(
-                        error_code=f"HTTP_{response.status_code}",
-                        error_message=error_message,
-                        status_code=response.status_code,
-                        raw_response=response_data,
-                    )
-                )
+    @retry(
+        retry=retry_if_exception_type(requests.exceptions.Timeout) |
+              retry_if_exception_type(requests.exceptions.ConnectionError)|
+              retry_if_exception_type(requests.exceptions.RequestException),
 
-            return response_data
-
-        except requests.Timeout:
-            raise MpesaApiException(
-                MpesaError(
-                    error_code="REQUEST_TIMEOUT",
-                    error_message="Request to Mpesa timed out.",
-                    status_code=None,
-                )
-            )
-        except requests.ConnectionError:
-            raise MpesaApiException(
-                MpesaError(
-                    error_code="CONNECTION_ERROR",
-                    error_message="Failed to connect to Mpesa API. Check network or URL.",
-                    status_code=None,
-                )
-            )
-        except requests.RequestException as e:
-            raise MpesaApiException(
-                MpesaError(
-                    error_code="REQUEST_FAILED",
-                    error_message=f"HTTP request failed: {str(e)}",
-                    status_code=None,
-                    raw_response=None,
-                )
-            )
-
+        wait=wait_fixed(2),
+        stop=stop_after_attempt(3),
+        retry_error_callback=handle_retry_exception
+    )
     def get(
         self,
         url: str,
@@ -118,67 +142,21 @@ class MpesaHttpClient(HttpClient):
         """Sends a GET request to the M-Pesa API.
 
         Args:
-            url (str): The endpoint URL to send the GET request to.
-            params (Optional[Dict[str, Any]]): The query parameters to include in the request.
-            headers (Optional[Dict[str, str]]): The headers to include in the request.
+            url (str): The URL path for the request.
+            params (Optional[Dict[str, Any]]): The URL parameters.
+            headers (Optional[Dict[str, str]]): The HTTP headers.
 
         Returns:
-            Dict[str, Any]: The JSON response from the M-Pesa API.
-
-        Raises:
-            MpesaApiException: If the request fails or returns an error response.
+            Dict[str, Any]: The JSON response from the API.
         """
-        try:
-            if headers is None:
-                headers = {}
-            full_url = f"{self.base_url}{url}"
-            if self._session:
-                response = self._session.get(
-                full_url, params=params, headers=headers, timeout=10
-            )  # Add timeout
-            else:
-                response=requests.get(full_url,params=params,headers=headers,timeout=10)
+        if headers is None:
+            headers = {}
+        full_url = f"{self.base_url}{url}"
+        if self._session:
+            response = self._session.get(full_url, params=params, headers=headers, timeout=10)
+        else:
+            response = requests.get(full_url, params=params, headers=headers, timeout=10)
 
-            try:
-                response_data = response.json()
-            except ValueError:
-                response_data = {"errorMessage": response.text.strip() or ""}
+        handle_request_error(response)
 
-            if not response.ok:
-                error_message = response_data.get("errorMessage", "")
-                raise MpesaApiException(
-                    MpesaError(
-                        error_code=f"HTTP_{response.status_code}",
-                        error_message=error_message,
-                        status_code=response.status_code,
-                        raw_response=response_data,
-                    )
-                )
-
-            return response_data
-
-        except requests.Timeout:
-            raise MpesaApiException(
-                MpesaError(
-                    error_code="REQUEST_TIMEOUT",
-                    error_message="Request to Mpesa timed out.",
-                    status_code=None,
-                )
-            )
-        except requests.ConnectionError:
-            raise MpesaApiException(
-                MpesaError(
-                    error_code="CONNECTION_ERROR",
-                    error_message="Failed to connect to Mpesa API. Check network or URL.",
-                    status_code=None,
-                )
-            )
-        except requests.RequestException as e:
-            raise MpesaApiException(
-                MpesaError(
-                    error_code="REQUEST_FAILED",
-                    error_message=f"HTTP request failed: {str(e)}",
-                    status_code=None,
-                    raw_response=None,
-                )
-            )
+        return response.json()
