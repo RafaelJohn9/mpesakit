@@ -17,7 +17,6 @@ from mpesakit.errors import MpesaError, MpesaApiException
 from .http_client import HttpClient
 
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def handle_request_error(response: requests.Response):
