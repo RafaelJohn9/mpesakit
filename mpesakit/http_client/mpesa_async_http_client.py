@@ -1,67 +1,61 @@
-"""MpesaHttpClient: A client for making HTTP requests to the M-Pesa API.
-
-Handles GET and POST requests with error handling for common HTTP issues.
-"""
+"""MpesaAsyncHttpClient: An asynchronous client for making HTTP requests to the M-Pesa API."""
 
 from typing import Dict, Any, Optional
-import requests
+import httpx 
+import asyncio 
 
 from mpesakit.errors import MpesaError, MpesaApiException
-from .http_client import HttpClient
+from .http_client import AsyncHttpClient 
 
 
-class MpesaHttpClient(HttpClient):
-    """A client for making HTTP requests to the M-Pesa API.
+class MpesaAsyncHttpClient(AsyncHttpClient):
+    """An asynchronous client for making HTTP requests to the M-Pesa API.
 
-    This client handles GET and POST requests, including error handling for common HTTP issues.
+    This client handles asynchronous GET and POST requests using the httpx library.
     It supports both sandbox and production environments.
 
     Attributes:
-        base_url (str): The base URL for the M-Pesa API, depending on the environment.
+        base_url (str): The base URL for the M-Pesa API.
     """
 
     base_url: str
+    _client: httpx.AsyncClient 
 
     def __init__(self, env: str = "sandbox"):
-        """Initializes the MpesaHttpClient with the specified environment.
-
-        Args:
-            env (str): The environment to use, either 'sandbox' or 'production'.
-                Defaults to 'sandbox'.
-        """
+        """Initializes the MpesaAsyncHttpClient with the specified environment."""
         self.base_url = self._resolve_base_url(env)
+        self._client = httpx.AsyncClient(base_url=self.base_url)
 
     def _resolve_base_url(self, env: str) -> str:
         if env.lower() == "production":
             return "https://api.safaricom.co.ke"
         return "https://sandbox.safaricom.co.ke"
+    
+    
+    async def __aenter__(self):
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self._client.aclose()
 
-    def post(
+
+    async def post(
         self, url: str, json: Dict[str, Any], headers: Dict[str, str]
     ) -> Dict[str, Any]:
-        """Sends a POST request to the M-Pesa API.
-
-        Args:
-            url (str): The endpoint URL to send the POST request to.
-            json (Dict[str, Any]): The JSON payload to include in the request body.
-            headers (Dict[str, str]): The headers to include in the request.
-
-        Returns:
-            Dict[str, Any]: The JSON response from the M-Pesa API.
-
-        Raises:
-            MpesaApiException: If the request fails or returns an error response.
-        """
+        """Sends an asynchronous POST request to the M-Pesa API."""
         try:
-            full_url = f"{self.base_url}{url}"
-            response = requests.post(full_url, json=json, headers=headers, timeout=10)
+            
+            response = await self._client.post(
+                url, json=json, headers=headers, timeout=10
+            )
 
+          
             try:
                 response_data = response.json()
             except ValueError:
                 response_data = {"errorMessage": response.text.strip() or ""}
 
-            if not response.ok:
+            if not response.is_success: 
                 error_message = response_data.get("errorMessage", "")
                 raise MpesaApiException(
                     MpesaError(
@@ -74,7 +68,7 @@ class MpesaHttpClient(HttpClient):
 
             return response_data
 
-        except requests.Timeout:
+        except httpx.TimeoutException:
             raise MpesaApiException(
                 MpesaError(
                     error_code="REQUEST_TIMEOUT",
@@ -82,7 +76,7 @@ class MpesaHttpClient(HttpClient):
                     status_code=None,
                 )
             )
-        except requests.ConnectionError:
+        except httpx.ConnectError:
             raise MpesaApiException(
                 MpesaError(
                     error_code="CONNECTION_ERROR",
@@ -90,7 +84,8 @@ class MpesaHttpClient(HttpClient):
                     status_code=None,
                 )
             )
-        except requests.RequestException as e:
+        except httpx.HTTPError as e:
+            
             raise MpesaApiException(
                 MpesaError(
                     error_code="REQUEST_FAILED",
@@ -100,40 +95,27 @@ class MpesaHttpClient(HttpClient):
                 )
             )
 
-    def get(
+    async def get(
         self,
         url: str,
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
-        """Sends a GET request to the M-Pesa API.
-
-        Args:
-            url (str): The endpoint URL to send the GET request to.
-            params (Optional[Dict[str, Any]]): The query parameters to include in the request.
-            headers (Optional[Dict[str, str]]): The headers to include in the request.
-
-        Returns:
-            Dict[str, Any]: The JSON response from the M-Pesa API.
-
-        Raises:
-            MpesaApiException: If the request fails or returns an error response.
-        """
+        """Sends an asynchronous GET request to the M-Pesa API."""
         try:
             if headers is None:
                 headers = {}
-            full_url = f"{self.base_url}{url}"
-
-            response = requests.get(
-                full_url, params=params, headers=headers, timeout=10
-            )  # Add timeout  
+            
+            response = await self._client.get(
+                url, params=params, headers=headers, timeout=10
+            )
 
             try:
                 response_data = response.json()
             except ValueError:
                 response_data = {"errorMessage": response.text.strip() or ""}
 
-            if not response.ok:
+            if not response.is_success:
                 error_message = response_data.get("errorMessage", "")
                 raise MpesaApiException(
                     MpesaError(
@@ -145,8 +127,9 @@ class MpesaHttpClient(HttpClient):
                 )
 
             return response_data
-
-        except requests.Timeout:
+        
+       
+        except httpx.TimeoutException:
             raise MpesaApiException(
                 MpesaError(
                     error_code="REQUEST_TIMEOUT",
@@ -154,7 +137,7 @@ class MpesaHttpClient(HttpClient):
                     status_code=None,
                 )
             )
-        except requests.ConnectionError:
+        except httpx.ConnectError:
             raise MpesaApiException(
                 MpesaError(
                     error_code="CONNECTION_ERROR",
@@ -162,7 +145,7 @@ class MpesaHttpClient(HttpClient):
                     status_code=None,
                 )
             )
-        except requests.RequestException as e:
+        except httpx.HTTPError as e:
             raise MpesaApiException(
                 MpesaError(
                     error_code="REQUEST_FAILED",
@@ -171,3 +154,7 @@ class MpesaHttpClient(HttpClient):
                     raw_response=None,
                 )
             )
+
+    async def aclose(self):
+        """Manually close the underlying httpx client connection pool."""
+        await self._client.aclose()
