@@ -126,7 +126,7 @@ class MpesaHttpClient(HttpClient):
 
             response = requests.get(
                 full_url, params=params, headers=headers, timeout=10
-            )  # Add timeout  
+            )  # Add timeout
 
             try:
                 response_data = response.json()
