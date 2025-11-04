@@ -79,8 +79,8 @@ class TransactionService:
             "OriginalConversationID": original_conversation_id
         }
 
-        for optional, value in optionals.items():
-            if optional is not None:
-                setattr(request, optional, value)
+        for field_name, value in optionals.items():
+            if value is not None:
+                setattr(request, field_name, value)
 
         return self.transaction_status.query(request)
