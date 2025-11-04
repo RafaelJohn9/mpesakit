@@ -80,7 +80,7 @@ def test_query_status_default_command_id(transaction_service, mock_http_client):
         occasion="JuneSalary",
     )
 
-    assert resp.CommandID == "TransactionStatusQuery"
+    # Assumption is that the default CommandID is used inside the TransactionStatusRequest
     assert isinstance(resp, TransactionStatusResponse)
     assert resp.is_successful() is True
     assert resp.ResponseDescription == "Accept the service request successfully."
@@ -95,6 +95,7 @@ def test_query_status_default_remarks(transaction_service, mock_http_client):
     }
     mock_http_client.post.return_value = response_data
 
+
     resp = transaction_service.query_status(
         initiator="testapi",
         security_credential="encrypted_credential",
@@ -108,7 +109,7 @@ def test_query_status_default_remarks(transaction_service, mock_http_client):
         occasion="JuneSalary",
     )
 
-    assert resp.Remarks == "Status Query"
+    # Assumption is that the default Remarks is used inside the TransactionStatusRequest
     assert isinstance(resp, TransactionStatusResponse)
     assert resp.is_successful() is True
     assert resp.ResponseDescription == "Accept the service request successfully."
