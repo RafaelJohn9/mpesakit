@@ -1,7 +1,5 @@
 """Facade for M-Pesa Transaction Status API interactions."""
 
-from typing import Optional
-
 from mpesakit.auth import TokenManager
 from mpesakit.http_client import HttpClient
 from mpesakit.transaction_status import (
@@ -35,7 +33,7 @@ class TransactionService:
         occasion: str = "",
         command_id: str | None = None,
         remarks: str | None = None,
-        original_conversation_id: Optional[str] = None,
+        original_conversation_id: str | None = None,
         **kwargs,
     ) -> TransactionStatusResponse:
         """Query the status of a transaction.
