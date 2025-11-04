@@ -46,7 +46,7 @@ class TransactionStatusRequest(BaseModel):
     IdentifierType: int = Field(..., description="Type of identifier for PartyA.")
     ResultURL: str = Field(..., description="URL for result notifications.")
     QueueTimeOutURL: str = Field(..., description="URL for timeout notifications.")
-    Remarks: str = Field(..., description="Comments for the transaction.")
+    Remarks: str = Field(default="Status Query", description="Comments for the transaction.")
     Occasion: Optional[str] = Field(
         None, description="Optional occasion for the query."
     )
