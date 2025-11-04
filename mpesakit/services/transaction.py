@@ -51,7 +51,7 @@ class TransactionService:
             queue_timeout_url: URL for timeout notification.
             remarks: Additional remarks.
             occasion: Occasion for the transaction.
-            originator_conversation_id: Can be used to query if you don't have the transaction ID.
+            original_conversation_id: Can be used to query if you don't have the transaction ID.
             **kwargs: Additional fields for TransactionStatusRequest.
 
         Returns:
