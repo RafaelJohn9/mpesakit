@@ -231,7 +231,7 @@ class B2CAccountTopUpCallback(BaseModel):
 
     def is_successful(self) -> bool:
         """Check if the callback indicates a successful transaction."""
-        return self.Result.ResultCode == 0
+        return str(self.Result.ResultCode) == "0"
 
 
 class B2CAccountTopUpCallbackResponse(BaseModel):

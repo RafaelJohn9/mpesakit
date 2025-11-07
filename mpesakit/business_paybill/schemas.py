@@ -229,7 +229,7 @@ class BusinessPayBillResultCallback(BaseModel):
 
     def is_successful(self) -> bool:
         """Check if the result indicates success."""
-        return self.Result.ResultCode == 0
+        return str(self.Result.ResultCode) == "0"
 
 
 class BusinessPayBillResultCallbackResponse(BaseModel):

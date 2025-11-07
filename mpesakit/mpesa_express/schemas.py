@@ -449,7 +449,7 @@ class StkPushSimulateCallback(BaseModel):
         Returns:
             bool: True if ResultCode is 0, False otherwise.
         """
-        return self.Body.stkCallback.ResultCode == 0
+        return str(self.Body.stkCallback.ResultCode) == "0"
 
 
 class StkPushSimulateCallbackResponse(BaseModel):
