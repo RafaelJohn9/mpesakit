@@ -226,7 +226,7 @@ class C2BValidationResponse(BaseModel):
 class C2BConfirmationResponse(BaseModel):
     """Schema for confirmation acknowledgment from your ConfirmationURL."""
 
-    ResultCode: int = Field(0, description="Always 0 (success).")
+    ResultCode: int | str = Field(0, description="Always 0 (success).")
     ResultDesc: str = Field("Success", description="Usually 'Success'.")
 
     model_config = ConfigDict(
