@@ -152,7 +152,7 @@ class C2BValidationRequest(BaseModel):
     ThirdPartyTransID: Optional[str] = Field(
         None, description="Partner transaction ID (optional)."
     )
-    MSISDN: int = Field(..., description="Customer mobile number.")
+    MSISDN: int | str = Field(..., description="Customer mobile number.")
     FirstName: Optional[str] = Field(None, description="Customer's first name.")
     MiddleName: Optional[str] = Field(None, description="Customer's middle name.")
     LastName: Optional[str] = Field(None, description="Customer's last name.")
