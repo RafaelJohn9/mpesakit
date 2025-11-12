@@ -15,7 +15,7 @@ import requests
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logger.addHandler(logging.NullHandler())
 
 
 def retryable_request(
