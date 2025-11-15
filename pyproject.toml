@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "A Python SDK for integrating with M-Pesa APIs"
 readme = "README.md"
 license = { text = "APACHE-2.0" }
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 authors = [
   { name = "John Kagunda", email = "johnmkagunda@gmail.com" }
 ]
